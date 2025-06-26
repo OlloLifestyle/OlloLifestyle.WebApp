@@ -1,0 +1,238 @@
+:root {
+  --primary: #00f7ff;
+  --secondary: #ff00e4;
+  --dark: #0a0a14;
+  --darker: #05050c;
+  --light: rgba(255, 255, 255, 0.9);
+}
+
+/* Include your CSS rules here. For brevity, only essential styles are shown. Include all styles from your shared CSS in your actual file. */
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a14;
+  font-family: 'Poppins', 'Inter', 'Roboto', Arial, sans-serif;
+}
+
+.auth-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 600px;
+  min-width: 850px;
+  max-width: 950px;
+  margin: 0 auto;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px 0 rgba(0,0,0,0.55);
+  background: var(--darker);
+  color: #fff;
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.form-side {
+  background: #181828;
+  color: #fff;
+  padding: 60px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 380px;
+  max-width: 420px;
+  flex: 1.1;
+}
+
+.form-title, .register-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  background: linear-gradient(90deg, #00f7ff 0%, #5f8fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 28px;
+}
+.input-group input {
+  width: 100%;
+  padding: 16px 20px 16px 48px;
+  background: #10101a;
+  border: 2px solid #23233a;
+  border-radius: 12px;
+  color: #e0e0e0;
+  font-size: 1.08rem;
+  transition: border 0.3s, background 0.3s;
+  outline: none;
+}
+.input-group input:focus {
+  border: 2px solid #00f7ff;
+  background: #181828;
+}
+.input-group i {
+  color: #00f7ff;
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+
+.mobile-form-toggle {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.mobile-form-toggle button {
+  background: #23233a;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 28px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  outline: none;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+}
+.mobile-form-toggle button.active, .mobile-form-toggle button:hover {
+  background: linear-gradient(90deg, #00f7ff 0%, #ff00e4 100%);
+  color: #181828;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(90deg, #00f7ff 0%, #ff00e4 100%);
+  border: none;
+  border-radius: 12px;
+  color: #181828;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.15);
+  margin-top: 18px;
+  margin-bottom: 10px;
+}
+.submit-btn:hover {
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+}
+.submit-icon {
+  margin-left: 8px;
+  transition: transform 0.3s;
+}
+.submit-btn:hover .submit-icon {
+  transform: translateX(6px) scale(1.1);
+}
+
+.form-footer, .form-footer a {
+  color: #00f7ff;
+  font-size: 1rem;
+}
+
+.social-login {
+  display: flex;
+  gap: 18px;
+  margin-top: 22px;
+  justify-content: center;
+}
+.social-btn {
+  background: #23233a;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+}
+.social-btn:hover {
+  background: linear-gradient(90deg, #00f7ff 0%, #ff00e4 100%);
+  color: #181828;
+}
+
+.visual-side {
+  flex: 1.2;
+  min-width: 350px;
+  position: relative;
+  background: linear-gradient(120deg, #00f7ff 0%, #ff00e4 100%);
+  background-image: url("../../../assets/images/gradient.svg"), linear-gradient(120deg, #00f7ff 0%, #ff00e4 100%);
+  background-blend-mode: lighten;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-top-right-radius: 28px;
+  border-bottom-right-radius: 28px;
+  overflow: hidden;
+  min-height: 600px;
+  animation: bgMove 10s linear infinite alternate;
+}
+.visual-side::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(0,247,255,0.18) 0%, rgba(255,0,228,0.18) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.visual-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+.visual-title {
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.visual-desc {
+  color: #e0e0e0;
+  font-size: 1.15rem;
+  margin-bottom: 32px;
+}
+.tech-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 24px;
+}
+.tech-logos i {
+  color: #181828;
+  filter: none;
+  font-size: 2.5rem !important;
+  margin: 10px;
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}

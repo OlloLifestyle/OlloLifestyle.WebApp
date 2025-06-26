@@ -1,0 +1,81 @@
+<!-- login.component.html -->
+<div class="auth-container">
+  <div class="glow-border"></div>
+  <div class="form-side">
+    <div class="mobile-form-toggle">
+      <button [class.active]="isLoginActive" (click)="showLoginForm()" id="mobileLoginBtn">Login</button>
+      <button [class.active]="!isLoginActive" (click)="showRegisterForm()" id="mobileRegisterBtn">Register</button>
+    </div>
+
+    <div class="form-container login-form" *ngIf="isLoginActive">
+      <h2 class="form-title">Welcome Back</h2>
+      <form (ngSubmit)="onLoginSubmit()">
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" placeholder="Email" [(ngModel)]="loginEmail" name="loginEmail" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" placeholder="Password" [(ngModel)]="loginPassword" name="loginPassword" required>
+        </div>
+        <button type="submit" class="submit-btn">
+          SIGN IN
+          <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <div class="form-footer">
+          Don't have an account? <a href="#" (click)="showRegisterForm()">Create account</a>
+        </div>
+      </form>
+      <div class="social-login">
+        <div class="social-btn"><i class="fab fa-google"></i></div>
+        <div class="social-btn"><i class="fab fa-apple"></i></div>
+        <div class="social-btn"><i class="fab fa-twitter"></i></div>
+      </div>
+    </div>
+
+    <div class="form-container register-form" *ngIf="!isLoginActive">
+      <h2 class="form-title">Create Account</h2>
+      <form (ngSubmit)="onRegisterSubmit()">
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" placeholder="Username" [(ngModel)]="registerUsername" name="registerUsername" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" placeholder="Email" [(ngModel)]="registerEmail" name="registerEmail" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" placeholder="Password" [(ngModel)]="registerPassword" name="registerPassword" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" placeholder="Confirm Password" [(ngModel)]="registerConfirmPassword" name="registerConfirmPassword" required>
+        </div>
+        <button type="submit" class="submit-btn">
+          SIGN UP
+          <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+      <div class="form-footer">
+        Already have an account? <a href="#" (click)="showLoginForm()">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-side">
+    <div class="card-effect"></div>
+    <div class="floating-shapes" id="floatingShapes"></div>
+    <div class="visual-content">
+      <h2 class="visual-title">FUTURE AUTH</h2>
+      <p class="visual-desc">
+        Experience the next generation authentication system with cutting-edge security and seamless UX.
+      </p>
+      <div class="tech-logos">
+        <i class="fas fa-fingerprint" style="font-size: 50px; margin: 10px; color: var(--dark);"></i>
+        <i class="fas fa-shield-alt" style="font-size: 50px; margin: 10px; color: var(--dark);"></i>
+        <i class="fas fa-bolt" style="font-size: 50px; margin: 10px; color: var(--dark);"></i>
+      </div>
+    </div>
+  </div>
+</div>
