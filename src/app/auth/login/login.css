@@ -159,15 +159,34 @@
 }
 
 .visual-side {
+  position: relative;
+  overflow: hidden; /* Ensure the animation doesn't bleed out */
   background: linear-gradient(120deg, #00f7ff 0%, #ff00e4 100%);
   color: #181828;
   text-align: center;
 }
+
+.visual-side-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #00f7ff, #ff00e4, #00f7ff);
+  background-size: 200% 200%;
+  animation: gradient-animation 10s ease infinite;
+  z-index: 0;
+}
+
 .visual-content {
+  position: relative;
+  z-index: 1; /* Keep the content on top of the animation */
   max-width: 90%;
   margin: 0 auto;
   word-break: break-word;
+  color: #1a1a2e;
 }
+
 .visual-title {
   color: #181828;
   font-size: 2.6rem;
@@ -203,6 +222,12 @@
 @keyframes ollo-bubbles-float {
   0% { transform: translateY(0) scale(1); opacity: 0.8; }
   100% { transform: translateY(-40px) scale(1.04); opacity: 1; }
+}
+
+@keyframes gradient-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @media (max-width: 1200px) {
