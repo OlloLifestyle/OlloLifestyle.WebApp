@@ -7,14 +7,32 @@
 }
 
 /* Include your CSS rules here. For brevity, only essential styles are shown. Include all styles from your shared CSS in your actual file. */
+html, body {
+  height: 100%;
+}
 body {
   min-height: 100vh;
+  height: 100vh;
   margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0a0a14;
+  background: #fff;
   font-family: 'Poppins', 'Inter', 'Roboto', Arial, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 700px;
+  height: 700px;
+  background: url('../../../assets/images/gradient.svg');
+  opacity: 0.18;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .auth-container {
@@ -22,85 +40,103 @@ body {
   align-items: stretch;
   justify-content: center;
   min-height: 600px;
-  min-width: 850px;
-  max-width: 950px;
-  margin: 0 auto;
-  border-radius: 28px;
+  min-width: 1100px;
+  max-width: 1200px;
+  width: 1100px;
+  height: 600px;
+  margin: 10% auto;
+  border-radius: 36px;
   overflow: hidden;
-  box-shadow: 0 16px 48px 0 rgba(0,0,0,0.55);
+  box-shadow: 0 24px 64px 0 rgba(0,0,0,0.18);
   background: var(--darker);
   color: #fff;
   transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  z-index: 1;
 }
 
 .form-side {
   background: #181828;
   color: #fff;
-  padding: 60px 48px;
+  padding: 64px 56px 64px 56px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 380px;
-  max-width: 420px;
+  min-width: 440px;
+  max-width: 520px;
   flex: 1.1;
+  position: relative;
 }
 
 .form-title, .register-title {
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   font-weight: 700;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
   background: linear-gradient(90deg, #00f7ff 0%, #5f8fff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
 }
 
 .input-group {
   position: relative;
-  margin-bottom: 28px;
+  margin-bottom: 26px;
+}
+.input-group i {
+  color: #00f7ff;
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.35rem;
+  z-index: 2;
 }
 .input-group input {
   width: 100%;
-  padding: 16px 20px 16px 48px;
+  padding: 20px 24px 20px 56px;
   background: #10101a;
   border: 2px solid #23233a;
-  border-radius: 12px;
+  border-radius: 16px;
   color: #e0e0e0;
-  font-size: 1.08rem;
+  font-size: 1.15rem;
   transition: border 0.3s, background 0.3s;
   outline: none;
+  height: 58px;
+  box-sizing: border-box;
 }
 .input-group input:focus {
   border: 2px solid #00f7ff;
   background: #181828;
 }
-.input-group i {
-  color: #00f7ff;
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
+.input-group input::placeholder {
+  color: #7befff;
+  opacity: 0.8;
+  font-size: 1.08rem;
 }
 
 .mobile-form-toggle {
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  width: 100%;
+  margin-bottom: 32px;
+  gap: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
 }
 .mobile-form-toggle button {
+  flex: 1 1 0;
   background: #23233a;
   color: #fff;
   border: none;
-  border-radius: 20px;
-  padding: 10px 28px;
-  font-size: 1.08rem;
+  border-radius: 0;
+  padding: 16px 0;
+  font-size: 1.15rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s, color 0.3s;
   outline: none;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+  box-shadow: none;
+  letter-spacing: 0.5px;
 }
 .mobile-form-toggle button.active, .mobile-form-toggle button:hover {
   background: linear-gradient(90deg, #00f7ff 0%, #ff00e4 100%);
@@ -109,13 +145,13 @@ body {
 
 .submit-btn {
   width: 100%;
-  padding: 18px;
+  padding: 22px;
   background: linear-gradient(90deg, #00f7ff 0%, #ff00e4 100%);
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   color: #181828;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.18rem;
   cursor: pointer;
   transition: all 0.3s, box-shadow 0.3s;
   position: relative;
@@ -124,43 +160,43 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.15);
-  margin-top: 18px;
-  margin-bottom: 10px;
+  gap: 14px;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.13);
+  margin-top: 24px;
+  margin-bottom: 14px;
 }
 .submit-btn:hover {
-  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
 }
 .submit-icon {
-  margin-left: 8px;
+  margin-left: 10px;
   transition: transform 0.3s;
 }
 .submit-btn:hover .submit-icon {
-  transform: translateX(6px) scale(1.1);
+  transform: translateX(8px) scale(1.1);
 }
 
 .form-footer, .form-footer a {
   color: #00f7ff;
-  font-size: 1rem;
+  font-size: 1.08rem;
 }
 
 .social-login {
   display: flex;
-  gap: 18px;
-  margin-top: 22px;
+  gap: 28px;
+  margin-top: 32px;
   justify-content: center;
 }
 .social-btn {
   background: #23233a;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 54px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 1.3rem;
+  font-size: 1.7rem;
   cursor: pointer;
   transition: background 0.3s, color 0.3s;
   box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
@@ -172,10 +208,9 @@ body {
 
 .visual-side {
   flex: 1.2;
-  min-width: 350px;
+  min-width: 400px;
   position: relative;
   background: linear-gradient(120deg, #00f7ff 0%, #ff00e4 100%);
-  background-image: url("../../../assets/images/gradient.svg"), linear-gradient(120deg, #00f7ff 0%, #ff00e4 100%);
   background-blend-mode: lighten;
   background-size: cover;
   background-position: center;
@@ -183,18 +218,18 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-top-right-radius: 28px;
-  border-bottom-right-radius: 28px;
+  border-top-right-radius: 36px;
+  border-bottom-right-radius: 36px;
   overflow: hidden;
   min-height: 600px;
   animation: bgMove 10s linear infinite alternate;
 }
-.visual-side::before {
-  content: '';
+.animated-svg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, rgba(0,247,255,0.18) 0%, rgba(255,0,228,0.18) 100%);
-  z-index: 1;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
   pointer-events: none;
 }
 .visual-content {
@@ -208,27 +243,29 @@ body {
   text-align: center;
 }
 .visual-title {
-  color: #fff;
-  font-size: 2.2rem;
+  color: #181828;
+  font-size: 2.6rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
 }
 .visual-desc {
-  color: #e0e0e0;
-  font-size: 1.15rem;
-  margin-bottom: 32px;
+  color: #181828;
+  font-size: 1.22rem;
+  margin-bottom: 44px;
+  font-weight: 500;
 }
 .tech-logos {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
-  margin-top: 24px;
+  gap: 36px;
+  margin-top: 32px;
 }
 .tech-logos i {
   color: #181828;
   filter: none;
-  font-size: 2.5rem !important;
+  font-size: 3.2rem !important;
   margin: 10px;
 }
 
