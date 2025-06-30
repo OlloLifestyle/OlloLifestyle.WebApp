@@ -4,6 +4,6 @@ import { Login } from './auth/login/login';
 export const routes: Routes = [
     {
          path: '',
-    component: Login
+         component: Login
     }
 ];
