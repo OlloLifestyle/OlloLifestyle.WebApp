@@ -33,11 +33,71 @@
 .ollo-logo-img {
   height: auto;
   width: 100%;
-  max-width: 120px;
+  max-width: 180px; /* Increased from 120px */
   display: block;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 1.5rem auto; /* Adjusted margin for better spacing */
   object-fit: contain;
+  position: relative; /* For z-index if ever needed and potential animation */
+  z-index: 2; /* Ensure logo is above background elements */
+  animation: logoFadeInScale 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards;
+  opacity: 0; /* Start hidden for animation */
 }
+
+@keyframes logoFadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.visual-title {
+  color: #181828;
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+  animation: contentFadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.4s forwards;
+  opacity: 0; /* Start hidden for animation */
+  position: relative; /* For animation */
+}
+
+.visual-desc {
+  color: #181828;
+  font-size: 1.22rem;
+  margin-bottom: 44px;
+  font-weight: 500;
+  animation: contentFadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s forwards;
+  opacity: 0; /* Start hidden for animation */
+  position: relative; /* For animation */
+}
+
+.tech-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 36px;
+  margin-top: 32px;
+  animation: contentFadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.8s forwards;
+  opacity: 0; /* Start hidden for animation */
+  position: relative; /* For animation */
+}
+
+
+@keyframes contentFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .input-group {
   position: relative;
   margin-bottom: 25px;
