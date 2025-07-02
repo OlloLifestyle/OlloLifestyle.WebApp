@@ -10,16 +10,25 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.css'
 })
 export class Login implements OnInit, OnDestroy {
-  isLoginActive = true;
-  loginEmail = '';
+  // Form data
+  loginCompany = '';
+  loginUser = '';
   loginPassword = '';
-  registerUsername = '';
-  registerEmail = '';
-  registerPassword = '';
-  registerConfirmPassword = '';
-
+  
+  // UI states
+  isLoading = false;
+  
   ngOnInit() {
     window.addEventListener('mousemove', this.handleParallax);
+    
+    // Add smooth entrance animation
+    setTimeout(() => {
+      const container = document.querySelector('.auth-container') as HTMLElement;
+      if (container) {
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+      }
+    }, 100);
   }
 
   ngOnDestroy() {
@@ -28,50 +37,139 @@ export class Login implements OnInit, OnDestroy {
 
   handleParallax = (event: MouseEvent) => {
     const container = document.querySelector('.auth-container') as HTMLElement;
-    if (!container) return;
-    const x = (event.clientX / window.innerWidth - 0.5) * 30; // max 15px left/right
-    const y = (event.clientY / window.innerHeight - 0.5) * 30; // max 15px up/down
+    if (!container || this.isLoading) return;
+    
+    const x = (event.clientX / window.innerWidth - 0.5) * 20; // Reduced intensity
+    const y = (event.clientY / window.innerHeight - 0.5) * 20;
+    
     container.style.transform = `translate(${x}px, ${y}px)`;
   };
 
-  showLoginForm() {
-    this.isLoginActive = true;
-    this.setActiveForm('login');
-  }
+  async onLoginSubmit() {
+    // Basic validation
+    if (!this.loginCompany.trim() || !this.loginUser.trim() || !this.loginPassword.trim()) {
+      this.showErrorMessage('Please fill in all fields');
+      return;
+    }
 
-  showRegisterForm() {
-    this.isLoginActive = false;
-    this.setActiveForm('register');
-  }
-
-  private setActiveForm(form: 'login' | 'register') {
-    const loginForm = document.querySelector('.login-form');
-    const registerForm = document.querySelector('.register-form');
-    const loginBtn = document.getElementById('mobileLoginBtn');
-    const registerBtn = document.getElementById('mobileRegisterBtn');
-
-    if (form === 'login') {
-      loginForm?.classList.add('active');
-      registerForm?.classList.remove('active');
-      loginBtn?.classList.add('active');
-      registerBtn?.classList.remove('active');
-    } else {
-      loginForm?.classList.remove('active');
-      registerForm?.classList.add('active');
-      loginBtn?.classList.remove('active');
-      registerBtn?.classList.add('active');
+    this.isLoading = true;
+    
+    try {
+      // Simulate API call
+      await this.performLogin();
+      
+      // Success handling
+      console.log('Login Successful', {
+        company: this.loginCompany,
+        user: this.loginUser,
+        // Don't log password in production
+      });
+      
+      this.showSuccessMessage('Login successful! Redirecting...');
+      
+      // Redirect logic would go here
+      setTimeout(() => {
+        // Example: this.router.navigate(['/dashboard']);
+        console.log('Redirecting to dashboard...');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Login failed:', error);
+      this.showErrorMessage('Login failed. Please check your credentials.');
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  onLoginSubmit() {
-    console.log('Login Submitted', this.loginEmail, this.loginPassword);
+  socialLogin(provider: string) {
+    console.log(`${provider} login initiated`);
+    
+    // Add visual feedback
+    const socialBtn = event?.target as HTMLElement;
+    const btn = socialBtn.closest('.social-btn') as HTMLElement;
+    
+    if (btn) {
+      btn.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        btn.style.transform = 'translateY(-2px)';
+      }, 150);
+    }
+
+    // Simulate social login
+    setTimeout(() => {
+      this.showInfoMessage(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login would be implemented here`);
+    }, 500);
   }
 
-  onRegisterSubmit() {
-    console.log('Register Submitted', this.registerUsername, this.registerEmail);
-    if (this.registerPassword !== this.registerConfirmPassword) {
-      alert('Passwords do not match');
-      return;
+  private async performLogin(): Promise<void> {
+    // Simulate API call delay
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // Simulate success/failure based on dummy credentials
+        if (this.loginCompany === 'demo' && this.loginUser === 'admin' && this.loginPassword === 'password') {
+          resolve();
+        } else {
+          // For demo purposes, always resolve after delay
+          resolve();
+          // In production, you might reject: reject(new Error('Invalid credentials'));
+        }
+      }, 2000);
+    });
+  }
+
+  private showErrorMessage(message: string) {
+    // In a real app, you might use a toast service or modal
+    console.error(message);
+    
+    // Add temporary visual feedback
+    const container = document.querySelector('.auth-container') as HTMLElement;
+    if (container) {
+      container.style.boxShadow = '0 24px 64px rgba(255,71,87,0.3)';
+      setTimeout(() => {
+        container.style.boxShadow = '0 24px 64px rgba(0,0,0,0.18)';
+      }, 2000);
+    }
+  }
+
+  private showSuccessMessage(message: string) {
+    console.log(message);
+    
+    // Add success visual feedback
+    const container = document.querySelector('.auth-container') as HTMLElement;
+    if (container) {
+      container.style.boxShadow = '0 24px 64px rgba(0,247,255,0.3)';
+      setTimeout(() => {
+        container.style.boxShadow = '0 24px 64px rgba(0,0,0,0.18)';
+      }, 2000);
+    }
+  }
+
+  private showInfoMessage(message: string) {
+    console.info(message);
+    alert(message); // Replace with proper notification system
+  }
+
+  // Utility method for form validation
+  isFieldInvalid(fieldName: string, form: any): boolean {
+    const field = form.controls[fieldName];
+    return field?.invalid && (field?.dirty || field?.touched);
+  }
+
+  // Clear form method
+  clearForm() {
+    this.loginCompany = '';
+    this.loginUser = '';
+    this.loginPassword = '';
+  }
+
+  // Method to handle enter key navigation
+  onEnterKey(event: KeyboardEvent, nextElement?: string) {
+    if (event.key === 'Enter' && nextElement) {
+      event.preventDefault();
+      const next = document.querySelector(`[name="${nextElement}"]`) as HTMLInputElement;
+      if (next) {
+        next.focus();
+      }
     }
   }
 }
