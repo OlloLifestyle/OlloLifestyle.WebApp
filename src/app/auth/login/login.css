@@ -261,21 +261,50 @@
   font-size: 0.95rem;
   opacity: 0.9;
 }
+.logo-container {
+  width: 100%;
+  max-width: 160px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.logo-image {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
 
 .logo-placeholder {
-  width: 120px;
-  height: 120px;
-  background: rgba(255,255,255,0.2);
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,0.15);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 20px auto;
   font-size: 2rem;
-  font-weight: bold;
-  backdrop-filter: blur(10px);
-  transition: transform 0.3s ease;
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(255,255,255,0.2);
 }
+@media (max-width: 600px) {
+  .logo-container {
+    max-width: 120px;
+  }
+
+  .logo-image,
+  .logo-placeholder {
+    max-width: 120px;
+  }
+}
+
 
 .logo-placeholder:hover {
   transform: scale(1.05);
