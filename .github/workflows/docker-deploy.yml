@@ -41,7 +41,7 @@ jobs:
         port: 22
         timeout: 60s
         command_timeout: 10m
-        fingerprint: SHA256:ZIINJvcZVuk5x/80mfCBiPf+WhwYbY0k/ovG0d6po/A
+        use_insecure_cipher: true
         script: |
           cd ~/OlloLifestyle.WebApp
           git pull origin main
