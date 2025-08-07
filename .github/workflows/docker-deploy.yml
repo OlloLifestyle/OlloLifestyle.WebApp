@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build and Deploy
 
 on:
   push:
@@ -26,3 +26,21 @@ jobs:
           dayandev/ollolifestyle-webapp:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          cd ~/OlloLifestyle.WebApp
+          git pull origin main
+          docker build --no-cache -t dayandev/ollolifestyle-webapp:latest .
+          docker-compose down
+          docker-compose up -d
