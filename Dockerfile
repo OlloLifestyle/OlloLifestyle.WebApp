@@ -7,20 +7,20 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies (including dev dependencies for build)
+RUN npm ci
 
 # Copy source code
 COPY . .
 
 # Build the Angular app
-RUN npm run build --prod
+RUN npm run build
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
 
-# Copy built app from previous stage
-COPY --from=build /app/dist/ollo-lifestyle-web-app /usr/share/nginx/html
+# Copy built app from previous stage (correct path)
+COPY --from=build /app/dist/OlloLifestyle.WebApp /usr/share/nginx/html
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf

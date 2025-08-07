@@ -1,63 +1,211 @@
-<<<<<<< HEAD
-# OlloLifestyleWebApp
+# OlloLifestyle Angular WebApp Deployment
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.3.
+This repository contains the Angular frontend application for OlloLifestyle with Docker deployment configuration.
 
-## Development server
+## Prerequisites
 
-To start a local development server, run:
+- Docker and Docker Compose installed on your server
+- Node.js 18+ for local development
+- Access to your Linux server (Ubuntu 20.04 LTS recommended)
 
-```bash
-ng serve
-```
+## Quick Start
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 1. Local Development
 
 ```bash
-ng generate component component-name
+npm install
+npm run start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The app will be available at `http://localhost:4200`
+
+### 2. Local Docker Build
 
 ```bash
-ng generate --help
+docker build -t ollolifestyle-webapp .
+docker run -p 3000:80 ollolifestyle-webapp
 ```
 
-## Building
+The app will be available at `http://localhost:3000`
 
-To build the project run:
+## Production Deployment
+
+### Server Setup (One-time)
+
+1. **Copy the setup script to your server:**
+   ```bash
+   scp scripts/setup-webapp-server.sh user@your-server:/tmp/
+   ```
+
+2. **Run the setup script on your server:**
+   ```bash
+   chmod +x /tmp/setup-webapp-server.sh
+   /tmp/setup-webapp-server.sh
+   ```
+
+3. **Configure environment variables:**
+   ```bash
+   cd /opt/ollo-webapp
+   nano .env  # Update API_BASE_URL and other settings
+   ```
+
+### GitHub Actions CI/CD Setup
+
+1. **Add these secrets to your GitHub repository:**
+   - `DOCKER_PASSWORD`: Your Docker Hub password
+   - `HOST`: Your server IP address (e.g., 192.168.50.98)
+   - `USERNAME`: SSH username for your server (e.g., webadmin)
+   - `SSH_PRIVATE_KEY`: Private SSH key for server access
+   - `PORT`: SSH port (default: 22)
+
+2. **Update the workflow file:**
+   - Edit `.github/workflows/deploy.yml`
+   - Update `DOCKER_USERNAME` to your Docker Hub username
+   - Verify server paths and configurations
+
+3. **Trigger deployment:**
+   - Push to `main` or `master` branch
+   - Or manually trigger via GitHub Actions tab
+
+### Manual Deployment
+
+1. **On your server, pull and deploy:**
+   ```bash
+   cd /opt/ollo-webapp
+   ./scripts/deploy-webapp.sh deploy
+   ```
+
+2. **Check deployment status:**
+   ```bash
+   ./scripts/deploy-webapp.sh status
+   ./health-check.sh
+   ```
+
+## Configuration
+
+### Environment Variables
+
+- `API_BASE_URL`: Base URL for your API server (default: http://192.168.50.98:8080/api)
+- `NODE_ENV`: Environment (production/development)
+- `WEBAPP_PORT`: Port for the webapp container (default: 3000)
+
+### Nginx Configuration
+
+The `nginx.conf` file includes:
+- Static file serving with caching
+- Gzip compression
+- Security headers
+- API proxy configuration
+- Angular routing support
+
+## Monitoring & Maintenance
+
+### Health Checks
 
 ```bash
-ng build
+# Check webapp health
+curl http://192.168.50.98:3000
+
+# Run comprehensive health check
+/opt/ollo-webapp/health-check.sh
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### View Logs
 
 ```bash
-ng test
+cd /opt/ollo-webapp
+
+# View container logs
+docker-compose logs -f ollo-webapp
+
+# View nginx access logs
+tail -f logs/access.log
+
+# View nginx error logs
+tail -f logs/error.log
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### Backup & Restore
 
 ```bash
-ng e2e
+# Create manual backup
+/opt/ollo-webapp/backup.sh
+
+# Rollback to previous version
+./scripts/deploy-webapp.sh rollback
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### System Monitoring
 
-## Additional Resources
+```bash
+# Check system status
+/opt/ollo-webapp/monitor.sh
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-=======
-# OlloLifestyle.WebApp
->>>>>>> b4f117cb0d2f3439bc83a00dc2ff1bde072e530b
+# Check container status
+docker-compose ps
+
+# Check resource usage
+docker stats ollo-webapp
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Container won't start:**
+   ```bash
+   docker-compose logs ollo-webapp
+   docker-compose down && docker-compose up -d
+   ```
+
+2. **API calls failing:**
+   - Check `API_BASE_URL` in `.env`
+   - Verify API server is running
+   - Check nginx proxy configuration
+
+3. **Port conflicts:**
+   - Change `WEBAPP_PORT` in `.env`
+   - Update docker-compose.yml ports mapping
+
+4. **Permission issues:**
+   ```bash
+   sudo chown -R webadmin:webadmin /opt/ollo-webapp
+   ```
+
+### Deployment Rollback
+
+If deployment fails:
+```bash
+cd /opt/ollo-webapp
+./scripts/deploy-webapp.sh rollback
+```
+
+### Manual Recovery
+
+```bash
+# Stop all containers
+docker-compose down
+
+# Remove problematic containers
+docker-compose rm -f
+
+# Pull fresh images
+docker-compose pull
+
+# Start fresh
+docker-compose up -d
+```
+
+## URLs
+
+- **Production WebApp**: http://192.168.50.98:3000
+- **API Backend**: http://192.168.50.98:8080/api
+- **Health Check**: http://192.168.50.98:3000
+
+## Support
+
+For deployment issues:
+1. Check the logs in `/opt/ollo-webapp/logs/`
+2. Run the monitoring script: `./monitor.sh`
+3. Verify all prerequisites are installed
+4. Check GitHub Actions workflow logs

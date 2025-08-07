@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  ollo-webapp:
+    image: dayandev/ollolifestyle-webapp:latest
+    container_name: ollo-webapp
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=${API_BASE_URL:-http://192.168.50.98:8080/api}
+    volumes:
+      - ./logs:/var/log/nginx
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"] 
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - webapp-network
+
+networks:
+  webapp-network:
+    driver: bridge
+
+volumes:
+  logs:
+    driver: local
