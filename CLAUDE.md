@@ -112,4 +112,4 @@ src/
 - Unit tests for all components using Jasmine/Karma
 - Test files should be co-located with components (`*.spec.ts`)
 - Run `npm test` before committing changes
-- Ensure all tests pass in CI/CD pipeline
+- Ensure all tests pass in CI/CD pipeline.
