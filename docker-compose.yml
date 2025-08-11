@@ -6,11 +6,13 @@ services:
     container_name: ollo-webapp
     ports:
       - "8080:80"
+      - "8443:443"
     environment:
       - NODE_ENV=production
       - API_BASE_URL=${API_BASE_URL:-http://192.168.50.98:8080/api}
     volumes:
       - ./logs:/var/log/nginx
+      - ./ssl:/etc/nginx/ssl
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"] 
