@@ -3,7 +3,7 @@ version: '3.8'
 services:
   ollo-webapp:
     image: dayandev/ollolifestyle-webapp:latest
-    container_name: ollo-webapp
+    container_name: ollowebapp
     ports:
       - "8080:80"
       - "8443:443"
