@@ -16,17 +16,25 @@ COPY . .
 # Build the Angular app
 RUN npm run build
 
-# Stage 2: Serve with Nginx
-FROM nginx:alpine
+# Stage 2: Serve with Node.js serve
+FROM node:20-alpine
+
+# Install serve globally
+RUN npm install -g serve
 
 # Copy built app from previous stage (correct path)
 COPY --from=build /app/dist/OlloLifestyle.WebApp/browser /usr/share/nginx/html
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S angular -u 1001
 
-# Expose port 80
-EXPOSE 80
+# Change ownership of the app directory
+RUN chown -R angular:nodejs /usr/share/nginx/html
+USER angular
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]  
+# Expose port 3000 for internal communication
+EXPOSE 3000
+
+# Start the app with serve
+CMD ["serve", "-s", "/usr/share/nginx/html", "-l", "3000"]  

@@ -1,0 +1,36 @@
+version: '3.8'
+
+# Development overrides
+services:
+  # Nginx with port binding for development
+  nginx-proxy:
+    ports:
+      - "80:80"  # Expose nginx to host for development
+
+  # WebApp with development settings
+  webapp:
+    environment:
+      - NODE_ENV=development
+      - API_BASE_URL=http://localhost/api
+    volumes:
+      # Mount source code for live reload (uncomment if using dev server)
+      # - ./src:/app/src
+      # - ./public:/app/public
+      - ./logs/webapp:/var/log/webapp
+    ports:
+      - "3000:3000"  # Optional: direct access to webapp for debugging
+
+  # API with development settings and port binding
+  api:
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DEBUG=*  # Enable debug logging
+    volumes:
+      # Mount API source for live reload (uncomment when API is ready)
+      # - ./api/src:/app/src
+      - ./logs/api:/var/log/api
+    ports:
+      - "3001:3001"  # Expose API for direct access/Swagger in development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/swagger"]  # Different health check for dev

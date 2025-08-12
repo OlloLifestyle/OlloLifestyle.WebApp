@@ -1,28 +1,63 @@
 version: '3.8'
 
 services:
-  ollo-webapp:
-    image: dayandev/ollolifestyle-webapp:latest
-    container_name: ollowebapp
-    ports:
-      - "8080:80"
+  # Nginx Reverse Proxy
+  nginx-proxy:
+    build: ./nginx
+    container_name: ollo-nginx
+    restart: unless-stopped
+    volumes:
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # WebApp Service
+  webapp:
+    build: .
+    container_name: ollo-webapp
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - API_BASE_URL=${API_BASE_URL:-http://192.168.50.98:8080/api}
-    volumes:
-      - ./logs:/var/log/nginx
-    restart: unless-stopped
+      - API_BASE_URL=http://nginx-proxy/api
+    networks:
+      - frontend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"] 
+      test: ["CMD", "curl", "-f", "http://localhost:3000"] 
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  # API Service (internal only)
+  api:
+    # build: ./api  # Uncomment when API project is ready
+    image: your-api-image:latest  # Replace with actual API image
+    container_name: ollo-api
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
     networks:
-      - webapp-network
+      - backend
+    # No ports exposed externally - only accessible via nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
-  webapp-network:
+  frontend:
+    driver: bridge
+  backend:
     driver: bridge
 
 volumes:

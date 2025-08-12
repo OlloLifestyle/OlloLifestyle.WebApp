@@ -1,32 +1,45 @@
-# OlloLifestyle Angular WebApp Deployment
+# Ollo Lifestyle - WebApp & API
 
-This repository contains the Angular frontend application for OlloLifestyle with Docker deployment configuration.
+Modern Angular application with secure API architecture using Docker and Nginx reverse proxy.
+
+## Architecture
+
+- **WebApp**: Angular 20 application (port 3000, internal)
+- **API**: Backend service (port 3001, internal only) 
+- **Nginx**: Reverse proxy (port 80, public)
+
+### Network Security
+- API is completely isolated from public internet
+- Only accessible through nginx reverse proxy
+- Swagger available in development mode only
 
 ## Prerequisites
 
-- Docker and Docker Compose installed on your server
-- Node.js 18+ for local development
-- Access to your Linux server (Ubuntu 20.04 LTS recommended)
+- Docker and Docker Compose installed
+- Node.js 20+ for local development
 
 ## Quick Start
 
-### 1. Local Development
+### Production
+```bash
+docker-compose up -d
+```
+Access: http://localhost
 
+### Development  
+```bash
+docker-compose up -d
+```
+- WebApp: http://localhost (via nginx)
+- API Direct: http://localhost:3001 (with Swagger)
+- Nginx logs: `./logs/nginx/`
+
+### Local Development (without Docker)
 ```bash
 npm install
 npm run start
 ```
-
-The app will be available at `http://localhost:4200`
-
-### 2. Local Docker Build
-
-```bash
-docker build -t ollolifestyle-webapp .
-docker run -p 3000:80 ollolifestyle-webapp
-```
-
-The app will be available at `http://localhost:3000`
+Access: http://localhost:4200
 
 ## Production Deployment
 

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl:*)",
       "Bash(openssl req:*)",
-      "Bash(nslookup:*)"
+      "Bash(nslookup:*)",
+      "Bash(ping:*)"
     ],
     "deny": []
   }
