@@ -2,10 +2,10 @@ version: '3.8'
 
 # Development overrides
 services:
-  # Nginx with port binding for development
+  # Nginx - port already exposed in main config
   nginx-proxy:
-    ports:
-      - "80:80"  # Expose nginx to host for development
+    environment:
+      - NGINX_DEBUG=1
 
   # WebApp with development settings
   webapp:
@@ -13,18 +13,25 @@ services:
       - NODE_ENV=development
       - API_BASE_URL=http://localhost/api
     volumes:
-      # Mount source code for live reload (uncomment if using dev server)
-      # - ./src:/app/src
-      # - ./public:/app/public
+      # Mount source code for live reload (uncomment if needed)
+      # - ./webapp/src:/app/src
       - ./logs/webapp:/var/log/webapp
     ports:
       - "3000:3000"  # Optional: direct access to webapp for debugging
 
-  # API configuration disabled - uncomment when API is ready
-  # api:
-  #   environment:
-  #     - NODE_ENV=development
-  #     - PORT=3001
-  #     - DEBUG=*
-  #   ports:
-  #     - "3001:3001"  # Expose API for Swagger in development
+  # API with development settings
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:5000
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - Jwt__SecretKey=${JWT_SECRET_KEY}
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
+      - DB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      # Mount source code for live reload (uncomment if using dotnet watch)
+      # - ./api/src:/app/src
+      # - ./api/appsettings.Development.json:/app/appsettings.Development.json
+      - ./logs/api:/app/Logs
+    ports:
+      - "5000:5000"  # Expose API for direct access/Swagger in development

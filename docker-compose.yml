@@ -1,10 +1,10 @@
 version: '3.8'
 
 services:
-  # Nginx Reverse Proxy
+  # Nginx Reverse Proxy (Shared for WebApp + API)
   nginx-proxy:
     build: ./nginx
-    container_name: ollo-nginx
+    container_name: ollo-nginx-proxy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -12,6 +12,7 @@ services:
       - ./logs/nginx:/var/log/nginx
     networks:
       - frontend
+      - backend
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
@@ -21,7 +22,7 @@ services:
 
   # WebApp Service
   webapp:
-    build: .
+    build: ./webapp
     container_name: ollo-webapp
     restart: unless-stopped
     environment:
@@ -29,16 +30,42 @@ services:
       - API_BASE_URL=http://nginx-proxy/api
     networks:
       - frontend
+    volumes:
+      - ./logs/webapp:/var/log/webapp
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"] 
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
+  # API Service
+  api:
+    build: ./api
+    container_name: ollo-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://0.0.0.0:5000
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - Jwt__SecretKey=${JWT_SECRET_KEY}
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - backend
+    volumes:
+      - ./logs/api:/app/Logs
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 networks:
   frontend:
+    driver: bridge
+  backend:
     driver: bridge
 
 volumes:
