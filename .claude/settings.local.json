@@ -4,7 +4,9 @@
       "Bash(curl:*)",
       "Bash(openssl req:*)",
       "Bash(nslookup:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(del docker-compose.test.yml)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
