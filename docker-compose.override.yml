@@ -20,17 +20,11 @@ services:
     ports:
       - "3000:3000"  # Optional: direct access to webapp for debugging
 
-  # API with development settings and port binding
-  api:
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - DEBUG=*  # Enable debug logging
-    volumes:
-      # Mount API source for live reload (uncomment when API is ready)
-      # - ./api/src:/app/src
-      - ./logs/api:/var/log/api
-    ports:
-      - "3001:3001"  # Expose API for direct access/Swagger in development
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/swagger"]  # Different health check for dev
+  # API configuration disabled - uncomment when API is ready
+  # api:
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=3001
+  #     - DEBUG=*
+  #   ports:
+  #     - "3001:3001"  # Expose API for Swagger in development

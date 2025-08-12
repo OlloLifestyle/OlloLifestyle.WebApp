@@ -10,7 +10,6 @@ services:
       - ./logs/nginx:/var/log/nginx
     networks:
       - frontend
-      - backend
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
@@ -35,27 +34,9 @@ services:
       retries: 3
       start_period: 40s
 
-  # API Service (internal only) - DISABLED until API is ready
-  # api:
-  #   image: dayandev/ollolifestyle-api:latest
-  #   container_name: ollo-api
-  #   restart: unless-stopped
-  #   environment:
-  #     - NODE_ENV=production
-  #     - PORT=3001
-  #   networks:
-  #     - backend
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 30s
 
 networks:
   frontend:
-    driver: bridge
-  backend:
     driver: bridge
 
 volumes:
