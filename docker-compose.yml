@@ -22,7 +22,7 @@ services:
 
   # WebApp Service
   webapp:
-    build: ./webapp
+    build: .
     container_name: ollo-webapp
     restart: unless-stopped
     environment:
@@ -39,28 +39,28 @@ services:
       retries: 3
       start_period: 40s
 
-  # API Service
-  api:
-    build: ./api
-    container_name: ollo-api
-    restart: unless-stopped
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://0.0.0.0:5000
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - Jwt__SecretKey=${JWT_SECRET_KEY}
-      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
-      - DB_PASSWORD=${DB_PASSWORD}
-    networks:
-      - backend
-    volumes:
-      - ./logs/api:/app/Logs
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+  # API Service - DISABLED until API directory is ready
+  # api:
+  #   build: ./api
+  #   container_name: ollo-api
+  #   restart: unless-stopped
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Production
+  #     - ASPNETCORE_URLS=http://0.0.0.0:5000
+  #     - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+  #     - Jwt__SecretKey=${JWT_SECRET_KEY}
+  #     - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #   networks:
+  #     - backend
+  #   volumes:
+  #     - ./logs/api:/app/Logs
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
 
 networks:
   frontend:
