@@ -84,14 +84,17 @@ Access: http://localhost:4200
 
 1. **On your server, pull and deploy:**
    ```bash
-   cd /opt/ollo-webapp
-   ./scripts/deploy-webapp.sh deploy
+   cd ~/OlloLifestyle.WebApp
+   git pull origin main
+   docker build --no-cache -t dayandev/ollolifestyle-webapp:latest .
+   docker-compose down
+   docker-compose up -d
    ```
 
 2. **Check deployment status:**
    ```bash
-   ./scripts/deploy-webapp.sh status
-   ./health-check.sh
+   docker-compose ps
+   docker-compose logs -f
    ```
 
 ## Configuration
@@ -142,23 +145,26 @@ tail -f logs/error.log
 
 ```bash
 # Create manual backup
-/opt/ollo-webapp/backup.sh
+docker-compose down
+cp -r ~/OlloLifestyle.WebApp ~/OlloLifestyle.WebApp.backup.$(date +%Y%m%d)
 
 # Rollback to previous version
-./scripts/deploy-webapp.sh rollback
+git log --oneline
+git reset --hard <previous-commit-hash>
+docker-compose down && docker-compose up -d
 ```
 
 ### System Monitoring
 
 ```bash
-# Check system status
-/opt/ollo-webapp/monitor.sh
-
 # Check container status
 docker-compose ps
 
+# Check logs
+docker-compose logs -f
+
 # Check resource usage
-docker stats ollo-webapp
+docker stats
 ```
 
 ## Troubleshooting
@@ -189,8 +195,10 @@ docker stats ollo-webapp
 
 If deployment fails:
 ```bash
-cd /opt/ollo-webapp
-./scripts/deploy-webapp.sh rollback
+cd ~/OlloLifestyle.WebApp
+git log --oneline
+git reset --hard <previous-working-commit>
+docker-compose down && docker-compose up -d
 ```
 
 ### Manual Recovery
@@ -211,14 +219,13 @@ docker-compose up -d
 
 ## URLs
 
-- **Production WebApp**: http://192.168.50.98:3000
-- **API Backend**: http://192.168.50.98:8080/api
-- **Health Check**: http://192.168.50.98:3000
+- **Production WebApp**: http://portal.ollolife.com
+- **Health Check**: http://portal.ollolife.com
 
 ## Support
 
 For deployment issues:
-1. Check the logs in `/opt/ollo-webapp/logs/`
-2. Run the monitoring script: `./monitor.sh`
+1. Check the logs: `docker-compose logs -f`
+2. Check container status: `docker-compose ps`
 3. Verify all prerequisites are installed
 4. Check GitHub Actions workflow logs
