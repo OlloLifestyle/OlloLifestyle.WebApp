@@ -74,25 +74,68 @@ src/
 - **Module System**: ESM with tree-shaking support
 - **Angular Compiler**: Strict templates and injection parameters
 
+## Multi-Service Architecture
+
+### Service Separation
+- **WebApp Project**: This repository (Angular frontend + Nginx proxy)
+- **API Project**: Separate repository (`OlloLifestyle.Webapi`) running independently
+- **Network Integration**: Both projects connect via shared Docker network `ollo-lifestyle-webapp_frontend`
+
+### Production Architecture
+- **Public Domain**: `http://portal.ollolife.com` (port 80) - WebApp only
+- **Internal API**: `http://192.168.50.98:8080/api/` - API access (internal network only)
+- **Swagger UI**: `http://192.168.50.98:8080/swagger` - API documentation (internal network only)
+- **Nginx Routing**: Single nginx handles both WebApp serving and API proxying
+
+### Container Network Setup
+```yaml
+# WebApp containers connect to network:
+networks:
+  frontend:
+    driver: bridge
+
+# API project must use external network:
+networks:
+  frontend:
+    external: true
+    name: ollo-lifestyle-webapp_frontend
+```
+
+### Nginx Proxy Configuration
+- **Port 80**: Serves WebApp to public domain
+- **Port 8080**: Routes `/api/` and `/swagger` to separate API container
+- **Security**: Port 8080 restricted to internal networks (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+- **API Upstream**: Points to `ollo-api:5000` container from separate project
+
 ## Deployment
 
 ### Production Deployment
 - **Docker Hub**: Automated builds push to Docker registry
-- **Production URL**: http://192.168.50.98:3000
-- **API Backend**: http://192.168.50.98:8080/api
+- **Production URL**: http://portal.ollolife.com (public)
+- **API Access**: http://192.168.50.98:8080/api (internal only)
 - **Server Setup**: Uses Docker Compose with Nginx reverse proxy
-- **Environment Variables**: Configure API_BASE_URL, NODE_ENV, WEBAPP_PORT in `.env`
+- **Environment Variables**: Configure API_BASE_URL, NODE_ENV in `.env`
+
+### Multi-Project Deployment Order
+1. **Start WebApp first**: `docker-compose up -d` (creates shared network)
+2. **Start API second**: In API project directory, `docker-compose up -d` (joins existing network)
+3. **Verify networking**: Both containers should appear in `docker network inspect ollo-lifestyle-webapp_frontend`
+
+### Container Dependencies
+- **WebApp nginx** expects `ollo-api:5000` container to exist for API routing
+- **API container** must use external network created by WebApp
+- **Network isolation** ensures API is only accessible through nginx proxy
 
 ### Monitoring & Maintenance
-- **Health Checks**: Built-in health check endpoints
-- **Logging**: Nginx access/error logs in `/opt/ollo-webapp/logs/`
-- **Backup**: Automated backup scripts for rollback capability
-- **Deployment Scripts**: Located in `scripts/` directory
+- **Health Checks**: Built-in health check endpoints for both services
+- **Logging**: Nginx access/error logs in `./logs/nginx/`
+- **Container Status**: Monitor both projects with `docker ps`
+- **API Health**: `curl http://localhost:8080/api/health` returns "Healthy"
 
 ### CI/CD
-- **GitHub Actions**: Automated deployment on push to main branch
-- **Docker Secrets**: DOCKER_USERNAME and DOCKER_PASSWORD required in repository secrets
-- **Server Secrets**: HOST, USERNAME, SSH_PRIVATE_KEY, PORT for deployment
+- **Separate Deployments**: Each project deploys independently
+- **Network Dependency**: WebApp must be running first to create shared network
+- **GitHub Actions**: Configured for WebApp automated deployment
 
 ## Development Guidelines
 
