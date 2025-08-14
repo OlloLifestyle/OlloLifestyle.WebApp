@@ -26,6 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Framework & Structure
 - **Angular 20** standalone components application using modern Angular features
+- **Progressive Web App (PWA)** with full offline support and service worker
 - **Standalone Components**: No NgModules, components are self-contained with their own imports
 - **Signal-based**: Uses Angular's latest reactivity system
 - **TypeScript 5.8** with strict type checking enabled
@@ -64,9 +65,19 @@ src/
 
 ### Dependencies & Libraries
 - **Core Angular**: @angular/core, @angular/common, @angular/forms, @angular/router
+- **PWA Support**: @angular/service-worker, @angular/pwa for offline functionality
 - **Testing**: Jasmine, Karma with Chrome launcher
 - **Build System**: Angular CLI with @angular/build
 - **Icons**: FontAwesome Free 6.7.2
+
+### PWA Features
+- **Service Worker**: Automatic caching and offline support via Angular Service Worker
+- **App Manifest**: Installable app with custom icons and branding
+- **Offline Sync**: Queues API requests when offline and syncs when back online
+- **Cache Strategies**: Fresh-first for critical data, cache-first for static assets
+- **Update Notifications**: Automatic update detection with user prompts
+- **Install Prompts**: Native app installation prompts on supported devices
+- **Network Status**: Real-time online/offline status indicators
 
 ### TypeScript Configuration
 - **Strict Mode**: All strict TypeScript options enabled
