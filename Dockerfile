@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (including dev dependencies for build)
-RUN npm ci
+# Install dependencies (using legacy peer deps to handle PWA version conflicts)
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -22,7 +22,7 @@ FROM node:20-alpine
 # Install serve globally
 RUN npm install -g serve
 
-# Copy built app from previous stage (correct path)
+# Copy built app from previous stage (includes PWA files)
 COPY --from=build /app/dist/OlloLifestyle.WebApp/browser /usr/share/nginx/html
 
 # Create non-root user
