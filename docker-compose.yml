@@ -7,10 +7,12 @@ services:
     container_name: ollo-nginx-proxy
     restart: unless-stopped
     ports:
-      - "80:80"      # WebApp domain access
+      - "80:80"      # HTTP (redirects to HTTPS)
+      - "443:443"    # HTTPS WebApp domain access  
       - "8080:8080"  # Internal API + Swagger access
     volumes:
       - ./logs/nginx:/var/log/nginx
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # SSL certificates (read-only)
     networks:
       - frontend
     healthcheck:

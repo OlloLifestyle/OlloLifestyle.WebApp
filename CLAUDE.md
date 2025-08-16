@@ -5,9 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Local Development
-- `npm install` - Install dependencies
+- `npm install --legacy-peer-deps` - Install dependencies (PWA requires legacy peer deps)
 - `npm run start` - Start development server (http://localhost:4200)
-- `npm run build` - Build for production
+- `npm run build` - Build for production (generates PWA files)
 - `npm run watch` - Build in watch mode for development
 - `npm test` - Run unit tests with Karma/Jasmine
 
@@ -21,6 +21,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `docker run -p 3000:80 ollolifestyle-webapp` - Run containerized app (http://localhost:3000)
 - `docker-compose up -d` - Run with docker-compose
 - `docker-compose logs -f ollo-webapp` - View container logs
+
+### HTTPS/SSL Setup
+- `chmod +x setup-ssl.sh && sudo ./setup-ssl.sh` - Set up free HTTPS certificates
+- `chmod +x test-ssl.sh && ./test-ssl.sh` - Test HTTPS and PWA functionality
+- `sudo certbot renew --dry-run` - Test certificate renewal
+- `sudo certbot certificates` - View certificate information
 
 ## Project Architecture
 
@@ -93,10 +99,11 @@ src/
 - **Network Integration**: Both projects connect via shared Docker network `ollo-lifestyle-webapp_frontend`
 
 ### Production Architecture
-- **Public Domain**: `http://portal.ollolife.com` (port 80) - WebApp only
+- **Public Domain**: `https://portal.ollolife.com` (port 443) - WebApp with SSL/TLS
+- **HTTP Redirect**: `http://portal.ollolife.com` (port 80) - Redirects to HTTPS
 - **Internal API**: `http://192.168.50.98:8080/api/` - API access (internal network only)
 - **Swagger UI**: `http://192.168.50.98:8080/swagger` - API documentation (internal network only)
-- **Nginx Routing**: Single nginx handles both WebApp serving and API proxying
+- **Nginx Routing**: Single nginx handles HTTPS termination, WebApp serving, and API proxying
 
 ### Container Network Setup
 ```yaml
@@ -113,19 +120,30 @@ networks:
 ```
 
 ### Nginx Proxy Configuration
-- **Port 80**: Serves WebApp to public domain
+- **Port 443**: HTTPS WebApp serving with SSL/TLS termination
+- **Port 80**: HTTP to HTTPS redirect for public domain
 - **Port 8080**: Routes `/api/` and `/swagger` to separate API container
-- **Security**: Port 8080 restricted to internal networks (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+- **SSL/TLS**: Let's Encrypt free certificates with auto-renewal
+- **Security**: Enhanced security headers, HSTS, and internal network restrictions
+- **HTTP/2**: Enabled for better performance over HTTPS
 - **API Upstream**: Points to `ollo-api:5000` container from separate project
 
 ## Deployment
 
 ### Production Deployment
 - **Docker Hub**: Automated builds push to Docker registry
-- **Production URL**: http://portal.ollolife.com (public)
+- **Production URL**: https://portal.ollolife.com (HTTPS with SSL)
 - **API Access**: http://192.168.50.98:8080/api (internal only)
-- **Server Setup**: Uses Docker Compose with Nginx reverse proxy
+- **Server Setup**: Uses Docker Compose with Nginx reverse proxy and SSL termination
+- **SSL Certificates**: Free Let's Encrypt certificates with auto-renewal
 - **Environment Variables**: Configure API_BASE_URL, NODE_ENV in `.env`
+
+### SSL/HTTPS Setup
+- **Certificate Provider**: Let's Encrypt (free, automated)
+- **Certificate Path**: `/etc/letsencrypt/live/portal.ollolife.com/`
+- **Auto-renewal**: Configured via cron job (runs twice daily)
+- **Protocols**: TLS 1.2 and 1.3 for maximum security
+- **Security Headers**: HSTS, CSP, and other security enhancements
 
 ### Multi-Project Deployment Order
 1. **Start WebApp first**: `docker-compose up -d` (creates shared network)
