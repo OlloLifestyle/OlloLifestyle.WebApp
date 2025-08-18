@@ -120,7 +120,7 @@ networks:
 ```
 
 ### Nginx Proxy Configuration
-- **Port 443**: HTTPS WebApp serving with SSL/TLS termination
+- **Port 443**: HTTPS WebApp serving with SSL/TLS termination.
 - **Port 80**: HTTP to HTTPS redirect for public domain
 - **Port 8080**: Routes `/api/` and `/swagger` to separate API container
 - **SSL/TLS**: Let's Encrypt free certificates with auto-renewal
