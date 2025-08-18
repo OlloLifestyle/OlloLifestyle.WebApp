@@ -128,8 +128,8 @@
                   <!-- Company Code Input -->
                   <div class="input-group">
                     <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none">
-                        <i class="fas fa-building text-white/60 transition-colors duration-300"></i>
+                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none flex items-center justify-center w-6 h-6">
+                        <i class="fas fa-building text-white/60 transition-colors duration-300 text-sm"></i>
                       </div>
                       <input
                         type="text"
@@ -148,8 +148,8 @@
                   <!-- Username Input -->
                   <div class="input-group">
                     <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none">
-                        <i class="fas fa-user text-white/60 transition-colors duration-300"></i>
+                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none flex items-center justify-center w-6 h-6">
+                        <i class="fas fa-user text-white/60 transition-colors duration-300 text-sm"></i>
                       </div>
                       <input
                         type="text"
@@ -168,8 +168,8 @@
                   <!-- Password Input -->
                   <div class="input-group">
                     <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none">
-                        <i class="fas fa-lock text-white/60 transition-colors duration-300"></i>
+                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none flex items-center justify-center w-6 h-6">
+                        <i class="fas fa-lock text-white/60 transition-colors duration-300 text-sm"></i>
                       </div>
                       <input
                         [type]="showPassword ? 'text' : 'password'"
@@ -184,9 +184,9 @@
                       <button
                         type="button"
                         (click)="togglePassword()"
-                        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-all duration-300 z-30 hover:scale-110"
+                        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-all duration-300 z-30 hover:scale-110 flex items-center justify-center w-6 h-6"
                       >
-                        <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                        <i [class]="(showPassword ? 'fas fa-eye-slash' : 'fas fa-eye') + ' text-sm'"></i>
                       </button>
                       <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500 pointer-events-none z-0"></div>
                     </div>

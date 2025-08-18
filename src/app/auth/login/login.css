@@ -111,7 +111,7 @@
   }
   
   .modern-input {
-    padding: 16px 16px 16px 48px;
+    padding: 16px 16px 16px 48px; /* Standard padding, password field has pr-12 in HTML */
     font-size: 16px; /* Prevents zoom on iOS */
     -webkit-appearance: none; /* Remove iOS styling */
     appearance: none;
