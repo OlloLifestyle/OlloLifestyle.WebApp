@@ -6,7 +6,12 @@
       "Bash(nslookup:*)",
       "Bash(ping:*)",
       "Bash(del docker-compose.test.yml)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run start:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": []
   }

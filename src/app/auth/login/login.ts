@@ -17,16 +17,18 @@ export class Login implements OnInit, OnDestroy {
   
   // UI states
   isLoading = false;
-  
+  showPassword = false;
+  mounted = false;
+
   ngOnInit() {
     window.addEventListener('mousemove', this.handleParallax);
     
     // Add smooth entrance animation
     setTimeout(() => {
-      const container = document.querySelector('.auth-container') as HTMLElement;
+      this.mounted = true;
+      const container = document.querySelector('.login-container') as HTMLElement;
       if (container) {
-        container.style.opacity = '1';
-        container.style.transform = 'translateY(0)';
+        container.classList.add('animate-in');
       }
     }, 100);
   }
@@ -36,14 +38,18 @@ export class Login implements OnInit, OnDestroy {
   }
 
   handleParallax = (event: MouseEvent) => {
-    const container = document.querySelector('.auth-container') as HTMLElement;
+    const container = document.querySelector('.login-panel') as HTMLElement;
     if (!container || this.isLoading) return;
     
-    const x = (event.clientX / window.innerWidth - 0.5) * 20; // Reduced intensity
-    const y = (event.clientY / window.innerHeight - 0.5) * 20;
+    const x = (event.clientX / window.innerWidth - 0.5) * 10; // Reduced intensity
+    const y = (event.clientY / window.innerHeight - 0.5) * 10;
     
     container.style.transform = `translate(${x}px, ${y}px)`;
   };
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 
   async onLoginSubmit() {
     // Basic validation
@@ -81,26 +87,6 @@ export class Login implements OnInit, OnDestroy {
     }
   }
 
-  socialLogin(provider: string) {
-    console.log(`${provider} login initiated`);
-    
-    // Add visual feedback
-    const socialBtn = event?.target as HTMLElement;
-    const btn = socialBtn.closest('.social-btn') as HTMLElement;
-    
-    if (btn) {
-      btn.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        btn.style.transform = 'translateY(-2px)';
-      }, 150);
-    }
-
-    // Simulate social login
-    setTimeout(() => {
-      this.showInfoMessage(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login would be implemented here`);
-    }, 500);
-  }
-
   private async performLogin(): Promise<void> {
     // Simulate API call delay
     return new Promise((resolve, reject) => {
@@ -122,11 +108,11 @@ export class Login implements OnInit, OnDestroy {
     console.error(message);
     
     // Add temporary visual feedback
-    const container = document.querySelector('.auth-container') as HTMLElement;
+    const container = document.querySelector('.login-panel') as HTMLElement;
     if (container) {
-      container.style.boxShadow = '0 24px 64px rgba(255,71,87,0.3)';
+      container.style.boxShadow = '0 32px 64px -12px rgba(255, 71, 87, 0.4), 0 0 0 1px rgba(255, 71, 87, 0.3)';
       setTimeout(() => {
-        container.style.boxShadow = '0 24px 64px rgba(0,0,0,0.18)';
+        container.style.boxShadow = '0 32px 64px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)';
       }, 2000);
     }
   }
@@ -135,18 +121,13 @@ export class Login implements OnInit, OnDestroy {
     console.log(message);
     
     // Add success visual feedback
-    const container = document.querySelector('.auth-container') as HTMLElement;
+    const container = document.querySelector('.login-panel') as HTMLElement;
     if (container) {
-      container.style.boxShadow = '0 24px 64px rgba(0,247,255,0.3)';
+      container.style.boxShadow = '0 32px 64px -12px rgba(34, 197, 94, 0.4), 0 0 0 1px rgba(34, 197, 94, 0.3)';
       setTimeout(() => {
-        container.style.boxShadow = '0 24px 64px rgba(0,0,0,0.18)';
+        container.style.boxShadow = '0 32px 64px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)';
       }, 2000);
     }
-  }
-
-  private showInfoMessage(message: string) {
-    console.info(message);
-    alert(message); // Replace with proper notification system
   }
 
   // Utility method for form validation
