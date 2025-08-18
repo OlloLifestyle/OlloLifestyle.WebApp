@@ -128,7 +128,7 @@
                   <!-- Company Code Input -->
                   <div class="input-group">
                     <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none">
                         <i class="fas fa-building text-white/60 transition-colors duration-300"></i>
                       </div>
                       <input
@@ -141,14 +141,14 @@
                         required
                         [class.error]="companyCode.invalid && companyCode.touched"
                       />
-                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500"></div>
+                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500 pointer-events-none z-0"></div>
                     </div>
                   </div>
 
                   <!-- Username Input -->
                   <div class="input-group">
                     <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none">
                         <i class="fas fa-user text-white/60 transition-colors duration-300"></i>
                       </div>
                       <input
@@ -161,14 +161,14 @@
                         required
                         [class.error]="userName.invalid && userName.touched"
                       />
-                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500"></div>
+                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500 pointer-events-none z-0"></div>
                     </div>
                   </div>
 
                   <!-- Password Input -->
                   <div class="input-group">
                     <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none">
                         <i class="fas fa-lock text-white/60 transition-colors duration-300"></i>
                       </div>
                       <input
@@ -184,11 +184,11 @@
                       <button
                         type="button"
                         (click)="togglePassword()"
-                        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-all duration-300 z-10 hover:scale-110"
+                        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-all duration-300 z-30 hover:scale-110"
                       >
                         <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                       </button>
-                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500"></div>
+                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500 pointer-events-none z-0"></div>
                     </div>
                   </div>
 

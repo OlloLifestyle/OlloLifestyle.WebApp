@@ -41,6 +41,8 @@
 /* Input Animations */
 .input-group {
   animation: inputFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  position: relative;
+  z-index: 1;
 }
 
 .input-group:nth-child(1) { animation-delay: 0.2s; }
@@ -51,6 +53,7 @@
   transform: translateZ(0);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  z-index: 10; /* Above the glow effect */
 }
 
 .modern-input:focus {
@@ -68,6 +71,8 @@
 .input-glow {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform: scale(0.98);
+  pointer-events: none; /* Allow clicks to pass through */
+  z-index: 0; /* Behind the input */
 }
 
 /* Button Animations */
@@ -108,6 +113,8 @@
   .modern-input {
     padding: 16px 16px 16px 48px;
     font-size: 16px; /* Prevents zoom on iOS */
+    -webkit-appearance: none; /* Remove iOS styling */
+    appearance: none;
   }
   
   .login-btn {

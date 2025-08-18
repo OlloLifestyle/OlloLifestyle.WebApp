@@ -41,10 +41,16 @@ export class Login implements OnInit, OnDestroy {
     const container = document.querySelector('.login-panel') as HTMLElement;
     if (!container || this.isLoading) return;
     
-    const x = (event.clientX / window.innerWidth - 0.5) * 10; // Reduced intensity
-    const y = (event.clientY / window.innerHeight - 0.5) * 10;
+    // Only apply parallax to background elements, not the whole panel
+    const backgroundElements = container.querySelectorAll('.absolute:not(.modern-input):not(button)');
     
-    container.style.transform = `translate(${x}px, ${y}px)`;
+    const x = (event.clientX / window.innerWidth - 0.5) * 5; // Further reduced
+    const y = (event.clientY / window.innerHeight - 0.5) * 5;
+    
+    backgroundElements.forEach((el: any) => {
+      if (el.classList.contains('input-glow')) return; // Skip input glow elements
+      el.style.transform = `translate(${x}px, ${y}px)`;
+    });
   };
 
   togglePassword() {
