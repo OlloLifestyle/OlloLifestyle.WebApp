@@ -184,4 +184,109 @@ networks:
 - Unit tests for all components using Jasmine/Karma
 - Test files should be co-located with components (`*.spec.ts`)
 - Run `npm test` before committing changes
-- Ensure all tests pass in CI/CD pipeline.
+- Ensure all tests pass in CI/CD pipeline
+
+## Deployment & CI/CD
+
+### Current Deployment Issue Pattern
+**Common Problem**: Docker containers serve old cached files even after CI/CD builds new images.
+
+**Root Cause**: docker-compose uses `build: .` which can serve stale cached layers, while CI/CD builds to specific image tags.
+
+**Solution Pattern**:
+```bash
+# Force fresh deployment
+docker-compose down
+docker rmi dayandev/ollolifestyle-webapp:latest -f
+docker-compose up -d --build
+
+# Verify new files deployed
+docker exec ollo-webapp ls -la /usr/share/nginx/html/ | grep main
+```
+
+### Deployment Scripts
+- `./deploy.sh` - Full CI/CD script (pulls code, builds, deploys)
+- `./quick-deploy.sh` - Quick deployment for local changes
+- Both scripts handle cache clearing and image rebuilding automatically
+
+### Git Workflow for Production Server
+- Server-specific files (`deploy.sh`, `quick-deploy.sh`, `docker-compose.yml`) should be in `.gitignore`
+- Use `git stash` pattern to handle conflicts when pulling updates:
+```bash
+git stash push -m "Local deployment configs"
+git pull origin main
+git stash pop
+```
+
+### Container Architecture Details
+- **webapp container**: Serves Angular app on internal port 3000 using Node.js `serve`
+- **nginx-proxy container**: Handles SSL termination, static serving, and API proxying
+- **Shared network**: `ollo-lifestyle-webapp_frontend` connects to separate API project
+- **Health checks**: Built-in health monitoring for both containers
+
+### Build Optimization
+- Uses multi-stage Docker build (Node.js build → Node.js serve)
+- PWA files generated automatically in production builds
+- FontAwesome loaded via CDN (configured in `angular.json`)
+- Assets split between `/assets` and `/public` directories
+
+## Advanced PWA Features
+
+### Offline Synchronization Architecture
+The app implements comprehensive offline support through several key components:
+
+**OfflineService** (`src/app/services/offline.service.ts`):
+- Network status monitoring using `navigator.onLine` and window events
+- Automatic update detection and application via Service Worker
+- PWA installation prompt management
+- Offline data queue persistence in localStorage
+
+**OfflineInterceptor** (`src/app/interceptors/offline.interceptor.ts`):
+- Intercepts all HTTP requests
+- Caches successful GET responses automatically
+- Queues POST/PUT/DELETE requests when offline
+- Attempts cached responses when requests fail
+- Generates cache keys based on HTTP method, URL, and parameters
+
+**Cache Strategy**:
+- GET requests: Cache successful responses, serve from cache when offline
+- Modify requests: Queue for sync when back online
+- Cache TTL: 24 hours for cached data
+- Automatic sync when network connection restored
+
+### Service Worker Integration
+- Registers when app is stable (30 second delay)
+- Automatic update checks every 30 seconds
+- Version ready notifications via `updateAvailable$` observable
+- Unrecoverable state handling with user notifications
+- PWA installation prompting with deferred prompt management
+
+### Network Status Component
+- Real-time online/offline status display
+- Integration with `OfflineService.isOnline$` observable
+- Visual indicators for users about connectivity state
+
+## Architecture Decisions
+
+### Standalone Components Pattern
+All components use `standalone: true` with explicit imports rather than NgModules:
+```typescript
+@Component({
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
+  // ...
+})
+```
+
+### Signal-Based Reactivity
+Application uses Angular's modern signal-based reactivity system for state management.
+
+### HTTP Client Configuration
+- Configured in `app.config.ts` with offline interceptor
+- Global error handling via `provideBrowserGlobalErrorListeners()`
+- Zone change detection with event coalescing for performance
+
+### Development vs Production Configurations
+- Service Worker disabled in development mode (`isDevMode()` check)
+- Different build configurations for development vs production
+- Environment-specific API base URLs via environment variables

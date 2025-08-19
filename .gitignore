@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # Compiled output
@@ -41,7 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
-=======
 # Logs
 logs
 *.log
@@ -178,4 +176,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
->>>>>>> b4f117cb0d2f3439bc83a00dc2ff1bde072e530b
+CLAUDE.md
+docker-compose.yml
+quick-deploy.yml
+setup-ssl.sh
+test-ssl.sh
+deploy.sh
