@@ -16,19 +16,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "🔨 Building fresh Docker image (no cache)..."
-docker build --no-cache -t dayandev/ollolifestyle-webapp:latest .
-
-if [ $? -ne 0 ]; then
-    echo "❌ Docker build failed! Exiting..."
-    exit 1
-fi
-
 echo "🛑 Stopping current containers..."
 docker-compose down
 
-echo "🚀 Starting services with new image..."
-docker-compose up -d
+echo "🗑️ Removing old images to force fresh build..."
+docker rmi dayandev/ollolifestyle-webapp:latest 2>/dev/null || echo "No old image to remove"
+
+echo "🔨 Building and starting with fresh image..."
+docker-compose up -d --build
 
 if [ $? -ne 0 ]; then
     echo "❌ Docker compose up failed! Exiting..."

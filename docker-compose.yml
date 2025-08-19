@@ -24,8 +24,8 @@ services:
 
   # WebApp Service
   webapp:
+    build: .
     image: dayandev/ollolifestyle-webapp:latest
-    pull_policy: always
     container_name: ollo-webapp
     restart: unless-stopped
     environment:

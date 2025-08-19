@@ -7,12 +7,14 @@ echo "⚡ Quick deployment starting..."
 
 cd ~/OlloLifestyle.WebApp
 
-echo "🔨 Building image..."
-docker build --no-cache -t dayandev/ollolifestyle-webapp:latest .
-
-echo "🔄 Restarting services..."
+echo "🔄 Stopping containers..."
 docker-compose down
-docker-compose up -d
+
+echo "🗑️ Removing old images..."
+docker rmi dayandev/ollolifestyle-webapp:latest 2>/dev/null || echo "No old image to remove"
+
+echo "🔨 Building and starting..."
+docker-compose up -d --build
 
 echo "✅ Quick deployment complete!"
 docker exec ollo-webapp ls /usr/share/nginx/html/ | grep "main-.*\.js"
