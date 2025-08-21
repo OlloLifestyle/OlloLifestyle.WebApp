@@ -6,6 +6,7 @@ export interface User {
   roles: string[];
   firstName?: string;
   lastName?: string;
+  avatar?: string;
 }
 
 export interface LoginCredentials {
