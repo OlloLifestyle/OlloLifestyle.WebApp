@@ -6,12 +6,11 @@ export interface User {
   roles: string[];
   firstName?: string;
   lastName?: string;
-  avatar?: string;
 }
 
 export interface LoginCredentials {
+  username: string;
   company: string;
-  user: string;
   password: string;
 }
 
@@ -24,19 +23,4 @@ export interface AuthResponse {
 
 export interface RefreshTokenRequest {
   refreshToken: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
-  company: string;
-}
-
-export interface ResetPasswordRequest {
-  token: string;
-  newPassword: string;
 }

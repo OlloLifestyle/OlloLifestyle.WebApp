@@ -1,30 +1,62 @@
-import { HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { HttpInterceptorFn, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const router = inject(Router);
   
+  // Skip auth for login/refresh endpoints
+  if (isAuthEndpoint(req)) {
+    return next(req);
+  }
+
   // Get the auth token
   const authToken = authService.getToken();
   
-  // If we have a token and the request is going to our API, add the Authorization header
-  if (authToken && shouldAddAuthHeader(req)) {
-    const authReq = req.clone({
-      setHeaders: {
-        'Authorization': `Bearer ${authToken}`
+  // Add Authorization header if token exists and request needs auth
+  const authReq = authToken && shouldAddAuthHeader(req) 
+    ? req.clone({
+        setHeaders: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      })
+    : req;
+
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        // Handle 401 Unauthorized - logout and redirect
+        console.warn('Unauthorized access - redirecting to login');
+        authService.logout().subscribe(() => {
+          router.navigate(['/login']);
+        });
       }
-    });
-    return next(authReq);
-  }
-  
-  return next(req);
+      return throwError(() => error);
+    })
+  );
 };
 
+/**
+ * Check if request is to authentication endpoints
+ */
+function isAuthEndpoint(req: HttpRequest<any>): boolean {
+  return req.url.includes('/auth/login') || 
+         req.url.includes('/auth/refresh') ||
+         req.url.includes('/auth/logout');
+}
+
+/**
+ * Check if request should include authorization header
+ */
 function shouldAddAuthHeader(req: HttpRequest<any>): boolean {
-  // Add auth header to requests going to our API endpoints
-  // You can customize this logic based on your API structure
-  return req.url.includes('/api/') || 
-         req.url.startsWith('/api') ||
-         req.url.includes('ollolife.com');
+  // Add auth header to API requests (exclude public endpoints)
+  return (req.url.includes('/api/') || 
+          req.url.startsWith('/api') ||
+          req.url.includes('ollolife.com')) &&
+         !req.url.includes('/public/');
 }
