@@ -9,31 +9,42 @@
     </div>
     
     <div class="nav-items">
+      <!-- Dashboard Section -->
+      <div class="nav-section-header">Dashboard</div>
       <div class="nav-section">
-        <div class="nav-item active" (click)="setActiveSection('dashboard')">
-          <i class="fas fa-th-large"></i>
-          <span *ngIf="navExpanded">Dashboard</span>
+        <div class="nav-item active" (click)="setActiveSection('overview')">
+          <i class="fas fa-chart-line"></i>
+          <span>Overview</span>
         </div>
-        <div class="nav-sub-items" *ngIf="navExpanded && activeSection === 'dashboard'">
-          <div class="nav-sub-item active">Dashboard</div>
-          <div class="nav-sub-item">CMS Dashboard</div>
-          <div class="nav-sub-item">HR Dashboard</div>
+        <div class="nav-item" (click)="setActiveSection('analytics')">
+          <i class="fas fa-chart-bar"></i>
+          <span>Analytics</span>
+        </div>
+        <div class="nav-item" (click)="setActiveSection('reports')">
+          <i class="fas fa-file-alt"></i>
+          <span>Reports</span>
         </div>
       </div>
       
-      <div class="nav-item" (click)="setActiveSection('settings')">
-        <i class="fas fa-cog"></i>
-        <span *ngIf="navExpanded">Settings</span>
-      </div>
-      
-      <div class="nav-item" (click)="setActiveSection('hr')">
-        <i class="fas fa-users"></i>
-        <span *ngIf="navExpanded">HR</span>
-      </div>
-      
-      <div class="nav-item" (click)="setActiveSection('finance')">
-        <i class="fas fa-dollar-sign"></i>
-        <span *ngIf="navExpanded">Finance</span>
+      <!-- Modules Section -->
+      <div class="nav-section-header">Modules</div>
+      <div class="nav-section">
+        <div class="nav-item" (click)="setActiveSection('hr')">
+          <i class="fas fa-users"></i>
+          <span>HR Management</span>
+        </div>
+        <div class="nav-item" (click)="setActiveSection('finance')">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Finance</span>
+        </div>
+        <div class="nav-item" (click)="setActiveSection('projects')">
+          <i class="fas fa-project-diagram"></i>
+          <span>Projects</span>
+        </div>
+        <div class="nav-item" (click)="setActiveSection('settings')">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </div>
       </div>
     </div>
   </nav>
@@ -42,8 +53,8 @@
   <header class="top-bar">
     <div class="top-bar-content">
       <div class="welcome-section">
-        <h2 class="greeting">Good {{ getGreeting() }},</h2>
-        <h1 class="username">{{ currentUser?.username || 'User' }}</h1>
+        <h1 class="greeting"> OLLO Workstation</h1>
+        <h2 class="username">{{ currentUser?.username || 'User' }}</h2>
       </div>
       
       <div class="top-bar-actions">
