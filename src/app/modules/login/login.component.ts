@@ -1,15 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { LoginCredentials } from '../../core/models';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './login.html',
-  styleUrl: './login.css'
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss'
 })
-export class Login implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit, OnDestroy {
+  private authService = inject(AuthService);
+  private router = inject(Router);
   // Form data
   loginCompany = '';
   loginUser = '';
@@ -73,22 +78,20 @@ export class Login implements OnInit, OnDestroy {
     this.isLoading = true;
     
     try {
-      // Simulate API call
-      await this.performLogin();
-      
-      // Success handling
-      console.log('Login Successful', {
-        company: this.loginCompany,
-        user: this.loginUser,
-        // Don't log password in production
-      });
+      const credentials: LoginCredentials = {
+        company: this.loginCompany.trim(),
+        user: this.loginUser.trim(),
+        password: this.loginPassword.trim()
+      };
+
+      await this.authService.login(credentials);
       
       this.showSuccessMessage('Login successful! Redirecting...');
       
-      // Redirect logic would go here
+      // For now, just show success message since no dashboard exists yet
       setTimeout(() => {
-        // Example: this.router.navigate(['/dashboard']);
-        console.log('Redirecting to dashboard...');
+        console.log('Login successful - ready for dashboard navigation');
+        // this.router.navigate(['/dashboard']); // Uncomment when dashboard is implemented
       }, 1500);
       
     } catch (error) {
@@ -99,21 +102,6 @@ export class Login implements OnInit, OnDestroy {
     }
   }
 
-  private async performLogin(): Promise<void> {
-    // Simulate API call delay
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate success/failure based on dummy credentials
-        if (this.loginCompany === 'demo' && this.loginUser === 'admin' && this.loginPassword === 'password') {
-          resolve();
-        } else {
-          // For demo purposes, always resolve after delay
-          resolve();
-          // In production, you might reject: reject(new Error('Invalid credentials'));
-        }
-      }, 2000);
-    });
-  }
 
   private showErrorMessage(message: string) {
     // In a real app, you might use a toast service or modal

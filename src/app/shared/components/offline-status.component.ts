@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { OfflineService } from '../../services/offline.service';
+import { OfflineService } from '../../core/services/offline.service';
 
 @Component({
   selector: 'app-offline-status',

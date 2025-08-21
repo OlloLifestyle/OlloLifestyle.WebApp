@@ -16,7 +16,13 @@
       "Bash(git pull:*)",
       "Bash(docker-compose:*)",
       "Bash(docker system prune:*)",
-      "Bash(start \"Docker Desktop\" \"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\")"
+      "Bash(start \"Docker Desktop\" \"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\")",
+      "Bash(true)",
+      "Bash(dir \"D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyle.WebApp\\src\\app\\core\\services\")",
+      "Bash(mkdir:*)",
+      "Bash(move:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }
