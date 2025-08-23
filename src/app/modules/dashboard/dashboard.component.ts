@@ -92,6 +92,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showProfileMenu = !this.showProfileMenu;
   }
 
+  toggleNotifications(): void {
+    console.log('Notifications clicked');
+    // TODO: Implement notifications functionality
+  }
+
+  toggleLanguage(): void {
+    console.log('Language clicked');
+    // TODO: Implement language switcher functionality
+  }
+
+  toggleTheme(): void {
+    console.log('Theme clicked');
+    // TODO: Implement theme switching functionality
+  }
+
+  toggleColorPalette(): void {
+    console.log('Color palette clicked');
+    // TODO: Implement color palette functionality
+  }
+
   getGreeting(): string {
     const hour = new Date().getHours();
     if (hour < 12) return 'Morning';
