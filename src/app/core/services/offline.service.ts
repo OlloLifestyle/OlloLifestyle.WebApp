@@ -1,7 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { BehaviorSubject, Observable, fromEvent, merge, of } from 'rxjs';
 import { map, startWith, distinctUntilChanged, shareReplay } from 'rxjs/operators';
+import { DatabaseService } from './database.service';
 
 export interface OfflineData {
   timestamp: number;
@@ -15,8 +16,8 @@ export interface OfflineData {
 })
 export class OfflineService {
   private swUpdate = inject(SwUpdate);
-  private offlineQueue: OfflineData[] = [];
-  private readonly OFFLINE_STORAGE_KEY = 'ollo_offline_queue';
+  private dbService = inject(DatabaseService);
+  private injector = inject(Injector);
   
   // Network status tracking
   public readonly isOnline$: Observable<boolean> = merge(
@@ -38,13 +39,17 @@ export class OfflineService {
 
   constructor() {
     this.initializeServiceWorker();
-    this.loadOfflineQueue();
     this.setupInstallPrompt();
     
     // Sync offline queue when coming back online
-    this.isOnline$.subscribe(online => {
+    this.isOnline$.subscribe(async online => {
       if (online) {
-        this.syncOfflineQueue();
+        await this.syncOfflineQueue();
+        // Show online notification using simple notification API
+        this.showSimpleNotification('🌐 You\'re back online!', 'Syncing your offline changes...');
+      } else {
+        // Show offline notification using simple notification API  
+        this.showSimpleNotification('📶 You\'re now offline', 'Don\'t worry, your data will sync when you\'re back online');
       }
     });
   }
@@ -107,61 +112,45 @@ export class OfflineService {
     }
   }
 
-  public queueOfflineData(endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data: any): void {
-    const offlineData: OfflineData = {
-      timestamp: Date.now(),
-      endpoint,
-      method,
-      data
-    };
-
-    this.offlineQueue.push(offlineData);
-    this.saveOfflineQueue();
+  public async queueOfflineData(endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data: any): Promise<void> {
+    await this.dbService.queueOfflineRequest({
+      url: endpoint,
+      method: method as 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+      body: data
+    });
   }
 
-  private loadOfflineQueue(): void {
-    try {
-      const stored = localStorage.getItem(this.OFFLINE_STORAGE_KEY);
-      if (stored) {
-        this.offlineQueue = JSON.parse(stored);
-      }
-    } catch (error) {
-      console.error('Failed to load offline queue:', error);
-      this.offlineQueue = [];
-    }
-  }
+  // Legacy method - now using DatabaseService
 
-  private saveOfflineQueue(): void {
-    try {
-      localStorage.setItem(this.OFFLINE_STORAGE_KEY, JSON.stringify(this.offlineQueue));
-    } catch (error) {
-      console.error('Failed to save offline queue:', error);
-    }
-  }
+  // Legacy method - now using DatabaseService
 
   private async syncOfflineQueue(): Promise<void> {
-    if (this.offlineQueue.length === 0) return;
+    const pendingRequests = await this.dbService.getPendingRequests();
+    if (pendingRequests.length === 0) return;
 
-    console.log(`Syncing ${this.offlineQueue.length} offline items...`);
+    console.log(`Syncing ${pendingRequests.length} offline items...`);
     
-    const itemsToSync = [...this.offlineQueue];
-    this.offlineQueue = [];
-    this.saveOfflineQueue();
-
-    for (const item of itemsToSync) {
+    for (const request of pendingRequests) {
       try {
-        await this.syncOfflineItem(item);
-        console.log(`Synced offline item: ${item.endpoint}`);
+        const response = await fetch(request.url, {
+          method: request.method,
+          headers: request.headers || {},
+          body: request.body ? JSON.stringify(request.body) : undefined
+        });
+        
+        if (response.ok) {
+          await this.dbService.markRequestSynced(request.id!);
+          console.log(`Synced offline item: ${request.url}`);
+        } else {
+          await this.dbService.markRequestFailed(request.id!);
+        }
       } catch (error) {
-        console.error(`Failed to sync offline item: ${item.endpoint}`, error);
-        // Re-queue failed items
-        this.offlineQueue.push(item);
+        console.error(`Failed to sync offline item: ${request.url}`, error);
+        await this.dbService.markRequestFailed(request.id!);
       }
     }
-
-    if (this.offlineQueue.length > 0) {
-      this.saveOfflineQueue();
-    }
+    
+    await this.dbService.clearSyncedRequests();
   }
 
   private async syncOfflineItem(item: OfflineData): Promise<void> {
@@ -185,32 +174,12 @@ export class OfflineService {
     }
   }
 
-  public getCachedData<T>(key: string): T | null {
-    try {
-      const cached = localStorage.getItem(`ollo_cache_${key}`);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        // Check if data is not too old (24 hours max)
-        if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
-          return parsed.data;
-        }
-      }
-    } catch (error) {
-      console.error('Failed to get cached data:', error);
-    }
-    return null;
+  public async getCachedData<T>(key: string): Promise<T | null> {
+    return await this.dbService.getCachedData<T>(key);
   }
 
-  public setCachedData<T>(key: string, data: T): void {
-    try {
-      const cacheItem = {
-        data,
-        timestamp: Date.now()
-      };
-      localStorage.setItem(`ollo_cache_${key}`, JSON.stringify(cacheItem));
-    } catch (error) {
-      console.error('Failed to cache data:', error);
-    }
+  public async setCachedData<T>(key: string, data: T): Promise<void> {
+    await this.dbService.setCachedData(key, data);
   }
 
   private notifyUser(message: string): void {
@@ -219,12 +188,39 @@ export class OfflineService {
     // You could also dispatch a custom event or use a toast service here
   }
 
-  public getOfflineQueueSize(): number {
-    return this.offlineQueue.length;
+  public async getOfflineQueueSize(): Promise<number> {
+    const stats = await this.dbService.getStorageStats();
+    return stats.offlineRequests;
   }
 
-  public clearOfflineQueue(): void {
-    this.offlineQueue = [];
-    this.saveOfflineQueue();
+  public async clearOfflineQueue(): Promise<void> {
+    await this.dbService.clearSyncedRequests();
+  }
+
+  // Simple notification method to avoid circular dependencies
+  private async showSimpleNotification(title: string, body: string): Promise<void> {
+    try {
+      // Check if notifications are supported and permission is granted
+      if ('Notification' in window && Notification.permission === 'granted') {
+        // Use service worker to show notification if available
+        if ('serviceWorker' in navigator) {
+          const registration = await navigator.serviceWorker.ready;
+          await registration.showNotification(title, {
+            body,
+            icon: '/assets/icons/icon-192x192.png',
+            badge: '/assets/icons/badge-72x72.png',
+            tag: 'network-status',
+            requireInteraction: false,
+            silent: true
+          });
+        }
+      } else {
+        // Fallback: log to console for development
+        console.log(`📱 ${title}: ${body}`);
+      }
+    } catch (error) {
+      // Silently fail - notifications are not critical
+      console.debug('Notification not shown:', error);
+    }
   }
 }
