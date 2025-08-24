@@ -2,36 +2,26 @@
 <app-offline-status></app-offline-status>
 
 <!-- Dashboard Header -->
-<div class="bg-gradient-to-r from-oxford-blue via-oxford-blue to-blue-900 p-6 border-b border-white/10">
+<div class="bg-white p-6 border-b border-gray-200">
   <div class="max-w-7xl mx-auto flex justify-between items-center">
     <div class="flex items-center space-x-4">
-      <div class="w-12 h-12 bg-peach rounded-full flex items-center justify-center text-oxford-blue font-bold text-xl">
+      <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
         OL
       </div>
       <div>
-        <h1 class="text-2xl font-bold text-white">Ollo Lifestyle Dashboard</h1>
-        <p class="text-white/70" *ngIf="currentUser()">
+        <h1 class="text-2xl font-bold text-gray-800">Ollo Lifestyle Dashboard</h1>
+        <p class="text-gray-600" *ngIf="currentUser()">
           Welcome back, {{ currentUser()?.firstName || currentUser()?.username }}!
         </p>
       </div>
     </div>
     
     <div class="flex items-center space-x-4">
-      <!-- Demo Toggle Button -->
-      <button 
-        (click)="toggleDemo()"
-        class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg 
-               transition-all duration-200 border border-white/20 hover:border-white/40
-               focus:outline-none focus:ring-2 focus:ring-peach/50">
-        <i class="fas" [class.fa-eye]="!showModernDemo()" [class.fa-eye-slash]="showModernDemo()"></i>
-        {{ showModernDemo() ? 'Hide' : 'Show' }} Demo
-      </button>
-      
       <!-- Logout Button -->
       <button 
         (click)="logout()"
-        class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 
-               rounded-lg transition-all duration-200 border border-red-500/30 hover:border-red-500/50
+        class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 
+               rounded-lg transition-all duration-200 border border-red-200 hover:border-red-300
                focus:outline-none focus:ring-2 focus:ring-red-500/50">
         <i class="fas fa-sign-out-alt mr-2"></i>
         Logout
@@ -41,161 +31,10 @@
 </div>
 
 <!-- Dashboard Content -->
-<div class="min-h-screen bg-oxford-blue">
-  
-  <!-- Modern Demo Section (Toggleable) -->
-  <div *ngIf="showModernDemo()" class="relative">
-    <!-- Demo Header -->
-    <div class="bg-gradient-to-r from-peach/10 to-green/10 border-b border-peach/20 p-4">
-      <div class="max-w-7xl mx-auto">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-xl font-semibold text-white flex items-center">
-              <i class="fas fa-flask mr-2 text-peach"></i>
-              Modern Angular + TailwindCSS Demo
-            </h2>
-            <p class="text-white/70 text-sm mt-1">
-              Testing 2025 best practices: Animations, PWA features, and accessibility
-            </p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="px-3 py-1 bg-green/20 text-green border border-green/30 rounded-full text-xs">
-               Build Successful
-            </span>
-            <span class="px-3 py-1 bg-peach/20 text-peach border border-peach/30 rounded-full text-xs">
-              =� Ready for Testing
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Demo Component -->
-    <app-modern-demo></app-modern-demo>
-  </div>
-
-  <!-- Regular Dashboard Content (When Demo is Hidden) -->
-  <div *ngIf="!showModernDemo()" class="p-8">
+<div class="min-h-screen bg-white">
+  <div class="p-8">
     <div class="max-w-7xl mx-auto">
-      
-      <!-- Welcome Card -->
-      <div class="card p-8 mb-8">
-        <div class="text-center">
-          <div class="w-24 h-24 bg-gradient-to-r from-peach to-green rounded-full mx-auto mb-6 
-                      flex items-center justify-center text-4xl text-white shadow-xl">
-            <�
-          </div>
-          <h2 class="text-3xl font-bold text-white mb-4">
-            Welcome to Your Dashboard!
-          </h2>
-          <p class="text-white/70 text-lg max-w-2xl mx-auto mb-8">
-            Your Angular 20 app has been successfully modernized with TailwindCSS, animations, 
-            PWA features, and world-class offline capabilities.
-          </p>
-          <button 
-            (click)="toggleDemo()"
-            class="btn-primary">
-            <i class="fas fa-rocket mr-2"></i>
-            View Modern Demo
-          </button>
-        </div>
-      </div>
-
-      <!-- Feature Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        <!-- TailwindCSS Card -->
-        <div class="card p-6 hover:bg-white/10 transition-all duration-300 group">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full 
-                        flex items-center justify-center text-2xl mr-4 
-                        transition-transform duration-200 group-hover:rotate-12">
-              <�
-            </div>
-            <h3 class="text-xl font-semibold text-white">TailwindCSS</h3>
-          </div>
-          <p class="text-white/70 mb-4">
-            Utility-first CSS framework with custom design system and animations
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 bg-white/10 text-white/80 text-sm rounded-full">
-              Utilities
-            </span>
-            <span class="px-3 py-1 bg-white/10 text-white/80 text-sm rounded-full">
-              Responsive
-            </span>
-          </div>
-        </div>
-
-        <!-- Angular Animations Card -->
-        <div class="card p-6 hover:bg-white/10 transition-all duration-300 group">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-full 
-                        flex items-center justify-center text-2xl mr-4 
-                        transition-transform duration-200 group-hover:rotate-12">
-              <�
-            </div>
-            <h3 class="text-xl font-semibold text-white">Animations</h3>
-          </div>
-          <p class="text-white/70 mb-4">
-            Smooth, performant animations with Web Animations API
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 bg-white/10 text-white/80 text-sm rounded-full">
-              Accessible
-            </span>
-            <span class="px-3 py-1 bg-white/10 text-white/80 text-sm rounded-full">
-              Performance
-            </span>
-          </div>
-        </div>
-
-        <!-- PWA Features Card -->
-        <div class="card p-6 hover:bg-white/10 transition-all duration-300 group">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-full 
-                        flex items-center justify-center text-2xl mr-4 
-                        transition-transform duration-200 group-hover:rotate-12">
-              =�
-            </div>
-            <h3 class="text-xl font-semibold text-white">PWA Ready</h3>
-          </div>
-          <p class="text-white/70 mb-4">
-            Offline support, push notifications, and background sync
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 bg-white/10 text-white/80 text-sm rounded-full">
-              Offline First
-            </span>
-            <span class="px-3 py-1 bg-white/10 text-white/80 text-sm rounded-full">
-              Native Feel
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="mt-12 text-center">
-        <div class="space-x-4">
-          <button 
-            (click)="toggleDemo()"
-            class="btn-primary">
-            <i class="fas fa-play mr-2"></i>
-            Launch Demo
-          </button>
-          
-          <button 
-            class="px-6 py-3 bg-transparent border-2 border-white/30 text-white rounded-lg 
-                   transition-all duration-200 hover:border-white/60 hover:bg-white/5 
-                   focus:outline-none focus:ring-2 focus:ring-white/50">
-            <i class="fab fa-github mr-2"></i>
-            View Documentation
-          </button>
-        </div>
-      </div>
-
+      <!-- Clean empty dashboard content -->
     </div>
   </div>
-
 </div>

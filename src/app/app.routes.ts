@@ -18,10 +18,6 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'demo',
-    loadComponent: () => import('./components/modern-demo.component').then(m => m.ModernDemoComponent)
-  },
-  {
     path: 'unauthorized',
     loadComponent: () => import('./shared/components/unauthorized.component').then(m => m.UnauthorizedComponent)
   },
