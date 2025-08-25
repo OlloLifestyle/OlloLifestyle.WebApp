@@ -1,0 +1,280 @@
+<nav class="mega-menu-navbar bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      
+      <!-- Logo/Brand -->
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">F</span>
+            </div>
+            <span class="text-xl font-semibold text-gray-900">Flowbase</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center space-x-1">
+        <div class="flex items-center space-x-1">
+          <div 
+            *ngFor="let item of menuItems" 
+            class="relative"
+            (mouseenter)="!isMobile() && toggleDropdown(item.id, $event)"
+            (mouseleave)="!isMobile() && closeDropdown()"
+          >
+            <!-- Menu Trigger -->
+            <button
+              class="group flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 transition-all duration-200"
+              (click)="isMobile() && toggleDropdown(item.id, $event)"
+              [class.text-gray-900]="isDropdownActive(item.id)"
+              [class.bg-gray-50]="isDropdownActive(item.id)"
+            >
+              <span>{{ item.title }}</span>
+              <svg 
+                class="ml-1.5 w-4 h-4 transform transition-transform duration-200"
+                [class.rotate-180]="isDropdownActive(item.id)"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Desktop Mega Menu Dropdown -->
+            <div 
+              *ngIf="isDropdownActive(item.id) && !isMobile()"
+              [@megaMenuAnimation]="isDropdownActive(item.id) ? 'open' : 'closed'"
+              class="absolute top-full left-0 mt-1 w-[1200px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+              (mouseenter)="toggleDropdown(item.id, $event)"
+              (mouseleave)="closeDropdown()"
+            >
+              <!-- Header Section -->
+              <div class="px-8 py-4 bg-gradient-to-r from-gray-50 to-gray-50/50 border-b border-gray-100">
+                <div class="text-center">
+                  <h3 class="text-base font-semibold text-gray-900 mb-1">Browse {{ item.title }}</h3>
+                  <p class="text-xs text-gray-600">{{ item.description }}</p>
+                </div>
+              </div>
+
+              <!-- Three Column Layout -->
+              <div class="grid grid-cols-3 divide-x divide-gray-100">
+                
+                <!-- Left Column - Browse Products -->
+                <div class="p-6">
+                  <h4 class="text-sm font-semibold text-gray-900 mb-4">Browse Products</h4>
+                  <div class="space-y-3">
+                    <div *ngFor="let subItem of getMainItems(item.items)" class="group">
+                      <a 
+                        href="javascript:void(0)"
+                        class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50/70 transition-all duration-200"
+                        (click)="onMenuItemClick()"
+                      >
+                        <div class="flex-shrink-0">
+                          <div class="w-8 h-8 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border border-gray-100">
+                            <span class="text-sm">{{ subItem.icon }}</span>
+                          </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between">
+                            <h5 class="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                              {{ subItem.title }}
+                            </h5>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Middle Column - Get Started -->
+                <div class="p-6">
+                  <h4 class="text-sm font-semibold text-gray-900 mb-4">Get Started</h4>
+                  <div class="space-y-3">
+                    <a 
+                      *ngFor="let subItem of getSecondaryItems(item.items)"
+                      href="javascript:void(0)"
+                      class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50/70 transition-all duration-200"
+                      (click)="onMenuItemClick()"
+                    >
+                      <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center border border-gray-100">
+                          <span class="text-sm">{{ subItem.icon }}</span>
+                        </div>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-gray-900">{{ subItem.title }}</div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Right Column - Apps & Tools -->
+                <div class="p-6 bg-gray-50/30">
+                  <h4 class="text-sm font-semibold text-gray-900 mb-4">Apps & Tools</h4>
+                  <div class="space-y-3">
+                    <div class="flex items-center space-x-3 p-3 bg-white/60 rounded-lg border border-gray-100">
+                      <div class="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <div class="text-sm font-medium text-gray-900">Chrome Extension</div>
+                        <div class="text-xs text-gray-500">Over 15,000+ Downloads</div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 p-3 bg-white/60 rounded-lg border border-gray-100">
+                      <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <div class="text-sm font-medium text-gray-900">Figma Plugin</div>
+                        <div class="text-xs text-gray-500">Access resources inside Figma</div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 p-3 bg-white/60 rounded-lg border border-gray-100">
+                      <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18z"/>
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <div class="text-sm font-medium text-gray-900">Boosters</div>
+                        <div class="text-xs text-gray-500">No-code advanced solutions</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center space-x-3 ml-8 pl-8 border-l border-gray-200">
+          <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50/80 transition-all duration-200">
+            Login
+          </button>
+          <button class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
+            Sign up
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button
+          (click)="toggleMobileMenu()"
+          class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+          aria-label="Toggle mobile menu"
+        >
+          <svg 
+            class="w-6 h-6 transform transition-transform duration-200"
+            [class.rotate-90]="isMobileMenuOpen()"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              *ngIf="!isMobileMenuOpen()" 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+            <path 
+              *ngIf="isMobileMenuOpen()" 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div 
+    *ngIf="isMobileMenuOpen()" 
+    [@mobileMenuAnimation]="isMobileMenuOpen() ? 'open' : 'closed'"
+    class="md:hidden bg-white border-t border-gray-200 shadow-lg"
+  >
+    <div class="px-4 pt-2 pb-3 space-y-1 max-h-screen overflow-y-auto">
+      
+      <div *ngFor="let item of menuItems" class="space-y-1">
+        <!-- Mobile Menu Section Header -->
+        <button
+          (click)="toggleDropdown(item.id, $event)"
+          class="w-full flex items-center justify-between px-3 py-3 rounded-md text-left font-medium text-gray-900 hover:bg-blue-50 transition-colors duration-200"
+          [class.bg-blue-50]="isDropdownActive(item.id)"
+          [class.text-blue-600]="isDropdownActive(item.id)"
+        >
+          <div class="flex items-center">
+            <span class="text-lg mr-3">{{ item.icon }}</span>
+            <div>
+              <span class="block text-sm">{{ item.title }}</span>
+              <span class="block text-xs text-gray-500 mt-1">{{ item.description }}</span>
+            </div>
+          </div>
+          <svg 
+            class="w-5 h-5 transform transition-transform duration-200"
+            [class.rotate-180]="isDropdownActive(item.id)"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        <!-- Mobile Submenu -->
+        <div 
+          *ngIf="isDropdownActive(item.id)"
+          [@mobileMenuAnimation]="isDropdownActive(item.id) ? 'open' : 'closed'"
+          class="pl-6 space-y-1"
+        >
+          <a
+            *ngFor="let subItem of item.items"
+            [routerLink]="subItem.route"
+            class="group flex items-center px-3 py-2 rounded-md text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+            (click)="onMenuItemClick()"
+          >
+            <span class="text-base mr-3">{{ subItem.icon }}</span>
+            <div class="flex-1">
+              <div class="flex items-center">
+                <span class="font-medium">{{ subItem.title }}</span>
+                <span 
+                  *ngIf="subItem.badge"
+                  class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                  [ngClass]="{
+                    'bg-red-100 text-red-800': subItem.badge === 'Live',
+                    'bg-blue-100 text-blue-800': subItem.badge !== 'Live'
+                  }"
+                >
+                  {{ subItem.badge }}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">{{ subItem.description }}</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Overlay for mobile menu -->
+<div 
+  *ngIf="isMobileMenuOpen()" 
+  class="fixed inset-0 bg-black bg-opacity-25 z-40 md:hidden"
+  (click)="toggleMobileMenu()"
+></div>

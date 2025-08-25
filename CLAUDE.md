@@ -11,6 +11,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run watch` - Build in watch mode for development
 - `npm test` - Run unit tests with Karma/Jasmine
 
+### Tailwind Development
+- `npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch` - Watch mode for Tailwind compilation
+- `npm run build:css` - Build optimized Tailwind CSS for production
+- Tailwind utilities are automatically processed during Angular build pipeline
+
 ### Testing
 - Uses Jasmine testing framework with Karma test runner
 - Test files follow `*.spec.ts` naming convention
@@ -64,26 +69,51 @@ src/
 - **Demo Credentials**: company: "demo", user: "admin", password: "password"
 
 ### Styling & Assets
+- **Tailwind CSS 3.4+** for utility-first styling with JIT compilation
+- **Tailwind Animations**: Built-in animation utilities (animate-spin, animate-pulse, animate-bounce, etc.)
+- **Custom Animations**: Extended animation configurations in tailwind.config.js
 - **FontAwesome 6.7.2** for icons (loaded via CDN in angular.json)
-- **CSS Custom Properties**: Uses modern CSS features
+- **CSS Custom Properties**: Uses modern CSS features alongside Tailwind utilities
 - **Assets**: Logo, SVG icons, and images stored in `/assets` and `/public` directories
-- **Responsive Design**: Mobile-first approach with modern CSS Grid/Flexbox
+- **Responsive Design**: Mobile-first approach using Tailwind breakpoints (sm:, md:, lg:, xl:, 2xl:)
 
 ### Dependencies & Libraries
 - **Core Angular**: @angular/core, @angular/common, @angular/forms, @angular/router
+- **Tailwind CSS**: tailwindcss, @tailwindcss/typography, @tailwindcss/forms for utility styling
 - **PWA Support**: @angular/service-worker, @angular/pwa for offline functionality
 - **Testing**: Jasmine, Karma with Chrome launcher
 - **Build System**: Angular CLI with @angular/build
 - **Icons**: FontAwesome Free 6.7.2
 
+### Tailwind CSS Configuration
+- **JIT Mode**: Just-in-time compilation for optimal bundle size
+- **Custom Theme**: Extended color palette, fonts, and spacing in tailwind.config.js
+- **Animation Extensions**: Custom keyframes and animation utilities
+- **Plugin Ecosystem**: Typography, forms, and aspect-ratio plugins integrated
+- **Purge Configuration**: Production builds only include used utilities
+- **Dark Mode**: Class-based dark mode support with 'class' strategy
+- **Responsive Design**: Mobile-first breakpoint system (sm:640px, md:768px, lg:1024px, xl:1280px, 2xl:1536px)
+
+### Tailwind Animation System
+- **Built-in Animations**: animate-spin, animate-ping, animate-pulse, animate-bounce
+- **Custom Animations**: Defined in tailwind.config.js extending the animation theme
+- **Transition Utilities**: transition-all, transition-colors, transition-opacity with duration controls
+- **Transform Utilities**: scale, rotate, translate, skew with hover and focus states
+- **Motion Preferences**: Respects prefers-reduced-motion for accessibility
+- **Performance**: Hardware-accelerated transforms using GPU layers
+
 ### PWA Features
 - **Service Worker**: Automatic caching and offline support via Angular Service Worker
-- **App Manifest**: Installable app with custom icons and branding
+- **App Manifest**: Installable app with custom icons and branding (manifest.json)
 - **Offline Sync**: Queues API requests when offline and syncs when back online
 - **Cache Strategies**: Fresh-first for critical data, cache-first for static assets
 - **Update Notifications**: Automatic update detection with user prompts
 - **Install Prompts**: Native app installation prompts on supported devices
 - **Network Status**: Real-time online/offline status indicators
+- **Background Sync**: Retry failed requests automatically when connection restored
+- **Push Notifications**: Framework ready for push messaging (Angular service worker)
+- **App Shell Architecture**: Instant loading with cached application shell
+- **Precaching**: Critical resources cached during service worker installation
 
 ### TypeScript Configuration
 - **Strict Mode**: All strict TypeScript options enabled
@@ -179,6 +209,16 @@ networks:
 - Use Angular's naming conventions (PascalCase for components, camelCase for properties)
 - Separate concerns: component logic, template, and styles in separate files
 - Follow Angular's style guide for component architecture
+
+### Tailwind CSS Development Guidelines
+- **Utility-First Approach**: Prefer Tailwind utilities over custom CSS
+- **Component Extraction**: Use @apply directive for repeated utility patterns
+- **Responsive Design**: Use mobile-first breakpoint prefixes (sm:, md:, lg:, xl:, 2xl:)
+- **State Variants**: Leverage hover:, focus:, active:, disabled: modifiers
+- **Animation Best Practices**: Use transition utilities with transform for smooth animations
+- **Accessibility**: Always include focus states and respect motion preferences
+- **Performance**: Avoid arbitrary values in favor of theme-based utilities
+- **Custom Components**: Extract complex utility combinations into CSS components when needed
 
 ### Testing Requirements
 - Unit tests for all components using Jasmine/Karma

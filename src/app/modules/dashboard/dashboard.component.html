@@ -1,40 +1,71 @@
 <!-- Offline Status Banner -->
 <app-offline-status></app-offline-status>
 
-<!-- Dashboard Header -->
-<div class="bg-white p-6 border-b border-gray-200">
-  <div class="max-w-7xl mx-auto flex justify-between items-center">
-    <div class="flex items-center space-x-4">
-      <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-        OL
-      </div>
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800">Ollo Lifestyle Dashboard</h1>
-        <p class="text-gray-600" *ngIf="currentUser()">
-          Welcome back, {{ currentUser()?.firstName || currentUser()?.username }}!
-        </p>
-      </div>
-    </div>
-    
-    <div class="flex items-center space-x-4">
-      <!-- Logout Button -->
-      <button 
-        (click)="logout()"
-        class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 
-               rounded-lg transition-all duration-200 border border-red-200 hover:border-red-300
-               focus:outline-none focus:ring-2 focus:ring-red-500/50">
-        <i class="fas fa-sign-out-alt mr-2"></i>
-        Logout
-      </button>
-    </div>
-  </div>
-</div>
+<!-- Mega Menu Navigation -->
+<app-mega-menu></app-mega-menu>
 
 <!-- Dashboard Content -->
 <div class="min-h-screen bg-white">
   <div class="p-8">
     <div class="max-w-7xl mx-auto">
-      <!-- Clean empty dashboard content -->
+      <!-- Welcome Section (Only shown when on main dashboard route) -->
+      <div *ngIf="isMainDashboard()" class="text-center py-16">
+        <div class="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+          <span class="text-white font-bold text-2xl">F</span>
+        </div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to Flowbase Dashboard</h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+          Discover professional design components and resources. 
+          Explore our extensive library using the redesigned mega menu above.
+        </p>
+        
+        <div *ngIf="currentUser()" class="bg-gradient-to-r from-gray-50 to-gray-50/50 rounded-2xl p-6 max-w-md mx-auto border border-gray-100 shadow-sm">
+          <p class="text-gray-800 font-medium">
+            👋 Welcome back, <strong>{{ currentUser()?.firstName || currentUser()?.username }}!</strong>
+          </p>
+          <p class="text-gray-600 text-sm mt-2">
+            Browse Components, explore Resources, check Pricing, or discover our Product features above.
+          </p>
+        </div>
+
+        <!-- Feature Highlights -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
+          <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100">
+              <span class="text-2xl">🧩</span>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Components</h3>
+            <p class="text-sm text-gray-600">Professional UI building blocks ready for your projects</p>
+          </div>
+          
+          <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+            <div class="w-12 h-12 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100">
+              <span class="text-2xl">📖</span>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Resources</h3>
+            <p class="text-sm text-gray-600">Complete documentation and guides to get started</p>
+          </div>
+          
+          <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100">
+              <span class="text-2xl">💎</span>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Premium</h3>
+            <p class="text-sm text-gray-600">Advanced features and tools for professional use</p>
+          </div>
+          
+          <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+            <div class="w-12 h-12 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg flex items-center justify-center mb-4 border border-gray-100">
+              <span class="text-2xl">🛠️</span>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Tools</h3>
+            <p class="text-sm text-gray-600">Browser extensions and design tool integrations</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Child Route Content -->
+      <router-outlet></router-outlet>
     </div>
   </div>
 </div>
