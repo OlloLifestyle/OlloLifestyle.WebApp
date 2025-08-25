@@ -1,7 +1,7 @@
 import { Component, signal, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import { trigger, state, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
 
 interface MegaMenuItem {
   id: string;
@@ -26,40 +26,154 @@ interface MegaMenuSubItem {
   templateUrl: './mega-menu.component.html',
   styleUrls: ['./mega-menu.component.css'],
   animations: [
-    trigger('megaMenuAnimation', [
-      state('closed', style({
-        opacity: 0,
-        transform: 'translateY(-10px)',
-        visibility: 'hidden'
-      })),
-      state('open', style({
-        opacity: 1,
-        transform: 'translateY(0)',
-        visibility: 'visible'
-      })),
-      transition('closed => open', [
-        animate('200ms ease-out')
-      ]),
-      transition('open => closed', [
-        animate('150ms ease-in')
+    // Stagger animation for all icons
+    trigger('staggerIcons', [
+      transition(':enter', [
+        query('div', [
+          style({ opacity: 0, transform: 'translateY(20px) scale(0.8)' }),
+          stagger(100, [
+            animate('600ms cubic-bezier(0.35, 0, 0.25, 1)', 
+              style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+            )
+          ])
+        ], { optional: true })
       ])
     ]),
-    trigger('mobileMenuAnimation', [
-      state('closed', style({
-        height: '0',
-        opacity: 0,
-        overflow: 'hidden'
-      })),
-      state('open', style({
-        height: '*',
-        opacity: 1,
-        overflow: 'visible'
-      })),
-      transition('closed => open', [
-        animate('300ms ease-out')
+    
+    // Creative floating animation for icons
+    trigger('iconFloat', [
+      state('float1', style({ transform: 'translateY(0px)' })),
+      state('float2', style({ transform: 'translateY(0px)' })),
+      state('float3', style({ transform: 'translateY(0px)' })),
+      state('float4', style({ transform: 'translateY(0px)' })),
+      transition('* => *', [
+        animate('3s ease-in-out', keyframes([
+          style({ transform: 'translateY(0px)', offset: 0 }),
+          style({ transform: 'translateY(-3px)', offset: 0.5 }),
+          style({ transform: 'translateY(0px)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Hover scale animation
+    trigger('iconHover', [
+      state('default', style({ transform: 'scale(1) rotate(0deg)' })),
+      state('hover', style({ transform: 'scale(1.15) rotate(-5deg)' })),
+      transition('default <=> hover', animate('300ms cubic-bezier(0.35, 0, 0.25, 1)'))
+    ]),
+    
+    // Bell shake animation
+    trigger('bellShake', [
+      state('default', style({ transform: 'rotate(0deg)' })),
+      state('shake', style({ transform: 'rotate(0deg)' })),
+      transition('default => shake', [
+        animate('600ms ease-in-out', keyframes([
+          style({ transform: 'rotate(0deg)', offset: 0 }),
+          style({ transform: 'rotate(-15deg)', offset: 0.25 }),
+          style({ transform: 'rotate(15deg)', offset: 0.5 }),
+          style({ transform: 'rotate(-10deg)', offset: 0.75 }),
+          style({ transform: 'rotate(0deg)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Globe rotation
+    trigger('globeRotate', [
+      state('default', style({ transform: 'rotateY(0deg)' })),
+      state('rotate', style({ transform: 'rotateY(0deg)' })),
+      transition('default => rotate', [
+        animate('1200ms ease-in-out', keyframes([
+          style({ transform: 'rotateY(0deg)', offset: 0 }),
+          style({ transform: 'rotateY(180deg)', offset: 0.5 }),
+          style({ transform: 'rotateY(360deg)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Moon phase animation
+    trigger('moonPhase', [
+      state('default', style({ transform: 'rotate(0deg) scale(1)' })),
+      state('phase', style({ transform: 'rotate(0deg) scale(1)' })),
+      transition('default => phase', [
+        animate('800ms ease-in-out', keyframes([
+          style({ transform: 'rotate(0deg) scale(1)', offset: 0 }),
+          style({ transform: 'rotate(90deg) scale(0.8)', offset: 0.25 }),
+          style({ transform: 'rotate(180deg) scale(1.1)', offset: 0.5 }),
+          style({ transform: 'rotate(270deg) scale(0.9)', offset: 0.75 }),
+          style({ transform: 'rotate(360deg) scale(1)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // User pulse animation
+    trigger('userPulse', [
+      state('default', style({ transform: 'scale(1)' })),
+      state('pulse', style({ transform: 'scale(1)' })),
+      transition('default => pulse', [
+        animate('1000ms ease-in-out', keyframes([
+          style({ transform: 'scale(1)', offset: 0 }),
+          style({ transform: 'scale(1.1)', offset: 0.3 }),
+          style({ transform: 'scale(0.95)', offset: 0.6 }),
+          style({ transform: 'scale(1.05)', offset: 0.8 }),
+          style({ transform: 'scale(1)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Notification badge pulse
+    trigger('notificationPulse', [
+      transition(':enter', [
+        animate('2000ms ease-in-out', keyframes([
+          style({ transform: 'scale(1)', offset: 0 }),
+          style({ transform: 'scale(1.3)', offset: 0.5 }),
+          style({ transform: 'scale(1)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Number bounce in notification
+    trigger('numberBounce', [
+      transition(':enter', [
+        style({ transform: 'scale(0) rotate(180deg)' }),
+        animate('500ms cubic-bezier(0.68, -0.55, 0.265, 1.55)', 
+          style({ transform: 'scale(1) rotate(0deg)' })
+        )
+      ])
+    ]),
+    
+    // Online status animation
+    trigger('onlineStatus', [
+      transition(':enter', [
+        animate('1500ms ease-in-out', keyframes([
+          style({ transform: 'scale(0)', opacity: 0, offset: 0 }),
+          style({ transform: 'scale(1.2)', opacity: 0.8, offset: 0.6 }),
+          style({ transform: 'scale(1)', opacity: 1, offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Dropdown slide animation
+    trigger('dropdownSlide', [
+      transition(':enter', [
+        style({ 
+          opacity: 0, 
+          transform: 'translateY(-20px) scale(0.95) rotateX(-10deg)',
+          transformOrigin: 'top right'
+        }),
+        animate('400ms cubic-bezier(0.25, 0.8, 0.25, 1)', 
+          style({ 
+            opacity: 1, 
+            transform: 'translateY(0) scale(1) rotateX(0deg)' 
+          })
+        )
       ]),
-      transition('open => closed', [
-        animate('200ms ease-in')
+      transition(':leave', [
+        animate('300ms cubic-bezier(0.25, 0.8, 0.25, 1)', 
+          style({ 
+            opacity: 0, 
+            transform: 'translateY(-20px) scale(0.95) rotateX(-10deg)' 
+          })
+        )
       ])
     ])
   ]
@@ -72,6 +186,13 @@ export class MegaMenuComponent {
   isMobileMenuOpen = signal(false);
   activeDropdown = signal<string | null>(null);
   isMobile = signal(false);
+  isUserDropdownOpen = signal(false);
+  
+  // Hover states for animations
+  notificationHover = false;
+  languageHover = false;
+  darkModeHover = false;
+  userHover = false;
 
   // Menu configuration
   menuItems: MegaMenuItem[] = [
@@ -145,6 +266,12 @@ export class MegaMenuComponent {
     if (isPlatformBrowser(this.platformId)) {
       this.checkScreenSize();
       window.addEventListener('resize', () => this.checkScreenSize());
+      // Close dropdown when clicking outside
+      window.addEventListener('click', (event) => {
+        if (!event.target || !(event.target as Element).closest('.relative.group')) {
+          this.isUserDropdownOpen.set(false);
+        }
+      });
     }
   }
 
@@ -162,6 +289,7 @@ export class MegaMenuComponent {
   }
 
   private hoverTimeout: any = null;
+  private userDropdownTimeout: any = null;
 
   public showDropdown(itemId: string): void {
     if (this.hoverTimeout) {
@@ -174,6 +302,37 @@ export class MegaMenuComponent {
     this.hoverTimeout = setTimeout(() => {
       this.activeDropdown.set(null);
     }, 150);
+  }
+
+  public showUserDropdown(): void {
+    if (this.userDropdownTimeout) {
+      clearTimeout(this.userDropdownTimeout);
+    }
+    this.isUserDropdownOpen.set(true);
+  }
+
+  public hideUserDropdown(): void {
+    this.userDropdownTimeout = setTimeout(() => {
+      this.isUserDropdownOpen.set(false);
+    }, 150);
+  }
+
+  public toggleUserDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isUserDropdownOpen.set(!this.isUserDropdownOpen());
+  }
+
+  public signOut(): void {
+    // Add sign out logic here
+    console.log('Signing out...');
+    // Close all dropdowns and mobile menu
+    this.isUserDropdownOpen.set(false);
+    this.isMobileMenuOpen.set(false);
+    this.activeDropdown.set(null);
+    // Redirect to login page or perform logout action
+    // Example: this.router.navigate(['/login']);
   }
 
   toggleDropdown(itemId: string, event: Event): void {
@@ -195,6 +354,7 @@ export class MegaMenuComponent {
   onMenuItemClick(): void {
     this.isMobileMenuOpen.set(false);
     this.activeDropdown.set(null);
+    this.isUserDropdownOpen.set(false);
   }
 
   // Helper method to check if dropdown is active

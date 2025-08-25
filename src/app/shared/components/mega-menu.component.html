@@ -145,15 +145,123 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center space-x-3">
-          <button type="button" class="text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors duration-150">
-            Login
-          </button>
-          
-          <button type="button" class="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-150">
-            Sign up
-          </button>
+        <!-- Dashboard Icons - Creative Angular Animations -->
+        <div class="flex items-center justify-end ml-auto mr-4" [@staggerIcons]>
+          <!-- Notifications -->
+          <div class="relative" [@iconFloat]="'float1'">
+            <button 
+              type="button"
+              class="relative p-3 text-gray-600 hover:text-blue-600 transition-colors duration-300"
+              aria-label="Notifications"
+              [@iconHover]="notificationHover ? 'hover' : 'default'"
+              (mouseenter)="notificationHover = true"
+              (mouseleave)="notificationHover = false"
+            >
+              <i class="fas fa-bell text-xl" aria-hidden="true" [@bellShake]="notificationHover ? 'shake' : 'default'"></i>
+              <!-- Creative notification badge -->
+              <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" [@notificationPulse]>
+                <span class="text-xs text-white font-bold" [@numberBounce]>3</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Language -->
+          <div class="relative ml-6" [@iconFloat]="'float2'">
+            <button 
+              type="button"
+              class="p-3 text-gray-600 hover:text-emerald-600 transition-colors duration-300"
+              aria-label="Language"
+              [@iconHover]="languageHover ? 'hover' : 'default'"
+              (mouseenter)="languageHover = true"
+              (mouseleave)="languageHover = false"
+            >
+              <i class="fas fa-globe text-xl" aria-hidden="true" [@globeRotate]="languageHover ? 'rotate' : 'default'"></i>
+            </button>
+          </div>
+
+          <!-- Dark Mode -->
+          <div class="relative ml-6" [@iconFloat]="'float3'">
+            <button 
+              type="button"
+              class="p-3 text-gray-600 hover:text-purple-600 transition-colors duration-300"
+              aria-label="Dark Mode"
+              [@iconHover]="darkModeHover ? 'hover' : 'default'"
+              (mouseenter)="darkModeHover = true"
+              (mouseleave)="darkModeHover = false"
+            >
+              <i class="fas fa-moon text-xl" aria-hidden="true" [@moonPhase]="darkModeHover ? 'phase' : 'default'"></i>
+            </button>
+          </div>
+
+          <!-- User Menu -->
+          <div class="relative ml-8" [@iconFloat]="'float4'">
+            <button 
+              type="button"
+              class="relative p-3 text-gray-600 hover:text-indigo-600 transition-colors duration-300"
+              aria-label="User Menu"
+              [@iconHover]="userHover ? 'hover' : 'default'"
+              (mouseenter)="userHover = true"
+              (mouseleave)="userHover = false"
+              (click)="toggleUserDropdown($event)"
+            >
+              <i class="fas fa-user-circle text-xl" aria-hidden="true" [@userPulse]="userHover ? 'pulse' : 'default'"></i>
+              <!-- Animated online status -->
+              <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full" [@onlineStatus]></div>
+            </button>
+
+            <!-- User Dropdown with Angular Animation -->
+            <div 
+              *ngIf="isUserDropdownOpen()"
+              class="absolute top-full right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 backdrop-blur-sm"
+              (click)="$event.stopPropagation()"
+              [@dropdownSlide]
+            >
+              <!-- Profile Header -->
+              <div class="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-gray-100">
+                <div class="flex items-center space-x-3">
+                  <div class="relative">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                      <i class="fas fa-user text-white text-lg" aria-hidden="true"></i>
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm font-semibold text-gray-900">Admin User</div>
+                    <div class="text-xs text-gray-600">admin&#64;ollolife.com</div>
+                    <div class="flex items-center mt-1">
+                      <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      <span class="text-xs text-green-600 font-medium">Online</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Menu Items -->
+              <div class="py-2">
+                <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+                  <i class="fas fa-user-cog mr-3 text-indigo-500" aria-hidden="true"></i>
+                  <span>Profile Settings</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+                  <i class="fas fa-bell mr-3 text-blue-500" aria-hidden="true"></i>
+                  <span>Notifications</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+                  <i class="fas fa-cog mr-3 text-gray-500" aria-hidden="true"></i>
+                  <span>Preferences</span>
+                </a>
+                <div class="border-t border-gray-100 my-2"></div>
+                <button 
+                  type="button"
+                  class="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+                  (click)="signOut()"
+                >
+                  <i class="fas fa-sign-out-alt mr-3 text-red-500" aria-hidden="true"></i>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -223,22 +331,70 @@
         </div>
       </div>
 
-      <!-- Mobile Action Buttons -->
-      <div class="mt-6 pt-4 border-t border-gray-200 space-y-3">
+      <!-- Mobile Dashboard Icons -->
+      <div class="mt-6 pt-4 border-t border-gray-200">
+        <!-- User Profile Section -->
+        <div class="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg mb-4">
+          <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-indigo-600 text-lg" aria-hidden="true"></i>
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold text-gray-900">Admin User</div>
+            <div class="text-xs text-gray-500">admin&#64;ollolife.com</div>
+          </div>
+          <div class="w-3 h-3 bg-green-500 rounded-full online-status"></div>
+        </div>
+
+        <!-- Dashboard Icons Grid -->
+        <div class="grid grid-cols-4 gap-4 mb-4 mobile-dashboard-grid">
+          <button 
+            type="button"
+            class="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
+            (click)="onMenuItemClick()"
+          >
+            <div class="relative">
+              <i class="fas fa-bell text-blue-600 text-lg mb-1" aria-hidden="true"></i>
+              <div class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+            </div>
+            <span class="text-xs text-gray-600 text-center">Notifications</span>
+          </button>
+
+          <button 
+            type="button"
+            class="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
+            (click)="onMenuItemClick()"
+          >
+            <i class="fas fa-globe text-green-600 text-lg mb-1" aria-hidden="true"></i>
+            <span class="text-xs text-gray-600 text-center">Language</span>
+          </button>
+
+          <button 
+            type="button"
+            class="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
+            (click)="onMenuItemClick()"
+          >
+            <i class="fas fa-moon text-purple-600 text-lg mb-1" aria-hidden="true"></i>
+            <span class="text-xs text-gray-600 text-center">Dark Mode</span>
+          </button>
+
+          <button 
+            type="button"
+            class="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
+            (click)="onMenuItemClick()"
+          >
+            <i class="fas fa-cog text-gray-600 text-lg mb-1" aria-hidden="true"></i>
+            <span class="text-xs text-gray-600 text-center">Settings</span>
+          </button>
+        </div>
+
+        <!-- Sign Out Button -->
         <button 
           type="button"
-          class="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-150"
-          (click)="onMenuItemClick()"
+          class="w-full px-4 py-3 text-sm font-medium text-red-600 hover:text-white hover:bg-red-600 border border-red-200 hover:border-red-600 rounded-lg transition-all duration-200"
+          (click)="signOut()"
         >
-          Login
-        </button>
-        
-        <button 
-          type="button"
-          class="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-150"
-          (click)="onMenuItemClick()"
-        >
-          Sign up
+          <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>
+          Sign Out
         </button>
       </div>
     </div>

@@ -386,6 +386,102 @@
   will-change: transform, opacity;
 }
 
+/* Dashboard Icons Animations */
+.dashboard-icon {
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.dashboard-icon:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* User Dropdown Animation - Updated */
+.user-dropdown {
+  animation: dropdownSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+
+@keyframes dropdownSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Notification Badge Pulse Enhanced */
+.notification-badge {
+  animation: notificationPulse 2s ease-in-out infinite;
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Mobile Dashboard Grid Animation */
+.mobile-dashboard-grid > * {
+  animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.mobile-dashboard-grid > *:nth-child(1) { animation-delay: 0.1s; }
+.mobile-dashboard-grid > *:nth-child(2) { animation-delay: 0.2s; }
+.mobile-dashboard-grid > *:nth-child(3) { animation-delay: 0.3s; }
+.mobile-dashboard-grid > *:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Professional Hover Colors */
+.hover-blue:hover {
+  color: #3b82f6 !important;
+}
+
+.hover-green:hover {
+  color: #10b981 !important;
+}
+
+.hover-purple:hover {
+  color: #8b5cf6 !important;
+}
+
+.hover-indigo:hover {
+  color: #6366f1 !important;
+}
+
+/* Online Status Indicator Pulse */
+.online-status {
+  animation: onlineStatusPulse 2s ease-in-out infinite;
+}
+
+@keyframes onlineStatusPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
 /* Advanced Hover States */
 .ultra-modern-navbar .group:hover {
   transform-style: preserve-3d;
@@ -448,5 +544,38 @@
   .mega-menu-dropdown {
     width: 350px !important;
     max-width: 70vw !important;
+  }
+  
+  /* Mobile Dashboard Responsive */
+  .mobile-dashboard-grid {
+    gap: 0.75rem;
+  }
+  
+  .mobile-dashboard-grid button {
+    padding: 0.75rem;
+  }
+}
+
+/* =================================== */
+/* CLEAN ANGULAR ANIMATION STYLES */
+/* =================================== */
+
+/* Remove any CSS animations - now handled by Angular */
+/* Keep only essential styling */
+
+/* Notification badge styling only */
+.notification-badge {
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  border: 2px solid white;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .ml-6 {
+    margin-left: 1rem;
+  }
+  
+  .ml-8 {
+    margin-left: 1.5rem;
   }
 }
