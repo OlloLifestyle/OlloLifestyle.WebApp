@@ -49,11 +49,20 @@ src/
 │   ├── app.config.ts          # Application configuration with providers
 │   ├── app.routes.ts          # Router configuration
 │   ├── app.ts                 # Root component
-│   └── auth/
-│       └── login/             # Login component with form handling
+│   ├── core/                  # Core services and infrastructure
+│   │   ├── guards/           # Route guards (auth.guard.ts)
+│   │   ├── interceptors/     # HTTP interceptors (auth, offline)
+│   │   ├── models/           # Core data models
+│   │   └── services/         # Core services (auth, database, offline, push-notification)
+│   ├── shared/               # Shared components and utilities
+│   │   ├── components/       # Reusable components (mega-menu, offline-status, unauthorized)
+│   │   └── models/           # Shared data models
+│   └── modules/              # Feature modules
+│       ├── login/            # Login component with form handling
+│       └── dashboard/        # Main dashboard component
 ├── main.ts                    # Bootstrap entry point
 ├── index.html                 # Main HTML template
-└── styles.css                 # Global styles
+└── styles.css                 # Global styles with Tailwind imports
 ```
 
 ### Key Architecture Patterns
@@ -64,8 +73,11 @@ src/
 
 ### Current Application State
 - **Entry Point**: Login component serves as the main landing page
-- **Authentication Flow**: Login form with company, user, and password fields
-- **UI Features**: Parallax mouse effects, loading states, form validation
+- **Authentication Flow**: Login form with company, user, and password fields with JWT-based authentication
+- **Navigation**: Mega menu component with animated dropdowns and responsive mobile menu
+- **Dashboard**: Main application dashboard with sidebar navigation
+- **UI Features**: Advanced animations using Angular Animations API, custom Tailwind keyframes
+- **Offline Support**: Full offline synchronization with local IndexedDB storage via Dexie
 - **Demo Credentials**: company: "demo", user: "admin", password: "password"
 
 ### Styling & Assets
@@ -78,21 +90,21 @@ src/
 - **Responsive Design**: Mobile-first approach using Tailwind breakpoints (sm:, md:, lg:, xl:, 2xl:)
 
 ### Dependencies & Libraries
-- **Core Angular**: @angular/core, @angular/common, @angular/forms, @angular/router
-- **Tailwind CSS**: tailwindcss, @tailwindcss/typography, @tailwindcss/forms for utility styling
-- **PWA Support**: @angular/service-worker, @angular/pwa for offline functionality
+- **Core Angular**: @angular/core, @angular/common, @angular/forms, @angular/router, @angular/animations
+- **Tailwind CSS**: tailwindcss for utility-first styling with custom animations and themes
+- **PWA Support**: @angular/service-worker for offline functionality and caching
+- **Database**: Dexie (IndexedDB wrapper) for local data storage and offline sync
 - **Testing**: Jasmine, Karma with Chrome launcher
 - **Build System**: Angular CLI with @angular/build
 - **Icons**: FontAwesome Free 6.7.2
 
 ### Tailwind CSS Configuration
 - **JIT Mode**: Just-in-time compilation for optimal bundle size
-- **Custom Theme**: Extended color palette, fonts, and spacing in tailwind.config.js
-- **Animation Extensions**: Custom keyframes and animation utilities
-- **Plugin Ecosystem**: Typography, forms, and aspect-ratio plugins integrated
-- **Purge Configuration**: Production builds only include used utilities
-- **Dark Mode**: Class-based dark mode support with 'class' strategy
+- **Custom Theme**: Extended color palette including oxford-blue, peach, and green brand colors
+- **Advanced Animations**: 15+ custom keyframe animations including mesh gradients, orb floating, particle effects
+- **Custom Keyframes**: meshGradient1/2, orbFloat1-4, gridMove, particleDrift, textShimmer, logoFloat, etc.
 - **Responsive Design**: Mobile-first breakpoint system (sm:640px, md:768px, lg:1024px, xl:1280px, 2xl:1536px)
+- **Animation Performance**: Hardware-accelerated transforms with GPU optimization
 
 ### Tailwind Animation System
 - **Built-in Animations**: animate-spin, animate-ping, animate-pulse, animate-bounce
@@ -275,24 +287,32 @@ git stash pop
 ### Offline Synchronization Architecture
 The app implements comprehensive offline support through several key components:
 
-**OfflineService** (`src/app/services/offline.service.ts`):
+**OfflineService** (`src/app/core/services/offline.service.ts`):
 - Network status monitoring using `navigator.onLine` and window events
 - Automatic update detection and application via Service Worker
 - PWA installation prompt management
-- Offline data queue persistence in localStorage
+- Integration with DatabaseService for persistent offline storage
 
-**OfflineInterceptor** (`src/app/interceptors/offline.interceptor.ts`):
+**OfflineInterceptor** (`src/app/core/interceptors/offline.interceptor.ts`):
 - Intercepts all HTTP requests
 - Caches successful GET responses automatically
-- Queues POST/PUT/DELETE requests when offline
+- Queues POST/PUT/DELETE requests when offline via DatabaseService
 - Attempts cached responses when requests fail
 - Generates cache keys based on HTTP method, URL, and parameters
 
+**DatabaseService** (`src/app/core/services/database.service.ts`):
+- Dexie-powered IndexedDB management with 4 main tables
+- Offline request queuing with automatic retry logic (max 3 attempts)
+- Cached data storage with configurable TTL (default 24 hours)
+- User data and push subscription management
+- Automatic cleanup of expired data and synced requests
+- Storage statistics and monitoring capabilities
+
 **Cache Strategy**:
 - GET requests: Cache successful responses, serve from cache when offline
-- Modify requests: Queue for sync when back online
-- Cache TTL: 24 hours for cached data
-- Automatic sync when network connection restored
+- Modify requests: Queue for sync when back online with retry mechanisms
+- Cache TTL: 24 hours for cached data, automatic expiry cleanup
+- Automatic sync when network connection restored with failure handling
 
 ### Service Worker Integration
 - Registers when app is stable (30 second delay)
