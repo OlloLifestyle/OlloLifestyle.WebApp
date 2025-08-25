@@ -1,5 +1,4 @@
 {
-  "enableAllProjectMcpServers": true,
   "permissions": {
     "allow": [
       "Bash(curl:*)",
@@ -31,8 +30,12 @@
       "Bash(npx @modelcontextprotocol/server-sequential-thinking:*)",
       "Bash(npm info:*)",
       "Bash(mcp-server-memory:*)",
-      "Bash(mcp-server-sequential-thinking:*)"
+      "Bash(mcp-server-sequential-thinking:*)",
+      "Bash(npm run test:puppeteer:*)",
+      "Bash(jest:*)",
+      "Bash(npx jest:*)"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": true
 }

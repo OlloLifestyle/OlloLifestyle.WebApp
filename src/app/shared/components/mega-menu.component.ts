@@ -6,16 +6,16 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 interface MegaMenuItem {
   id: string;
   title: string;
-  icon?: string;
-  description?: string;
+  icon: string;
+  description: string;
   items: MegaMenuSubItem[];
 }
 
 interface MegaMenuSubItem {
   title: string;
-  description?: string;
+  description: string;
   route: string;
-  icon?: string;
+  icon: string;
   badge?: string;
 }
 
@@ -76,63 +76,67 @@ export class MegaMenuComponent {
   // Menu configuration
   menuItems: MegaMenuItem[] = [
     {
-      id: 'explore',
-      title: 'Explore',
-      description: 'Discover design components and resources',
+      id: 'dashboard',
+      title: 'Dashboard',
+      icon: 'fas fa-tachometer-alt',
+      description: 'Manage your business overview and analytics',
       items: [
-        { title: 'Components', description: 'UI building blocks', route: '/components', icon: '🧩' },
-        { title: 'Wireframes', description: 'Layout structures', route: '/wireframes', icon: '📐' },
-        { title: 'UI Elements', description: 'Interface components', route: '/ui-elements', icon: '🎨' },
-        { title: 'Boosters', description: 'Advanced solutions', route: '/boosters', icon: '🚀' },
-        { title: 'Illustrations', description: 'Vector graphics', route: '/illustrations', icon: '🎭' },
-        { title: 'Icons', description: 'Icon library', route: '/icons', icon: '⭐' },
-        { title: 'Templates', description: 'Ready-made layouts', route: '/templates', icon: '📄' },
-        { title: 'Pro Access', description: 'Premium resources', route: '/pro', icon: '👑', badge: 'Pro' }
+        { title: 'Overview', description: 'Business performance metrics', route: '/dashboard/overview', icon: 'fas fa-chart-line' },
+        { title: 'Analytics', description: 'Detailed data insights', route: '/dashboard/analytics', icon: 'fas fa-chart-bar' },
+        { title: 'Reports', description: 'Generate comprehensive reports', route: '/dashboard/reports', icon: 'fas fa-file-alt' },
+        { title: 'Real-time Data', description: 'Live business monitoring', route: '/dashboard/realtime', icon: 'fas fa-broadcast-tower', badge: 'New' },
+        { title: 'KPI Tracking', description: 'Key performance indicators', route: '/dashboard/kpis', icon: 'fas fa-bullseye' },
+        { title: 'Custom Views', description: 'Personalized dashboard layouts', route: '/dashboard/custom', icon: 'fas fa-th-large' },
+        { title: 'Export Tools', description: 'Data export capabilities', route: '/dashboard/export', icon: 'fas fa-download' },
+        { title: 'Notifications', description: 'Alert and notification center', route: '/dashboard/notifications', icon: 'fas fa-bell', badge: 'Pro' }
       ]
     },
     {
-      id: 'product',
-      title: 'Product',
-      description: 'Learn about our features and capabilities',
+      id: 'products',
+      title: 'Products',
+      icon: 'fas fa-box',
+      description: 'Manage your product catalog and inventory',
       items: [
-        { title: 'Browse Products', description: 'Explore our catalog', route: '/products', icon: '🔍' },
-        { title: 'Get Started', description: 'Begin your journey', route: '/get-started', icon: '🚀' },
-        { title: 'Apps & Tools', description: 'Extensions and plugins', route: '/apps', icon: '🛠️' },
-        { title: 'Framer', description: 'Framer integration', route: '/framer', icon: '📱', badge: 'New' },
-        { title: 'Webflow', description: 'Webflow resources', route: '/webflow', icon: '🌐' },
-        { title: 'Figma', description: 'Figma components', route: '/figma', icon: '🎨' },
-        { title: 'Components', description: 'Reusable elements', route: '/components', icon: '🧩' },
-        { title: 'Wireframes', description: 'Structure layouts', route: '/wireframes', icon: '📐' }
+        { title: 'Product Catalog', description: 'Browse all products', route: '/products', icon: 'fas fa-th-large' },
+        { title: 'Inventory', description: 'Stock management', route: '/products/inventory', icon: 'fas fa-warehouse' },
+        { title: 'Categories', description: 'Product categorization', route: '/products/categories', icon: 'fas fa-tags' },
+        { title: 'Price Management', description: 'Pricing strategies', route: '/products/pricing', icon: 'fas fa-dollar-sign', badge: 'New' },
+        { title: 'Product Reviews', description: 'Customer feedback', route: '/products/reviews', icon: 'fas fa-star' },
+        { title: 'Bulk Actions', description: 'Mass product operations', route: '/products/bulk', icon: 'fas fa-list' },
+        { title: 'Import/Export', description: 'Product data management', route: '/products/import-export', icon: 'fas fa-exchange-alt' },
+        { title: 'Analytics', description: 'Product performance metrics', route: '/products/analytics', icon: 'fas fa-chart-pie' }
       ]
     },
     {
-      id: 'resources',
-      title: 'Resources',
-      description: 'Documentation, guides, and support materials',
+      id: 'customers',
+      title: 'Customers',
+      icon: 'fas fa-users',
+      description: 'Customer relationship management tools',
       items: [
-        { title: 'Documentation', description: 'Complete guides', route: '/docs', icon: '📖' },
-        { title: 'Tutorials', description: 'Step-by-step guides', route: '/tutorials', icon: '🎓' },
-        { title: 'Blog', description: 'Latest updates', route: '/blog', icon: '✍️' },
-        { title: 'Community', description: 'Join discussions', route: '/community', icon: '👥' },
-        { title: 'Support', description: 'Get help', route: '/support', icon: '🆘' },
-        { title: 'Changelog', description: 'Recent updates', route: '/changelog', icon: '📋', badge: 'Updated' },
-        { title: 'API Reference', description: 'Developer docs', route: '/api', icon: '⚡' },
-        { title: 'Best Practices', description: 'Design guidelines', route: '/best-practices', icon: '⭐' }
+        { title: 'Customer List', description: 'View all customers', route: '/customers', icon: 'fas fa-address-book' },
+        { title: 'Customer Profiles', description: 'Detailed customer info', route: '/customers/profiles', icon: 'fas fa-user-circle' },
+        { title: 'Order History', description: 'Customer purchase history', route: '/customers/orders', icon: 'fas fa-shopping-bag' },
+        { title: 'Support Tickets', description: 'Customer service management', route: '/customers/support', icon: 'fas fa-headset', badge: 'Popular' },
+        { title: 'Loyalty Program', description: 'Customer rewards system', route: '/customers/loyalty', icon: 'fas fa-award' },
+        { title: 'Communications', description: 'Email and messaging', route: '/customers/communications', icon: 'fas fa-envelope' },
+        { title: 'Segmentation', description: 'Customer group analysis', route: '/customers/segments', icon: 'fas fa-layer-group' },
+        { title: 'Feedback', description: 'Customer satisfaction surveys', route: '/customers/feedback', icon: 'fas fa-comment-dots' }
       ]
     },
     {
-      id: 'pricing',
-      title: 'Pricing',
-      description: 'Choose the perfect plan for your needs',
+      id: 'orders',
+      title: 'Orders',
+      icon: 'fas fa-shopping-cart',
+      description: 'Order management and fulfillment',
       items: [
-        { title: 'Free Plan', description: 'Get started for free', route: '/pricing/free', icon: '🆓' },
-        { title: 'Pro Plan', description: 'Advanced features', route: '/pricing/pro', icon: '👑', badge: 'Popular' },
-        { title: 'Team Plan', description: 'Collaborate with team', route: '/pricing/team', icon: '👥' },
-        { title: 'Enterprise', description: 'Custom solutions', route: '/pricing/enterprise', icon: '🏢' },
-        { title: 'Compare Plans', description: 'Feature comparison', route: '/pricing/compare', icon: '⚖️' },
-        { title: 'Chrome Extension', description: 'Browser integration', route: '/chrome-extension', icon: '🌐' },
-        { title: 'Figma Plugin', description: 'Design tool plugin', route: '/figma-plugin', icon: '🎨' },
-        { title: 'Boosters', description: 'No-code solutions', route: '/boosters', icon: '🚀' }
+        { title: 'Order Management', description: 'Process and track orders', route: '/orders', icon: 'fas fa-clipboard-list' },
+        { title: 'Shipping', description: 'Delivery and logistics', route: '/orders/shipping', icon: 'fas fa-truck' },
+        { title: 'Returns', description: 'Return request handling', route: '/orders/returns', icon: 'fas fa-undo' },
+        { title: 'Payments', description: 'Payment processing', route: '/orders/payments', icon: 'fas fa-credit-card', badge: 'New' },
+        { title: 'Invoices', description: 'Invoice generation', route: '/orders/invoices', icon: 'fas fa-file-invoice' },
+        { title: 'Order Tracking', description: 'Real-time order status', route: '/orders/tracking', icon: 'fas fa-route' },
+        { title: 'Fulfillment', description: 'Order processing workflow', route: '/orders/fulfillment', icon: 'fas fa-tasks' },
+        { title: 'Reports', description: 'Order analytics and reports', route: '/orders/reports', icon: 'fas fa-chart-area' }
       ]
     }
   ];
@@ -146,7 +150,7 @@ export class MegaMenuComponent {
 
   private checkScreenSize(): void {
     if (isPlatformBrowser(this.platformId)) {
-      this.isMobile.set(window.innerWidth < 768);
+      this.isMobile.set(window.innerWidth < 1024);
     }
   }
 
@@ -157,6 +161,21 @@ export class MegaMenuComponent {
     }
   }
 
+  private hoverTimeout: any = null;
+
+  public showDropdown(itemId: string): void {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+    }
+    this.activeDropdown.set(itemId);
+  }
+
+  public hideDropdown(): void {
+    this.hoverTimeout = setTimeout(() => {
+      this.activeDropdown.set(null);
+    }, 150);
+  }
+
   toggleDropdown(itemId: string, event: Event): void {
     event.stopPropagation();
     
@@ -165,14 +184,12 @@ export class MegaMenuComponent {
       this.activeDropdown.set(this.activeDropdown() === itemId ? null : itemId);
     } else {
       // Desktop hover behavior
-      this.activeDropdown.set(itemId);
+      this.showDropdown(itemId);
     }
   }
 
   closeDropdown(): void {
-    setTimeout(() => {
-      this.activeDropdown.set(null);
-    }, 150);
+    this.hideDropdown();
   }
 
   onMenuItemClick(): void {
@@ -194,4 +211,5 @@ export class MegaMenuComponent {
   getSecondaryItems(items: MegaMenuSubItem[]): MegaMenuSubItem[] {
     return items.slice(4);
   }
+
 }
