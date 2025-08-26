@@ -2,6 +2,7 @@ import { Component, signal, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
+import { LottieComponent } from 'ngx-lottie';
 
 interface MegaMenuItem {
   id: string;
@@ -22,7 +23,7 @@ interface MegaMenuSubItem {
 @Component({
   selector: 'app-mega-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LottieComponent],
   templateUrl: './mega-menu.component.html',
   styleUrls: ['./mega-menu.component.css'],
   animations: [
@@ -46,6 +47,7 @@ interface MegaMenuSubItem {
       state('float2', style({ transform: 'translateY(0px)' })),
       state('float3', style({ transform: 'translateY(0px)' })),
       state('float4', style({ transform: 'translateY(0px)' })),
+      state('float5', style({ transform: 'translateY(0px)' })),
       transition('* => *', [
         animate('3s ease-in-out', keyframes([
           style({ transform: 'translateY(0px)', offset: 0 }),
@@ -62,60 +64,138 @@ interface MegaMenuSubItem {
       transition('default <=> hover', animate('300ms cubic-bezier(0.35, 0, 0.25, 1)'))
     ]),
     
-    // Bell shake animation
-    trigger('bellShake', [
-      state('default', style({ transform: 'rotate(0deg)' })),
-      state('shake', style({ transform: 'rotate(0deg)' })),
-      transition('default => shake', [
-        animate('600ms ease-in-out', keyframes([
-          style({ transform: 'rotate(0deg)', offset: 0 }),
-          style({ transform: 'rotate(-15deg)', offset: 0.25 }),
-          style({ transform: 'rotate(15deg)', offset: 0.5 }),
-          style({ transform: 'rotate(-10deg)', offset: 0.75 }),
-          style({ transform: 'rotate(0deg)', offset: 1 })
-        ]))
-      ])
-    ]),
-    
-    // Globe rotation
-    trigger('globeRotate', [
-      state('default', style({ transform: 'rotateY(0deg)' })),
-      state('rotate', style({ transform: 'rotateY(0deg)' })),
-      transition('default => rotate', [
-        animate('1200ms ease-in-out', keyframes([
-          style({ transform: 'rotateY(0deg)', offset: 0 }),
-          style({ transform: 'rotateY(180deg)', offset: 0.5 }),
-          style({ transform: 'rotateY(360deg)', offset: 1 })
-        ]))
-      ])
-    ]),
-    
-    // Moon phase animation
-    trigger('moonPhase', [
-      state('default', style({ transform: 'rotate(0deg) scale(1)' })),
-      state('phase', style({ transform: 'rotate(0deg) scale(1)' })),
-      transition('default => phase', [
-        animate('800ms ease-in-out', keyframes([
+    // 🔔 Bell swing with springy overshoot
+    trigger('bellSwing', [
+      state('default', style({ transform: 'rotate(0deg) scale(1)', transformOrigin: 'top center' })),
+      state('swing', style({ transform: 'rotate(0deg) scale(1)', transformOrigin: 'top center' })),
+      transition('default => swing', [
+        animate('1200ms cubic-bezier(0.68, -0.55, 0.265, 1.55)', keyframes([
           style({ transform: 'rotate(0deg) scale(1)', offset: 0 }),
-          style({ transform: 'rotate(90deg) scale(0.8)', offset: 0.25 }),
-          style({ transform: 'rotate(180deg) scale(1.1)', offset: 0.5 }),
-          style({ transform: 'rotate(270deg) scale(0.9)', offset: 0.75 }),
-          style({ transform: 'rotate(360deg) scale(1)', offset: 1 })
+          style({ transform: 'rotate(-25deg) scale(1.1)', offset: 0.3 }),
+          style({ transform: 'rotate(20deg) scale(1.05)', offset: 0.6 }),
+          style({ transform: 'rotate(-10deg) scale(1.02)', offset: 0.8 }),
+          style({ transform: 'rotate(0deg) scale(1)', offset: 1 })
+        ]))
+      ]),
+      transition('swing => default', [
+        animate('400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)')
+      ])
+    ]),
+    
+    // 🌐 Globe orbit with tilt + spin
+    trigger('globeOrbit', [
+      state('default', style({ transform: 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)' })),
+      state('orbit', style({ transform: 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)' })),
+      transition('default => orbit', [
+        animate('2000ms ease-in-out', keyframes([
+          style({ transform: 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)', offset: 0 }),
+          style({ transform: 'rotateX(-15deg) rotateY(90deg) rotateZ(10deg)', offset: 0.25 }),
+          style({ transform: 'rotateX(-25deg) rotateY(180deg) rotateZ(0deg)', offset: 0.5 }),
+          style({ transform: 'rotateX(-15deg) rotateY(270deg) rotateZ(-10deg)', offset: 0.75 }),
+          style({ transform: 'rotateX(0deg) rotateY(360deg) rotateZ(0deg)', offset: 1 })
         ]))
       ])
     ]),
     
-    // User pulse animation
-    trigger('userPulse', [
+    // Orbiting dot animation
+    trigger('orbitingDot', [
+      state('default', style({ transform: 'translateX(0px) translateY(0px)' })),
+      state('orbit', style({ transform: 'translateX(0px) translateY(0px)' })),
+      transition('default => orbit', [
+        animate('2000ms linear', keyframes([
+          style({ transform: 'translateX(0px) translateY(-8px)', offset: 0 }),
+          style({ transform: 'translateX(8px) translateY(0px)', offset: 0.25 }),
+          style({ transform: 'translateX(0px) translateY(8px)', offset: 0.5 }),
+          style({ transform: 'translateX(-8px) translateY(0px)', offset: 0.75 }),
+          style({ transform: 'translateX(0px) translateY(-8px)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // 🌙 Moon phases with masking
+    trigger('moonPhases', [
       state('default', style({ transform: 'scale(1)' })),
-      state('pulse', style({ transform: 'scale(1)' })),
-      transition('default => pulse', [
+      state('phases', style({ transform: 'scale(1)' })),
+      transition('default => phases', [
+        animate('1500ms ease-in-out', keyframes([
+          style({ transform: 'scale(1)', offset: 0 }),
+          style({ transform: 'scale(1.1)', offset: 0.33 }),
+          style({ transform: 'scale(1.2)', offset: 0.66 }),
+          style({ transform: 'scale(1)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Moon mask for phases
+    trigger('moonMask', [
+      state('default', style({ 
+        transform: 'translateX(100%)', 
+        opacity: 0 
+      })),
+      state('waning', style({ 
+        transform: 'translateX(0%)', 
+        opacity: 0.7 
+      })),
+      transition('default => waning', [
+        animate('1500ms ease-in-out', keyframes([
+          style({ transform: 'translateX(100%)', opacity: 0, offset: 0 }),
+          style({ transform: 'translateX(50%)', opacity: 0.3, offset: 0.33 }),
+          style({ transform: 'translateX(0%)', opacity: 0.7, offset: 0.66 }),
+          style({ transform: 'translateX(-50%)', opacity: 0.3, offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // ⚙️ Settings gear spin with easing & snap-back
+    trigger('gearSpin', [
+      state('default', style({ transform: 'rotate(0deg)' })),
+      state('spin', style({ transform: 'rotate(0deg)' })),
+      transition('default => spin', [
+        animate('1200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)', keyframes([
+          style({ transform: 'rotate(0deg)', offset: 0 }),
+          style({ transform: 'rotate(270deg)', offset: 0.7 }),
+          style({ transform: 'rotate(360deg)', offset: 1 })
+        ]))
+      ]),
+      transition('spin => default', [
+        animate('300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)', 
+          style({ transform: 'rotate(0deg)' })
+        )
+      ])
+    ]),
+    
+    // 👤 User heartbeat pulse with subtle glow
+    trigger('userHeartbeat', [
+      state('default', style({ transform: 'scale(1)' })),
+      state('heartbeat', style({ transform: 'scale(1)' })),
+      transition('default => heartbeat', [
         animate('1000ms ease-in-out', keyframes([
           style({ transform: 'scale(1)', offset: 0 }),
-          style({ transform: 'scale(1.1)', offset: 0.3 }),
-          style({ transform: 'scale(0.95)', offset: 0.6 }),
-          style({ transform: 'scale(1.05)', offset: 0.8 }),
+          style({ transform: 'scale(1.05)', offset: 0.14 }),
+          style({ transform: 'scale(1)', offset: 0.28 }),
+          style({ transform: 'scale(1.08)', offset: 0.42 }),
+          style({ transform: 'scale(1)', offset: 0.70 }),
           style({ transform: 'scale(1)', offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // User glow effect
+    trigger('userGlow', [
+      state('default', style({ 
+        boxShadow: '0 0 0 0 rgba(99, 102, 241, 0)' 
+      })),
+      state('glow', style({ 
+        boxShadow: '0 0 20px 5px rgba(99, 102, 241, 0.3)' 
+      })),
+      transition('default => glow', [
+        animate('1000ms ease-in-out', keyframes([
+          style({ boxShadow: '0 0 0 0 rgba(99, 102, 241, 0)', offset: 0 }),
+          style({ boxShadow: '0 0 10px 2px rgba(99, 102, 241, 0.2)', offset: 0.14 }),
+          style({ boxShadow: '0 0 5px 1px rgba(99, 102, 241, 0.1)', offset: 0.28 }),
+          style({ boxShadow: '0 0 15px 3px rgba(99, 102, 241, 0.25)', offset: 0.42 }),
+          style({ boxShadow: '0 0 20px 5px rgba(99, 102, 241, 0.3)', offset: 0.70 }),
+          style({ boxShadow: '0 0 10px 2px rgba(99, 102, 241, 0.15)', offset: 1 })
         ]))
       ])
     ]),
@@ -152,7 +232,41 @@ interface MegaMenuSubItem {
       ])
     ]),
     
-    // Dropdown slide animation
+    // ⎋ Logout door animation
+    trigger('door', [
+      state('default', style({ transform: 'rotateY(0deg)', transformOrigin: 'left center' })),
+      state('swing', style({ transform: 'rotateY(-90deg)', transformOrigin: 'left center' })),
+      transition('default => swing', [
+        animate('400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)')
+      ]),
+      transition('swing => default', [
+        animate('300ms ease-out')
+      ])
+    ]),
+    
+    // Door frame with click effect
+    trigger('doorFrame', [
+      state('default', style({ borderColor: 'rgb(248 113 113)' })),
+      state('open', style({ borderColor: 'rgb(239 68 68)' })),
+      transition('default => open', [
+        animate('100ms ease-out')
+      ])
+    ]),
+    
+    // Arrow sliding through door
+    trigger('logoutArrow', [
+      state('default', style({ transform: 'translateX(0px)', opacity: 1 })),
+      state('slide', style({ transform: 'translateX(0px)', opacity: 1 })),
+      transition('default => slide', [
+        animate('800ms ease-in-out', keyframes([
+          style({ transform: 'translateX(0px)', opacity: 1, offset: 0 }),
+          style({ transform: 'translateX(-3px)', opacity: 0.8, offset: 0.5 }),
+          style({ transform: 'translateX(8px)', opacity: 1, offset: 1 })
+        ]))
+      ])
+    ]),
+    
+    // Enhanced dropdown slide animation
     trigger('dropdownSlide', [
       transition(':enter', [
         style({ 
@@ -192,7 +306,126 @@ export class MegaMenuComponent {
   notificationHover = false;
   languageHover = false;
   darkModeHover = false;
+  settingsHover = false;
   userHover = false;
+  logoutHover = false;
+
+  // Lottie animation options for professional icons
+  notificationOptions = {
+    path: '/assets/animations/notification-bell.json',
+    loop: false,
+    autoplay: false
+  };
+
+  languageOptions = {
+    path: '/assets/animations/language-globe.json', 
+    loop: false,
+    autoplay: false
+  };
+
+  darkModeOptions = {
+    path: '/assets/animations/dark-mode-toggle.json',
+    loop: false,
+    autoplay: false
+  };
+
+  userMenuOptions = {
+    path: '/assets/animations/user-profile.json',
+    loop: false,
+    autoplay: false
+  };
+
+  // Lottie animation control methods
+  onNotificationHover(): void {
+    this.notificationHover = true;
+    if (this.notificationAnimation) {
+      this.notificationAnimation.play();
+    }
+  }
+
+  onNotificationLeave(): void {
+    this.notificationHover = false;
+    if (this.notificationAnimation) {
+      this.notificationAnimation.stop();
+    }
+  }
+
+  onLanguageHover(): void {
+    this.languageHover = true;
+    if (this.languageAnimation) {
+      this.languageAnimation.play();
+    }
+  }
+
+  onLanguageLeave(): void {
+    this.languageHover = false;
+    if (this.languageAnimation) {
+      this.languageAnimation.stop();
+    }
+  }
+
+  onDarkModeHover(): void {
+    this.darkModeHover = true;
+    if (this.darkModeAnimation) {
+      this.darkModeAnimation.play();
+    }
+  }
+
+  onDarkModeLeave(): void {
+    this.darkModeHover = false;
+    if (this.darkModeAnimation) {
+      this.darkModeAnimation.stop();
+    }
+  }
+
+  onUserHover(): void {
+    this.userHover = true;
+    if (this.userAnimation) {
+      this.userAnimation.play();
+    }
+  }
+
+  onUserLeave(): void {
+    this.userHover = false;
+    if (this.userAnimation) {
+      this.userAnimation.stop();
+    }
+  }
+
+  // Lottie animation event handlers
+  onNotificationAnimationCreated(animationItem: any): void {
+    console.log('Notification animation created:', animationItem);
+    if (animationItem) {
+      this.notificationAnimation = animationItem;
+    }
+  }
+
+  onLanguageAnimationCreated(animationItem: any): void {
+    console.log('Language animation created:', animationItem);
+    if (animationItem) {
+      this.languageAnimation = animationItem;
+    }
+  }
+
+  onDarkModeAnimationCreated(animationItem: any): void {
+    console.log('Dark mode animation created:', animationItem);
+    if (animationItem) {
+      this.darkModeAnimation = animationItem;
+    }
+  }
+
+  onUserAnimationCreated(animationItem: any): void {
+    console.log('User animation created:', animationItem);
+    if (animationItem) {
+      this.userAnimation = animationItem;
+    }
+  }
+
+  // Animation instances
+  public notificationAnimation: any;
+  public languageAnimation: any;
+  public darkModeAnimation: any;
+  public userAnimation: any;
 
   // Menu configuration
   menuItems: MegaMenuItem[] = [
@@ -327,6 +560,8 @@ export class MegaMenuComponent {
   public signOut(): void {
     // Add sign out logic here
     console.log('Signing out...');
+    // Reset hover states
+    this.logoutHover = false;
     // Close all dropdowns and mobile menu
     this.isUserDropdownOpen.set(false);
     this.isMobileMenuOpen.set(false);

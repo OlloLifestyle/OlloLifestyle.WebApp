@@ -153,14 +153,25 @@
               type="button"
               class="relative p-3 text-gray-600 hover:text-blue-600 transition-colors duration-300"
               aria-label="Notifications"
-              [@iconHover]="notificationHover ? 'hover' : 'default'"
-              (mouseenter)="notificationHover = true"
-              (mouseleave)="notificationHover = false"
+              (mouseenter)="onNotificationHover()"
+              (mouseleave)="onNotificationLeave()"
             >
-              <i class="fas fa-bell text-xl" aria-hidden="true" [@bellShake]="notificationHover ? 'shake' : 'default'"></i>
-              <!-- Creative notification badge -->
-              <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" [@notificationPulse]>
-                <span class="text-xs text-white font-bold" [@numberBounce]>3</span>
+              <div class="w-6 h-6 flex items-center justify-center relative">
+                <!-- Always show FontAwesome icon first -->
+                <i class="fas fa-bell text-xl text-gray-600 hover:text-blue-600 transition-colors" aria-hidden="true"></i>
+                <!-- Lottie animation overlay (hidden until loaded) -->
+                <div class="absolute inset-0" [style.display]="notificationAnimation ? 'block' : 'none'">
+                  <ng-lottie 
+                    [options]="notificationOptions"
+                    [styles]="{'width': '24px', 'height': '24px'}"
+                    (animationCreated)="onNotificationAnimationCreated($event)"
+                    (click)="notificationAnimation?.play()"
+                  ></ng-lottie>
+                </div>
+              </div>
+              <!-- Professional notification badge -->
+              <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+                <span class="text-xs text-white font-bold">3</span>
               </div>
             </button>
           </div>
@@ -169,13 +180,24 @@
           <div class="relative ml-6" [@iconFloat]="'float2'">
             <button 
               type="button"
-              class="p-3 text-gray-600 hover:text-emerald-600 transition-colors duration-300"
+              class="relative p-3 text-gray-600 hover:text-emerald-600 transition-colors duration-300"
               aria-label="Language"
-              [@iconHover]="languageHover ? 'hover' : 'default'"
-              (mouseenter)="languageHover = true"
-              (mouseleave)="languageHover = false"
+              (mouseenter)="onLanguageHover()"
+              (mouseleave)="onLanguageLeave()"
             >
-              <i class="fas fa-globe text-xl" aria-hidden="true" [@globeRotate]="languageHover ? 'rotate' : 'default'"></i>
+              <div class="w-6 h-6 flex items-center justify-center relative">
+                <!-- Always show FontAwesome icon first -->
+                <i class="fas fa-globe text-xl text-gray-600 hover:text-emerald-600 transition-colors" aria-hidden="true"></i>
+                <!-- Lottie animation overlay (hidden until loaded) -->
+                <div class="absolute inset-0" [style.display]="languageAnimation ? 'block' : 'none'">
+                  <ng-lottie 
+                    [options]="languageOptions"
+                    [styles]="{'width': '24px', 'height': '24px'}"
+                    (animationCreated)="onLanguageAnimationCreated($event)"
+                    (click)="languageAnimation?.play()"
+                  ></ng-lottie>
+                </div>
+              </div>
             </button>
           </div>
 
@@ -183,30 +205,66 @@
           <div class="relative ml-6" [@iconFloat]="'float3'">
             <button 
               type="button"
-              class="p-3 text-gray-600 hover:text-purple-600 transition-colors duration-300"
+              class="relative p-3 text-gray-600 hover:text-purple-600 transition-colors duration-300"
               aria-label="Dark Mode"
-              [@iconHover]="darkModeHover ? 'hover' : 'default'"
-              (mouseenter)="darkModeHover = true"
-              (mouseleave)="darkModeHover = false"
+              (mouseenter)="onDarkModeHover()"
+              (mouseleave)="onDarkModeLeave()"
             >
-              <i class="fas fa-moon text-xl" aria-hidden="true" [@moonPhase]="darkModeHover ? 'phase' : 'default'"></i>
+              <div class="w-6 h-6 flex items-center justify-center relative">
+                <!-- Always show FontAwesome icon first -->
+                <i class="fas fa-moon text-xl text-gray-600 hover:text-purple-600 transition-colors" aria-hidden="true"></i>
+                <!-- Lottie animation overlay (hidden until loaded) -->
+                <div class="absolute inset-0" [style.display]="darkModeAnimation ? 'block' : 'none'">
+                  <ng-lottie 
+                    [options]="darkModeOptions"
+                    [styles]="{'width': '24px', 'height': '24px'}"
+                    (animationCreated)="onDarkModeAnimationCreated($event)"
+                    (click)="darkModeAnimation?.play()"
+                  ></ng-lottie>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Settings -->
+          <div class="relative ml-6" [@iconFloat]="'float4'">
+            <button 
+              type="button"
+              class="p-3 text-gray-600 hover:text-orange-600 transition-colors duration-300"
+              aria-label="Settings"
+              [@iconHover]="settingsHover ? 'hover' : 'default'"
+              (mouseenter)="settingsHover = true"
+              (mouseleave)="settingsHover = false"
+            >
+              <i class="fas fa-cog text-xl" aria-hidden="true" [@gearSpin]="settingsHover ? 'spin' : 'default'"></i>
             </button>
           </div>
 
           <!-- User Menu -->
-          <div class="relative ml-8" [@iconFloat]="'float4'">
+          <div class="relative ml-6" [@iconFloat]="'float5'">
             <button 
               type="button"
               class="relative p-3 text-gray-600 hover:text-indigo-600 transition-colors duration-300"
               aria-label="User Menu"
-              [@iconHover]="userHover ? 'hover' : 'default'"
-              (mouseenter)="userHover = true"
-              (mouseleave)="userHover = false"
+              (mouseenter)="onUserHover()"
+              (mouseleave)="onUserLeave()"
               (click)="toggleUserDropdown($event)"
             >
-              <i class="fas fa-user-circle text-xl" aria-hidden="true" [@userPulse]="userHover ? 'pulse' : 'default'"></i>
+              <div class="w-6 h-6 flex items-center justify-center relative">
+                <!-- Always show FontAwesome icon first -->
+                <i class="fas fa-user-circle text-xl text-gray-600 hover:text-indigo-600 transition-colors" aria-hidden="true"></i>
+                <!-- Lottie animation overlay (hidden until loaded) -->
+                <div class="absolute inset-0" [style.display]="userAnimation ? 'block' : 'none'">
+                  <ng-lottie 
+                    [options]="userMenuOptions"
+                    [styles]="{'width': '24px', 'height': '24px'}"
+                    (animationCreated)="onUserAnimationCreated($event)"
+                    (click)="userAnimation?.play()"
+                  ></ng-lottie>
+                </div>
+              </div>
               <!-- Animated online status -->
-              <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full" [@onlineStatus]></div>
+              <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
             </button>
 
             <!-- User Dropdown with Angular Animation -->
@@ -255,8 +313,18 @@
                   type="button"
                   class="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
                   (click)="signOut()"
+                  (mouseenter)="logoutHover = true"
+                  (mouseleave)="logoutHover = false"
                 >
-                  <i class="fas fa-sign-out-alt mr-3 text-red-500" aria-hidden="true"></i>
+                  <!-- Door and arrow animation -->
+                  <div class="relative mr-3 w-5 h-5 flex items-center justify-center">
+                    <!-- Door frame -->
+                    <div class="absolute inset-0 border-2 border-red-400 rounded-sm" [@doorFrame]="logoutHover ? 'open' : 'default'"></div>
+                    <!-- Door -->
+                    <div class="absolute inset-y-0 left-0 w-2/3 bg-red-100 rounded-l-sm" [@door]="logoutHover ? 'swing' : 'default'"></div>
+                    <!-- Arrow -->
+                    <i class="fas fa-arrow-right text-red-500 relative z-10" aria-hidden="true" [@logoutArrow]="logoutHover ? 'slide' : 'default'"></i>
+                  </div>
                   <span>Sign Out</span>
                 </button>
               </div>
