@@ -25,7 +25,6 @@ interface MegaMenuSubItem {
   standalone: true,
   imports: [CommonModule, RouterModule, LottieComponent],
   templateUrl: './mega-menu.component.html',
-  styleUrls: ['./mega-menu.component.css'],
   animations: [
     // Stagger animation for all icons
     trigger('staggerIcons', [

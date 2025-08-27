@@ -11,8 +11,7 @@ import { OfflineStatusComponent, MegaMenuComponent } from '../../shared/componen
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterOutlet, OfflineStatusComponent, MegaMenuComponent],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
