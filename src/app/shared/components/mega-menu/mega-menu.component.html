@@ -1,0 +1,202 @@
+<!-- Desktop Navigation -->
+<nav class="hidden lg:block bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <div class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          SaaS Logo
+        </div>
+      </div>
+
+      <!-- Desktop Menu Items -->
+      <div class="hidden lg:block">
+        <div class="ml-10 flex items-baseline space-x-8">
+          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+            Explore
+          </a>
+          
+          <!-- Product Dropdown -->
+          <div class="relative"
+               (mouseenter)="showProductDropdown.set(true)"
+               (mouseleave)="showProductDropdown.set(false)">
+            <button class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium flex items-center transition-colors duration-200"
+                    [class.text-blue-600]="showProductDropdown()">
+              Product
+              <i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-200"
+                 [class.rotate-180]="showProductDropdown()"></i>
+            </button>
+
+            <!-- Mega Dropdown -->
+            <div [@slideDown]="showProductDropdown() ? 'open' : 'closed'"
+                 class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-[600px] bg-white/95 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 p-6">
+              <div class="grid grid-cols-2 gap-8">
+                <!-- Browse Products Section -->
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-cube text-blue-500 mr-2"></i>
+                    Browse Products
+                  </h3>
+                  <div class="space-y-3">
+                    <a *ngFor="let item of productSections[0].items" 
+                       [href]="item.href" 
+                       class="flex items-center p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200 group">
+                      <i [class]="item.icon + ' text-gray-400 group-hover:text-blue-500 mr-3 w-4 transition-colors duration-200'"></i>
+                      <span class="text-sm text-gray-700 group-hover:text-gray-900 font-medium">{{item.name}}</span>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Apps & Tools Section -->
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-tools text-purple-500 mr-2"></i>
+                    Apps & Tools
+                  </h3>
+                  <div class="space-y-3">
+                    <a *ngFor="let item of productSections[1].items" 
+                       [href]="item.href" 
+                       class="block p-3 rounded-lg hover:bg-purple-50 transition-colors duration-200 group">
+                      <div class="flex items-start">
+                        <i [class]="item.icon + ' text-gray-400 group-hover:text-purple-500 mr-3 mt-0.5 transition-colors duration-200'"></i>
+                        <div>
+                          <div class="text-sm font-medium text-gray-900 group-hover:text-gray-900">{{item.name}}</div>
+                          <div class="text-xs text-gray-500 mt-1">{{item.description}}</div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+            Resources
+          </a>
+          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+            Pricing
+          </a>
+        </div>
+      </div>
+
+      <!-- CTA Button -->
+      <div class="hidden lg:block">
+        <button class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+          Get Started
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Navigation -->
+<nav class="lg:hidden bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+  <div class="px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16">
+      <!-- Mobile Logo -->
+      <div class="flex-shrink-0">
+        <div class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          SaaS Logo
+        </div>
+      </div>
+
+      <!-- Hamburger Button -->
+      <button (click)="toggleMobileMenu()" 
+              class="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors duration-200">
+        <div class="w-6 h-6 flex flex-col justify-center items-center">
+          <span class="bg-current block h-0.5 w-6 rounded-sm transition-all duration-300"
+                [class.rotate-45]="mobileMenuOpen()"
+                [class.translate-y-1.5]="mobileMenuOpen()"></span>
+          <span class="bg-current block h-0.5 w-6 rounded-sm mt-1 transition-all duration-300"
+                [class.opacity-0]="mobileMenuOpen()"></span>
+          <span class="bg-current block h-0.5 w-6 rounded-sm mt-1 transition-all duration-300"
+                [class.-rotate-45]="mobileMenuOpen()"
+                [class.-translate-y-1.5]="mobileMenuOpen()"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div *ngIf="mobileMenuOpen()" 
+       class="fixed inset-0 top-16 bg-black/20 backdrop-blur-sm z-40"
+       (click)="closeMobileMenu()">
+  </div>
+
+  <!-- Mobile Menu -->
+  <div [@slideInMobile]="mobileMenuOpen() ? 'open' : 'closed'"
+       class="lg:hidden fixed top-16 left-0 h-[calc(100vh-4rem)] w-80 bg-white/95 backdrop-blur-lg shadow-xl z-50 overflow-y-auto">
+    <div class="p-6">
+      <!-- Mobile Menu Items -->
+      <div class="space-y-4">
+        <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+          Explore
+        </a>
+
+        <!-- Mobile Product Section -->
+        <div>
+          <button (click)="toggleMobileProduct()" 
+                  class="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+            <span>Product</span>
+            <i class="fas fa-chevron-down text-xs transition-transform duration-200"
+               [class.rotate-180]="mobileProductOpen()"></i>
+          </button>
+
+          <div *ngIf="mobileProductOpen()" class="mt-2 ml-4 space-y-4">
+            <!-- Mobile Browse Products -->
+            <div>
+              <h4 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <i class="fas fa-cube text-blue-500 mr-2"></i>
+                Browse Products
+              </h4>
+              <div class="space-y-2">
+                <a *ngFor="let item of productSections[0].items" 
+                   [href]="item.href" 
+                   class="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                  <i [class]="item.icon + ' mr-3 w-4'"></i>
+                  {{item.name}}
+                </a>
+              </div>
+            </div>
+
+            <!-- Mobile Apps & Tools -->
+            <div>
+              <h4 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <i class="fas fa-tools text-purple-500 mr-2"></i>
+                Apps & Tools
+              </h4>
+              <div class="space-y-2">
+                <a *ngFor="let item of productSections[1].items" 
+                   [href]="item.href" 
+                   class="block px-3 py-2 text-sm hover:bg-purple-50 rounded-lg transition-colors duration-200">
+                  <div class="flex items-start">
+                    <i [class]="item.icon + ' mr-3 mt-0.5 text-gray-400'"></i>
+                    <div>
+                      <div class="text-gray-700 hover:text-gray-900 font-medium">{{item.name}}</div>
+                      <div class="text-xs text-gray-500 mt-1">{{item.description}}</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+          Resources
+        </a>
+        <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+          Pricing
+        </a>
+
+        <!-- Mobile CTA -->
+        <div class="pt-4 border-t border-gray-200">
+          <button class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+            Get Started
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

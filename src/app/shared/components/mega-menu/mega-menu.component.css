@@ -1,0 +1,151 @@
+/* MegaMenu Component Styles */
+
+/* Desktop Navigation Styles */
+.mega-menu-nav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+/* Logo Gradient Text */
+.logo-gradient {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Menu Item Hover Effects */
+.menu-item {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.menu-item:hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 1px;
+}
+
+/* Mega Dropdown Styles */
+.mega-dropdown {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(229, 231, 235, 0.3);
+}
+
+/* Product Section Icons */
+.product-icon {
+  transition: color 0.2s ease-in-out;
+}
+
+/* Hamburger Animation */
+.hamburger-line {
+  transform-origin: center;
+  transition: all 0.3s ease;
+}
+
+/* Mobile Menu Backdrop */
+.mobile-backdrop {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Mobile Menu Slide */
+.mobile-menu {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 8px 0 32px rgba(0, 0, 0, 0.1);
+}
+
+/* CTA Button */
+.cta-button {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+  transition: all 0.2s ease-in-out;
+}
+
+.cta-button:hover {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px) scale(1.02);
+}
+
+/* Focus States for Accessibility */
+.menu-item:focus,
+.cta-button:focus,
+.mobile-menu-item:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Mobile Menu Items */
+.mobile-menu-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.mobile-menu-item:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-left: 3px solid #3b82f6;
+}
+
+/* Section Headers in Mobile */
+.mobile-section-header {
+  color: #374151;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .mega-dropdown {
+    width: calc(100vw - 2rem);
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-menu {
+    width: 100%;
+  }
+  
+  .logo-gradient {
+    font-size: 1.25rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .mega-menu-nav {
+    background: rgba(17, 24, 39, 0.8);
+    border-bottom-color: rgba(55, 65, 81, 0.8);
+  }
+  
+  .mega-dropdown,
+  .mobile-menu {
+    background: rgba(17, 24, 39, 0.95);
+    border-color: rgba(55, 65, 81, 0.3);
+  }
+}
+
+/* Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
