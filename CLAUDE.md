@@ -56,7 +56,7 @@ src/
 │   │   ├── models/           # Core data models
 │   │   └── services/         # Core services (auth, database, offline, push-notification)
 │   ├── shared/               # Shared components and utilities
-│   │   ├── components/       # Reusable components (offline-status, unauthorized, placeholder-page)
+│   │   ├── components/       # Reusable components (offline-status, unauthorized, placeholder-page, mega-menu/)
 │   │   └── models/           # Shared data models
 │   └── modules/              # Feature modules
 │       ├── login/            # Login component with form handling
@@ -75,7 +75,7 @@ src/
 ### Current Application State
 - **Entry Point**: Login component serves as the main landing page
 - **Authentication Flow**: Login form with company, user, and password fields with JWT-based authentication
-- **Navigation**: Main navigation removed (mega-menu component deleted for cleaner architecture)
+- **Navigation**: Modern MegaMenuComponent with responsive design and smooth animations
 - **Dashboard**: Main application dashboard with sidebar navigation
 - **UI Features**: Advanced animations using Angular Animations API, custom Tailwind keyframes
 - **Offline Support**: Full offline synchronization with local IndexedDB storage via Dexie
@@ -212,16 +212,27 @@ networks:
 ## Development Guidelines
 
 ### Component Development
-- Always use standalone components with explicit imports
+- **MANDATORY**: Always use standalone components with explicit imports
+- **MANDATORY**: Direct imports only - NO index.ts barrel exports allowed
 - Follow Angular's reactive patterns and lifecycle hooks
 - Use Angular Forms (FormsModule) for form handling
 - Implement proper TypeScript typing for all properties and methods
+- Use Angular Signals for state management when appropriate
+- Organize complex components in subdirectories (e.g., `mega-menu/mega-menu.component.ts`)
 
 ### Code Style
 - Strict TypeScript configuration enforced
 - Use Angular's naming conventions (PascalCase for components, camelCase for properties)
 - Separate concerns: component logic, template, and styles in separate files
 - Follow Angular's style guide for component architecture
+
+### Architecture Enforcement
+- **Direct Import Policy**: All imports must be direct file paths
+- **No Barrel Exports**: index.ts files are forbidden throughout the codebase  
+- **Standalone Components**: Every new component must use `standalone: true`
+- **Tree-shaking Optimization**: Import strategy designed for maximum bundle optimization
+- **Build Verification**: Run `npm run build` to verify no barrel imports remain
+- **Bundle Monitoring**: Use `npm run analyze` to monitor import impact on bundle size
 
 ### Tailwind CSS Development Guidelines
 - **Utility-First Approach**: Prefer Tailwind utilities over custom CSS
@@ -286,31 +297,73 @@ git stash pop
 ## Bundle Size Optimization
 
 ### Recent Optimizations (Major Success)
-- **Bundle size reduced by 35%**: From 876kB to 568kB
+- **Bundle size reduced by 35%**: From 876kB to 568kB  
 - **Main bundle optimized**: From 375kB to 66.7kB (82% reduction)
 - **Removed unnecessary dependencies**: Lottie-web (308kB savings)
 - **Implemented direct imports**: Replaced barrel exports for better tree-shaking
-- **Current status**: 68kB over 500kB budget (significant improvement from 376kB over)
+- **Added MegaMenuComponent**: Modern navigation with minimal bundle impact (+26kB)
+- **Current status**: 94kB over 500kB budget (594kB total - still significantly improved from original 876kB)
 
-### Import Strategy
-- **Direct imports used**: All components now use specific file imports instead of barrel exports
-- **Tree-shaking optimized**: Webpack can better eliminate unused code
+### Import Strategy (Mandatory Architecture)
+- **Direct imports enforced**: ALL components MUST use specific file imports instead of barrel exports
+- **No index.ts files allowed**: Barrel exports completely eliminated from codebase
+- **Standalone component optimization**: Better tree-shaking and explicit dependencies
 - **Examples**:
   ```typescript
-  // BEFORE (barrel imports)
-  import { OfflineStatusComponent } from '../../shared/components';
-  import { authInterceptor, offlineInterceptor } from './core/interceptors';
-  
-  // AFTER (direct imports) 
-  import { OfflineStatusComponent } from '../../shared/components/offline-status.component';
+  // ✅ REQUIRED (direct imports)
+  import { OfflineStatusComponent } from './shared/components/offline-status.component';
+  import { MegaMenuComponent } from './shared/components/mega-menu/mega-menu.component';
   import { authInterceptor } from './core/interceptors/auth.interceptor';
   import { offlineInterceptor } from './core/interceptors/offline.interceptor';
+  
+  // ❌ FORBIDDEN (barrel imports)
+  import { OfflineStatusComponent } from '../../shared/components';
+  import { authInterceptor, offlineInterceptor } from './core/interceptors';
   ```
 
 ### Bundle Analysis Tools
 - **webpack-bundle-analyzer**: Installed for dependency size analysis
 - **Command**: `npm run analyze` - Generate bundle size reports
 - **Budget monitoring**: Angular.json configured with 500kB warning threshold
+
+## Component Architecture
+
+### MegaMenuComponent
+Modern SaaS-style navigation component with advanced features:
+
+**Location**: `src/app/shared/components/mega-menu/mega-menu.component.ts`
+
+**Features**:
+- **Desktop Navigation**: Horizontal menu bar with hover mega-dropdown
+- **Mega Dropdown**: Wide dropdown with two organized sections:
+  - Browse Products: Components, Wireframes, UI Elements, Boosters, Freebies
+  - Apps & Tools: Chrome Extension, Figma Plugin, Boosters (with descriptions)
+- **Mobile Responsive**: Hamburger menu with slide-in navigation drawer
+- **Modern Styling**: Tailwind CSS with backdrop blur, gradients, rounded corners, shadows
+- **Smooth Animations**: Angular animations (slideDown, slideInMobile) + Tailwind transitions
+- **Accessibility**: Keyboard navigation, click outside detection, ESC key support
+
+**Technical Implementation**:
+```typescript
+// Direct import usage
+import { MegaMenuComponent } from './shared/components/mega-menu/mega-menu.component';
+
+// Component features
+- Angular Signals for state management
+- Standalone component architecture  
+- TypeScript interfaces for data structure
+- Angular Animations API
+- HostListener decorators for global events
+- Responsive breakpoints with Tailwind CSS
+```
+
+**Design System**:
+- **Colors**: Blue/purple gradients, professional grays
+- **Typography**: Modern font weights and sizes
+- **Spacing**: Consistent padding and margins (p-6, space-x-8)
+- **Shadows**: Professional drop shadows (shadow-xl)
+- **Blur Effects**: Backdrop blur for modern glass effect
+- **Animations**: 200-300ms duration for smooth interactions
 
 ## Advanced PWA Features
 
