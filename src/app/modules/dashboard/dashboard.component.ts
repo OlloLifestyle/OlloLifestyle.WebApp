@@ -2,10 +2,10 @@ import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { User } from '../../core/models';
+import { User } from '../../core/models/auth.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { OfflineStatusComponent } from '../../shared/components';
+import { OfflineStatusComponent } from '../../shared/components/offline-status.component';
 
 @Component({
   selector: 'app-dashboard',

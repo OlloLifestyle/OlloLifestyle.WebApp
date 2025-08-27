@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { LoginCredentials } from '../../core/models';
+import { LoginCredentials } from '../../core/models/auth.models';
 
 @Component({
   selector: 'app-login',

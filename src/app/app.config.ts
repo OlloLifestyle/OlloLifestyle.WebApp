@@ -7,7 +7,8 @@ import player from 'lottie-web';
 
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
-import { authInterceptor, offlineInterceptor } from './core/interceptors';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { offlineInterceptor } from './core/interceptors/offline.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
