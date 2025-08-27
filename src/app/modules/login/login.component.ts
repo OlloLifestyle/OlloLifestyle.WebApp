@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { LoginCredentials } from '../../core/models/auth.models';
 
 @Component({
@@ -19,11 +20,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
 
   loginForm!: FormGroup;
   showPassword = false;
   mounted = false;
-  errorMessage = '';
 
   // Observables
   isLoading$ = this.authService.isLoading$;
@@ -83,7 +84,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.errorMessage = '';
       const formValue = this.loginForm.value;
       
       const credentials: LoginCredentials = {
@@ -96,19 +96,33 @@ export class LoginComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
-            this.showSuccessMessage('Login successful! Redirecting...');
+            this.showSuccessState();
+            this.notificationService.success(
+              'Login Successful!',
+              'Welcome to Ollo Lifestyle. Redirecting to dashboard...',
+              { duration: 2000 }
+            );
             setTimeout(() => {
               this.router.navigate(['/dashboard']);
             }, 1500);
           },
           error: (error) => {
-            this.errorMessage = error.message || 'Login failed. Please check your credentials.';
-            this.showErrorMessage(this.errorMessage);
+            const errorMsg = error.message || 'Login failed. Please check your credentials.';
+            this.showErrorState();
+            this.notificationService.error(
+              'Authentication Failed',
+              errorMsg,
+              { duration: 6000 }
+            );
           }
         });
     } else {
       this.markFormGroupTouched();
-      this.errorMessage = 'Please fill in all required fields correctly.';
+      this.notificationService.warning(
+        'Form Incomplete',
+        'Please fill in all required fields correctly.',
+        { duration: 4000 }
+      );
     }
   }
 
@@ -163,7 +177,6 @@ export class LoginComponent implements OnInit, OnDestroy {
    */
   clearForm(): void {
     this.loginForm.reset();
-    this.errorMessage = '';
   }
 
   /**
@@ -184,20 +197,36 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  private showErrorMessage(message: string): void {
+  private showErrorState(): void {
     const container = document.querySelector('.login-panel') as HTMLElement;
     if (container) {
-      container.style.boxShadow = '0 32px 64px -12px rgba(255, 71, 87, 0.4), 0 0 0 1px rgba(255, 71, 87, 0.3)';
+      // Add red border and glow effect
+      container.style.border = '1px solid rgba(239, 68, 68, 0.6)';
+      container.style.boxShadow = '0 32px 64px -12px rgba(239, 68, 68, 0.4), 0 0 0 1px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.1)';
+      
+      // Reset to normal after 4 seconds
       setTimeout(() => {
-        container.style.boxShadow = '0 32px 64px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)';
-      }, 3000);
+        this.resetPanelState();
+      }, 4000);
     }
   }
 
-  private showSuccessMessage(message: string): void {
+  private showSuccessState(): void {
     const container = document.querySelector('.login-panel') as HTMLElement;
     if (container) {
-      container.style.boxShadow = '0 32px 64px -12px rgba(34, 197, 94, 0.4), 0 0 0 1px rgba(34, 197, 94, 0.3)';
+      // Add green border and glow effect
+      container.style.border = '1px solid rgba(34, 197, 94, 0.6)';
+      container.style.boxShadow = '0 32px 64px -12px rgba(34, 197, 94, 0.4), 0 0 0 1px rgba(34, 197, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.1)';
     }
   }
+
+  private resetPanelState(): void {
+    const container = document.querySelector('.login-panel') as HTMLElement;
+    if (container) {
+      // Reset to original styling
+      container.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+      container.style.boxShadow = '0 32px 64px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.1)';
+    }
+  }
+
 }
