@@ -3,10 +3,14 @@
 
 <!-- Dashboard Content -->
 <div class="min-h-screen bg-white">
-  <div class="p-8">
+  <!-- Top Bar / Mega Menu -->
+  <div class="w-full border-b shadow-sm bg-white">
+    <app-mega-menu></app-mega-menu>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="p-6">
     <div class="max-w-7xl mx-auto">
-      <!-- Dashboard content cleared -->
-      
       <!-- Child Route Content -->
       <router-outlet></router-outlet>
     </div>

@@ -6,11 +6,12 @@ import { User } from '../../core/models/auth.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OfflineStatusComponent } from '../../shared/components/offline-status.component';
+import { MegaMenuComponent } from "../../shared/components/mega-menu/mega-menu.component";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, OfflineStatusComponent],
+  imports: [CommonModule, RouterOutlet, OfflineStatusComponent, MegaMenuComponent],
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
