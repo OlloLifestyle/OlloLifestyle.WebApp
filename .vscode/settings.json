@@ -1,0 +1,19 @@
+{
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+  "tailwindCSS.includeLanguages": {
+    "html": "html",
+    "javascript": "javascript",
+    "typescript": "typescript"
+  },
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.experimental.classRegex": [
+    "class\\s*=\\s*[\"']([^\"']*)[\"']",
+    "className\\s*=\\s*[\"']([^\"']*)[\"']",
+    "ngClass\\s*=\\s*[\"']([^\"']*)[\"']"
+  ],
+  "editor.quickSuggestions": {
+    "strings": true
+  }
+}

@@ -10,6 +10,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Build for production (generates PWA files)
 - `npm run watch` - Build in watch mode for development
 - `npm test` - Run unit tests with Karma/Jasmine
+- `npm run analyze` - Bundle analyzer to identify large dependencies and optimize build size
+
+### Tailwind Development
+- `npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch` - Watch mode for Tailwind compilation
+- `npm run build:css` - Build optimized Tailwind CSS for production
+- Tailwind utilities are automatically processed during Angular build pipeline
 
 ### Testing
 - Uses Jasmine testing framework with Karma test runner
@@ -44,11 +50,20 @@ src/
 │   ├── app.config.ts          # Application configuration with providers
 │   ├── app.routes.ts          # Router configuration
 │   ├── app.ts                 # Root component
-│   └── auth/
-│       └── login/             # Login component with form handling
+│   ├── core/                  # Core services and infrastructure
+│   │   ├── guards/           # Route guards (auth.guard.ts)
+│   │   ├── interceptors/     # HTTP interceptors (auth, offline)
+│   │   ├── models/           # Core data models
+│   │   └── services/         # Core services (auth, database, offline, push-notification)
+│   ├── shared/               # Shared components and utilities
+│   │   ├── components/       # Reusable components (offline-status, unauthorized, placeholder-page, mega-menu/)
+│   │   └── models/           # Shared data models
+│   └── modules/              # Feature modules
+│       ├── login/            # Login component with form handling
+│       └── dashboard/        # Main dashboard component
 ├── main.ts                    # Bootstrap entry point
 ├── index.html                 # Main HTML template
-└── styles.css                 # Global styles
+└── styles.css                 # Global styles with Tailwind imports
 ```
 
 ### Key Architecture Patterns
@@ -58,32 +73,60 @@ src/
 - **Component Structure**: Each component has separate `.ts`, `.html`, and `.css` files
 
 ### Current Application State
-- **Entry Point**: Login component serves as the main landing page
-- **Authentication Flow**: Login form with company, user, and password fields
-- **UI Features**: Parallax mouse effects, loading states, form validation
+- **Entry Point**: Login component serves as the main landing page (no navigation shown)
+- **Authentication Flow**: Login form with company, user, and password fields with JWT-based authentication
+- **Navigation**: MegaMenuComponent appears only in dashboard context - NOT on login screen
+- **Dashboard**: Main application dashboard with integrated MegaMenuComponent in top bar
+- **UI Features**: Advanced animations using Angular Animations API, custom Tailwind keyframes
+- **Offline Support**: Full offline synchronization with local IndexedDB storage via Dexie (status banners hidden)
 - **Demo Credentials**: company: "demo", user: "admin", password: "password"
 
 ### Styling & Assets
+- **Tailwind CSS 3.4+** for utility-first styling with JIT compilation
+- **Tailwind Animations**: Built-in animation utilities (animate-spin, animate-pulse, animate-bounce, etc.)
+- **Custom Animations**: Extended animation configurations in tailwind.config.js
 - **FontAwesome 6.7.2** for icons (loaded via CDN in angular.json)
-- **CSS Custom Properties**: Uses modern CSS features
+- **CSS Custom Properties**: Uses modern CSS features alongside Tailwind utilities
 - **Assets**: Logo, SVG icons, and images stored in `/assets` and `/public` directories
-- **Responsive Design**: Mobile-first approach with modern CSS Grid/Flexbox
+- **Responsive Design**: Mobile-first approach using Tailwind breakpoints (sm:, md:, lg:, xl:, 2xl:)
 
 ### Dependencies & Libraries
-- **Core Angular**: @angular/core, @angular/common, @angular/forms, @angular/router
-- **PWA Support**: @angular/service-worker, @angular/pwa for offline functionality
+- **Core Angular**: @angular/core, @angular/common, @angular/forms, @angular/router, @angular/animations
+- **Tailwind CSS**: tailwindcss for utility-first styling with custom animations and themes
+- **PWA Support**: @angular/service-worker for offline functionality and caching
+- **Database**: Dexie (IndexedDB wrapper) for local data storage and offline sync
 - **Testing**: Jasmine, Karma with Chrome launcher
 - **Build System**: Angular CLI with @angular/build
 - **Icons**: FontAwesome Free 6.7.2
 
+### Tailwind CSS Configuration
+- **JIT Mode**: Just-in-time compilation for optimal bundle size
+- **Custom Theme**: Extended color palette including oxford-blue, peach, and green brand colors
+- **Advanced Animations**: 15+ custom keyframe animations including mesh gradients, orb floating, particle effects
+- **Custom Keyframes**: meshGradient1/2, orbFloat1-4, gridMove, particleDrift, textShimmer, logoFloat, etc.
+- **Responsive Design**: Mobile-first breakpoint system (sm:640px, md:768px, lg:1024px, xl:1280px, 2xl:1536px)
+- **Animation Performance**: Hardware-accelerated transforms with GPU optimization
+
+### Tailwind Animation System
+- **Built-in Animations**: animate-spin, animate-ping, animate-pulse, animate-bounce
+- **Custom Animations**: Defined in tailwind.config.js extending the animation theme
+- **Transition Utilities**: transition-all, transition-colors, transition-opacity with duration controls
+- **Transform Utilities**: scale, rotate, translate, skew with hover and focus states
+- **Motion Preferences**: Respects prefers-reduced-motion for accessibility
+- **Performance**: Hardware-accelerated transforms using GPU layers
+
 ### PWA Features
 - **Service Worker**: Automatic caching and offline support via Angular Service Worker
-- **App Manifest**: Installable app with custom icons and branding
+- **App Manifest**: Installable app with custom icons and branding (manifest.json)
 - **Offline Sync**: Queues API requests when offline and syncs when back online
 - **Cache Strategies**: Fresh-first for critical data, cache-first for static assets
 - **Update Notifications**: Automatic update detection with user prompts
 - **Install Prompts**: Native app installation prompts on supported devices
 - **Network Status**: Real-time online/offline status indicators
+- **Background Sync**: Retry failed requests automatically when connection restored
+- **Push Notifications**: Framework ready for push messaging (Angular service worker)
+- **App Shell Architecture**: Instant loading with cached application shell
+- **Precaching**: Critical resources cached during service worker installation
 
 ### TypeScript Configuration
 - **Strict Mode**: All strict TypeScript options enabled
@@ -169,16 +212,38 @@ networks:
 ## Development Guidelines
 
 ### Component Development
-- Always use standalone components with explicit imports
+- **MANDATORY**: Always use standalone components with explicit imports
+- **MANDATORY**: Direct imports only - NO index.ts barrel exports allowed  
+- **MANDATORY**: World standard file structure - separate .ts, .html, .css files
 - Follow Angular's reactive patterns and lifecycle hooks
 - Use Angular Forms (FormsModule) for form handling
 - Implement proper TypeScript typing for all properties and methods
+- Use Angular Signals for state management when appropriate
+- Organize complex components in subdirectories with separate template/style files
 
 ### Code Style
 - Strict TypeScript configuration enforced
 - Use Angular's naming conventions (PascalCase for components, camelCase for properties)
 - Separate concerns: component logic, template, and styles in separate files
 - Follow Angular's style guide for component architecture
+
+### Architecture Enforcement
+- **Direct Import Policy**: All imports must be direct file paths
+- **No Barrel Exports**: index.ts files are forbidden throughout the codebase  
+- **Standalone Components**: Every new component must use `standalone: true`
+- **Tree-shaking Optimization**: Import strategy designed for maximum bundle optimization
+- **Build Verification**: Run `npm run build` to verify no barrel imports remain
+- **Bundle Monitoring**: Use `npm run analyze` to monitor import impact on bundle size
+
+### Tailwind CSS Development Guidelines
+- **Utility-First Approach**: Prefer Tailwind utilities over custom CSS
+- **Component Extraction**: Use @apply directive for repeated utility patterns
+- **Responsive Design**: Use mobile-first breakpoint prefixes (sm:, md:, lg:, xl:, 2xl:)
+- **State Variants**: Leverage hover:, focus:, active:, disabled: modifiers
+- **Animation Best Practices**: Use transition utilities with transform for smooth animations
+- **Accessibility**: Always include focus states and respect motion preferences
+- **Performance**: Avoid arbitrary values in favor of theme-based utilities
+- **Custom Components**: Extract complex utility combinations into CSS components when needed
 
 ### Testing Requirements
 - Unit tests for all components using Jasmine/Karma
@@ -230,29 +295,111 @@ git stash pop
 - FontAwesome loaded via CDN (configured in `angular.json`)
 - Assets split between `/assets` and `/public` directories
 
+## Bundle Size Optimization
+
+### Recent Optimizations (Major Success)
+- **Bundle size reduced by 35%**: From 876kB to 568kB  
+- **Main bundle optimized**: From 375kB to 66.7kB (82% reduction)
+- **Removed unnecessary dependencies**: Lottie-web (308kB savings)
+- **Implemented direct imports**: Replaced barrel exports for better tree-shaking
+- **Added MegaMenuComponent**: Modern navigation with minimal bundle impact (+26kB)
+- **Current status**: 94kB over 500kB budget (594kB total - still significantly improved from original 876kB)
+
+### Import Strategy (Mandatory Architecture)
+- **Direct imports enforced**: ALL components MUST use specific file imports instead of barrel exports
+- **No index.ts files allowed**: Barrel exports completely eliminated from codebase
+- **Standalone component optimization**: Better tree-shaking and explicit dependencies
+- **Examples**:
+  ```typescript
+  // ✅ REQUIRED (direct imports)
+  import { OfflineStatusComponent } from './shared/components/offline-status.component';
+  import { MegaMenuComponent } from './shared/components/mega-menu/mega-menu.component';
+  import { authInterceptor } from './core/interceptors/auth.interceptor';
+  import { offlineInterceptor } from './core/interceptors/offline.interceptor';
+  
+  // ❌ FORBIDDEN (barrel imports)
+  import { OfflineStatusComponent } from '../../shared/components';
+  import { authInterceptor, offlineInterceptor } from './core/interceptors';
+  ```
+
+### Bundle Analysis Tools
+- **webpack-bundle-analyzer**: Installed for dependency size analysis
+- **Command**: `npm run analyze` - Generate bundle size reports
+- **Budget monitoring**: Angular.json configured with 500kB warning threshold
+
+## Component Architecture
+
+### MegaMenuComponent
+Modern SaaS-style navigation component with advanced features:
+
+**Location**: `src/app/shared/components/mega-menu/` (follows world standard structure)
+- `mega-menu.component.ts` - Component logic and configuration
+- `mega-menu.component.html` - Template (separate file)
+- `mega-menu.component.css` - Styles (separate file)
+
+**Features**:
+- **Desktop Navigation**: Horizontal menu bar with hover mega-dropdown
+- **Mega Dropdown**: Wide dropdown with two organized sections:
+  - Browse Products: Components, Wireframes, UI Elements, Boosters, Freebies
+  - Apps & Tools: Chrome Extension, Figma Plugin, Boosters (with descriptions)
+- **Mobile Responsive**: Hamburger menu with slide-in navigation drawer
+- **Modern Styling**: Tailwind CSS with backdrop blur, gradients, rounded corners, shadows
+- **Smooth Animations**: Angular animations (slideDown, slideInMobile) + Tailwind transitions
+- **Accessibility**: Keyboard navigation, click outside detection, ESC key support
+
+**Technical Implementation**:
+```typescript
+// Direct import usage
+import { MegaMenuComponent } from './shared/components/mega-menu/mega-menu.component';
+
+// Component features
+- Angular Signals for state management
+- Standalone component architecture  
+- TypeScript interfaces for data structure
+- Angular Animations API
+- HostListener decorators for global events
+- Responsive breakpoints with Tailwind CSS
+```
+
+**Design System**:
+- **Colors**: Blue/purple gradients, professional grays
+- **Typography**: Modern font weights and sizes
+- **Spacing**: Consistent padding and margins (p-6, space-x-8)
+- **Shadows**: Professional drop shadows (shadow-xl)
+- **Blur Effects**: Backdrop blur for modern glass effect
+- **Animations**: 200-300ms duration for smooth interactions
+
 ## Advanced PWA Features
 
 ### Offline Synchronization Architecture
 The app implements comprehensive offline support through several key components:
 
-**OfflineService** (`src/app/services/offline.service.ts`):
+**OfflineService** (`src/app/core/services/offline.service.ts`):
 - Network status monitoring using `navigator.onLine` and window events
 - Automatic update detection and application via Service Worker
 - PWA installation prompt management
-- Offline data queue persistence in localStorage
+- Integration with DatabaseService for persistent offline storage
 
-**OfflineInterceptor** (`src/app/interceptors/offline.interceptor.ts`):
+**OfflineInterceptor** (`src/app/core/interceptors/offline.interceptor.ts`):
 - Intercepts all HTTP requests
 - Caches successful GET responses automatically
-- Queues POST/PUT/DELETE requests when offline
+- Queues POST/PUT/DELETE requests when offline via DatabaseService
 - Attempts cached responses when requests fail
 - Generates cache keys based on HTTP method, URL, and parameters
 
+**DatabaseService** (`src/app/core/services/database.service.ts`):
+- Dexie-powered IndexedDB management with 4 main tables
+- Offline request queuing with automatic retry logic (max 3 attempts)
+- Cached data storage with configurable TTL (default 24 hours)
+- User data and push subscription management
+- Automatic cleanup of expired data and synced requests
+- Storage statistics and monitoring capabilities
+
 **Cache Strategy**:
 - GET requests: Cache successful responses, serve from cache when offline
-- Modify requests: Queue for sync when back online
-- Cache TTL: 24 hours for cached data
-- Automatic sync when network connection restored
+- Modify requests: Queue for sync when back online with retry mechanisms
+- Cache TTL: 24 hours for cached data, automatic expiry cleanup
+- Automatic sync when network connection restored with failure handling
 
 ### Service Worker Integration
 - Registers when app is stable (30 second delay)

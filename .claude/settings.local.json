@@ -22,8 +22,20 @@
       "Bash(mkdir:*)",
       "Bash(move:*)",
       "Bash(mv:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(npm search:*)",
+      "Bash(npx @modelcontextprotocol/server-filesystem:*)",
+      "Bash(npx @modelcontextprotocol/server-puppeteer:*)",
+      "Bash(npx @modelcontextprotocol/server-memory:*)",
+      "Bash(npx @modelcontextprotocol/server-sequential-thinking:*)",
+      "Bash(npm info:*)",
+      "Bash(mcp-server-memory:*)",
+      "Bash(mcp-server-sequential-thinking:*)",
+      "Bash(npm run test:puppeteer:*)",
+      "Bash(jest:*)",
+      "Bash(npx jest:*)"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": true
 }

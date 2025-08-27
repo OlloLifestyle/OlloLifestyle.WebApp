@@ -3,9 +3,11 @@ import { inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { OfflineService } from '../services/offline.service';
+import { DatabaseService } from '../services/database.service';
 
 export const offlineInterceptor: HttpInterceptorFn = (req, next) => {
   const offlineService = inject(OfflineService);
+  const dbService = inject(DatabaseService);
   
   // Check if we're online
   let isOnline = true;
@@ -13,24 +15,24 @@ export const offlineInterceptor: HttpInterceptorFn = (req, next) => {
 
   // If offline, try to serve from cache or queue the request
   if (!isOnline) {
-    return handleOfflineRequest(req, offlineService);
+    return handleOfflineRequest(req, offlineService, dbService);
   }
 
   // If online, proceed with the request but cache successful responses
   return next(req).pipe(
-    tap(event => {
+    tap(async event => {
       if (event instanceof HttpResponse && event.status === 200) {
-        // Cache successful GET responses
+        // Cache successful GET responses in IndexedDB
         if (req.method === 'GET') {
           const cacheKey = generateCacheKey(req);
-          offlineService.setCachedData(cacheKey, event.body);
+          await dbService.setCachedData(cacheKey, event.body, 1440); // 24 hours TTL
         }
       }
     }),
-    catchError((error: HttpErrorResponse) => {
+    catchError(async (error: HttpErrorResponse) => {
       // If request fails due to network issues, try to serve from cache
       if (error.status === 0 || error.status >= 500) {
-        const cachedResponse = tryServeCachedResponse(req, offlineService);
+        const cachedResponse = await tryServeCachedResponse(req, dbService);
         if (cachedResponse) {
           return cachedResponse;
         }
@@ -40,48 +42,63 @@ export const offlineInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-function handleOfflineRequest(req: HttpRequest<any>, offlineService: OfflineService): Observable<any> {
+function handleOfflineRequest(req: HttpRequest<any>, offlineService: OfflineService, dbService: DatabaseService): Observable<any> {
   // For GET requests, try to serve from cache
   if (req.method === 'GET') {
-    const cachedResponse = tryServeCachedResponse(req, offlineService);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    
-    // No cached data available
-    return throwError(() => new HttpErrorResponse({
-      error: 'No cached data available for this request',
-      status: 0,
-      statusText: 'Offline'
-    }));
+    return new Observable(subscriber => {
+      tryServeCachedResponse(req, dbService).then(cachedResponse => {
+        if (cachedResponse) {
+          subscriber.next(cachedResponse);
+          subscriber.complete();
+        } else {
+          // No cached data available
+          subscriber.error(new HttpErrorResponse({
+            error: 'No cached data available for this request',
+            status: 0,
+            statusText: 'Offline'
+          }));
+        }
+      });
+    });
   }
 
-  // For POST/PUT/DELETE requests, queue them for later sync
-  const endpoint = req.url;
-  const method = req.method as 'POST' | 'PUT' | 'DELETE';
-  const data = req.body;
+  // For POST/PUT/DELETE requests, queue them for later sync using IndexedDB
+  return new Observable(subscriber => {
+    const headers: Record<string, string> = {};
+    req.headers.keys().forEach(key => {
+      headers[key] = req.headers.get(key) || '';
+    });
 
-  offlineService.queueOfflineData(endpoint, method, data);
-
-  // Return a success response to indicate the request was queued
-  return of(new HttpResponse({
-    status: 202,
-    statusText: 'Queued for sync',
-    body: { message: 'Request queued for synchronization when online', queued: true }
-  }));
+    dbService.queueOfflineRequest({
+      url: req.url,
+      method: req.method as 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+      body: req.body,
+      headers
+    }).then(() => {
+      // Return a success response to indicate the request was queued
+      subscriber.next(new HttpResponse({
+        status: 202,
+        statusText: 'Queued for sync',
+        body: { message: 'Request queued for synchronization when online', queued: true }
+      }));
+      subscriber.complete();
+    }).catch(error => {
+      subscriber.error(error);
+    });
+  });
 }
 
-function tryServeCachedResponse(req: HttpRequest<any>, offlineService: OfflineService): Observable<HttpResponse<any>> | null {
+async function tryServeCachedResponse(req: HttpRequest<any>, dbService: DatabaseService): Promise<HttpResponse<any> | null> {
   const cacheKey = generateCacheKey(req);
-  const cachedData = offlineService.getCachedData(cacheKey);
+  const cachedData = await dbService.getCachedData(cacheKey);
   
   if (cachedData) {
-    return of(new HttpResponse({
+    return new HttpResponse({
       status: 200,
       statusText: 'OK (Cached)',
       body: cachedData,
       headers: req.headers.set('X-Served-From-Cache', 'true')
-    }));
+    });
   }
   
   return null;

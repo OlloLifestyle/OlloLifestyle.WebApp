@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { OfflineService } from '../../core/services/offline.service';
@@ -19,8 +19,8 @@ import { OfflineService } from '../../core/services/offline.service';
           <span class="status-text">
             {{ (isOnline$ | async) ? 'Online' : 'Offline' }}
           </span>
-          <div class="queue-info" *ngIf="!(isOnline$ | async) && getQueueSize() > 0">
-            {{ getQueueSize() }} items queued for sync
+          <div class="queue-info" *ngIf="!(isOnline$ | async) && queueSize() > 0">
+            {{ queueSize() }} items queued for sync
           </div>
         </div>
       </div>
@@ -56,7 +56,7 @@ import { OfflineService } from '../../core/services/offline.service';
       <!-- Sync Status -->
       <div 
         class="sync-status"
-        *ngIf="(isOnline$ | async) && getQueueSize() > 0">
+        *ngIf="(isOnline$ | async) && queueSize() > 0">
         <div class="sync-content">
           <i class="fas fa-sync-alt fa-spin"></i>
           <span class="sync-text">Syncing offline data...</span>
@@ -71,6 +71,7 @@ import { OfflineService } from '../../core/services/offline.service';
       left: 0;
       right: 0;
       z-index: 9999;
+      pointer-events: none;
     }
 
     .offline-banner, .update-banner, .install-banner, .sync-status {
@@ -80,6 +81,7 @@ import { OfflineService } from '../../core/services/offline.service';
       font-weight: 500;
       transition: all 0.3s ease;
       transform: translateY(-100%);
+      pointer-events: auto;
     }
 
     .offline-banner.offline {
@@ -89,10 +91,7 @@ import { OfflineService } from '../../core/services/offline.service';
     }
 
     .offline-banner.online {
-      background: linear-gradient(135deg, #51cf66, #40c057);
-      color: white;
-      transform: translateY(0);
-      animation: slideUp 3s ease forwards;
+      display: none !important;
     }
 
     .update-banner {
@@ -172,12 +171,29 @@ import { OfflineService } from '../../core/services/offline.service';
     }
   `]
 })
-export class OfflineStatusComponent {
+export class OfflineStatusComponent implements OnInit {
   private offlineService = inject(OfflineService);
 
   public readonly isOnline$: Observable<boolean> = this.offlineService.isOnline$;
   public readonly updateAvailable$: Observable<boolean> = this.offlineService.updateAvailable$;
   public readonly installPrompt$: Observable<boolean> = this.offlineService.installPrompt$;
+  
+  public queueSize = signal(0);
+
+  ngOnInit() {
+    // Update queue size periodically
+    this.updateQueueSize();
+    setInterval(() => this.updateQueueSize(), 5000);
+  }
+
+  private async updateQueueSize() {
+    try {
+      const size = await this.offlineService.getOfflineQueueSize();
+      this.queueSize.set(size);
+    } catch (error) {
+      console.error('Error updating queue size:', error);
+    }
+  }
 
   public applyUpdate(): void {
     this.offlineService.applyUpdate();
@@ -185,9 +201,5 @@ export class OfflineStatusComponent {
 
   public installApp(): void {
     this.offlineService.installApp();
-  }
-
-  public getQueueSize(): number {
-    return this.offlineService.getOfflineQueueSize();
   }
 }
