@@ -73,12 +73,12 @@ src/
 - **Component Structure**: Each component has separate `.ts`, `.html`, and `.css` files
 
 ### Current Application State
-- **Entry Point**: Login component serves as the main landing page
+- **Entry Point**: Login component serves as the main landing page (no navigation shown)
 - **Authentication Flow**: Login form with company, user, and password fields with JWT-based authentication
-- **Navigation**: Modern MegaMenuComponent with responsive design and smooth animations
-- **Dashboard**: Main application dashboard with sidebar navigation
+- **Navigation**: MegaMenuComponent appears only in dashboard context - NOT on login screen
+- **Dashboard**: Main application dashboard with integrated MegaMenuComponent in top bar
 - **UI Features**: Advanced animations using Angular Animations API, custom Tailwind keyframes
-- **Offline Support**: Full offline synchronization with local IndexedDB storage via Dexie
+- **Offline Support**: Full offline synchronization with local IndexedDB storage via Dexie (status banners hidden)
 - **Demo Credentials**: company: "demo", user: "admin", password: "password"
 
 ### Styling & Assets
@@ -213,12 +213,13 @@ networks:
 
 ### Component Development
 - **MANDATORY**: Always use standalone components with explicit imports
-- **MANDATORY**: Direct imports only - NO index.ts barrel exports allowed
+- **MANDATORY**: Direct imports only - NO index.ts barrel exports allowed  
+- **MANDATORY**: World standard file structure - separate .ts, .html, .css files
 - Follow Angular's reactive patterns and lifecycle hooks
 - Use Angular Forms (FormsModule) for form handling
 - Implement proper TypeScript typing for all properties and methods
 - Use Angular Signals for state management when appropriate
-- Organize complex components in subdirectories (e.g., `mega-menu/mega-menu.component.ts`)
+- Organize complex components in subdirectories with separate template/style files
 
 ### Code Style
 - Strict TypeScript configuration enforced
@@ -331,7 +332,10 @@ git stash pop
 ### MegaMenuComponent
 Modern SaaS-style navigation component with advanced features:
 
-**Location**: `src/app/shared/components/mega-menu/mega-menu.component.ts`
+**Location**: `src/app/shared/components/mega-menu/` (follows world standard structure)
+- `mega-menu.component.ts` - Component logic and configuration
+- `mega-menu.component.html` - Template (separate file)
+- `mega-menu.component.css` - Styles (separate file)
 
 **Features**:
 - **Desktop Navigation**: Horizontal menu bar with hover mega-dropdown
