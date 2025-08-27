@@ -80,11 +80,72 @@
         </div>
       </div>
 
-      <!-- CTA Button -->
-      <div class="hidden lg:block">
-        <button class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
-          Get Started
+      <!-- Professional Dashboard Icons -->
+      <div class="hidden lg:flex items-center gap-4">
+        
+        <!-- Notifications Icon -->
+        <div class="relative">
+          <button class="dashboard-icon-btn group" 
+                  aria-label="Notifications"
+                  title="Notifications">
+            <i class="fas fa-bell text-lg text-gray-600 group-hover:text-blue-500 transition-colors duration-300"></i>
+            <!-- Notification Badge -->
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+              3
+            </span>
+          </button>
+        </div>
+
+        <!-- Language/Globe Icon -->
+        <button class="dashboard-icon-btn group" 
+                aria-label="Language"
+                title="Language">
+          <i class="fas fa-globe text-lg text-gray-600 group-hover:text-blue-500 transition-colors duration-300"></i>
         </button>
+
+        <!-- Dark Mode Toggle -->
+        <button class="dashboard-icon-btn group" 
+                aria-label="Toggle Dark Mode"
+                title="Toggle Dark Mode"
+                (click)="toggleDarkMode()">
+          <i [class]="darkMode() ? 'fas fa-sun text-yellow-500' : 'fas fa-moon text-gray-600'" 
+             class="text-lg group-hover:text-blue-500 transition-colors duration-300"></i>
+        </button>
+
+        <!-- User Menu -->
+        <div class="relative" (click)="toggleUserMenu()">
+          <button class="dashboard-icon-btn group relative" 
+                  aria-label="User Menu"
+                  title="User Profile">
+            <i class="fas fa-user-circle text-xl text-gray-600 group-hover:text-blue-500 transition-colors duration-300"></i>
+            <!-- Online Status Indicator -->
+            <span class="absolute -bottom-0 -right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
+          </button>
+          
+          <!-- User Dropdown -->
+          <div *ngIf="showUserDropdown()" 
+               class="absolute right-0 top-12 bg-white/95 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-xl py-2 w-48 z-50"
+               [@slideDown]="showUserDropdown() ? 'open' : 'closed'">
+            <div class="px-4 py-2 border-b border-gray-100">
+              <div class="text-sm font-medium text-gray-900">John Doe</div>
+              <div class="text-xs text-gray-500">john.doe&#64;company.com</div>
+            </div>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+              <i class="fas fa-user-cog w-4 text-gray-400 mr-3"></i>
+              Profile Settings
+            </a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+              <i class="fas fa-cog w-4 text-gray-400 mr-3"></i>
+              Preferences
+            </a>
+            <hr class="my-1">
+            <button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">
+              <i class="fas fa-sign-out-alt w-4 text-red-400 mr-3"></i>
+              Sign Out
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -190,11 +251,73 @@
           Pricing
         </a>
 
-        <!-- Mobile CTA -->
+        <!-- Mobile Professional Dashboard Icons -->
         <div class="pt-4 border-t border-gray-200">
-          <button class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
-            Get Started
-          </button>
+          <div class="flex items-center justify-center gap-6">
+            
+            <!-- Mobile Notifications Icon -->
+            <div class="relative">
+              <button class="dashboard-icon-btn group" 
+                      aria-label="Notifications"
+                      title="Notifications">
+                <i class="fas fa-bell text-lg text-gray-600 group-hover:text-blue-500 transition-colors duration-300"></i>
+                <!-- Notification Badge -->
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                  3
+                </span>
+              </button>
+            </div>
+
+            <!-- Mobile Language/Globe Icon -->
+            <button class="dashboard-icon-btn group" 
+                    aria-label="Language"
+                    title="Language">
+              <i class="fas fa-globe text-lg text-gray-600 group-hover:text-blue-500 transition-colors duration-300"></i>
+            </button>
+
+            <!-- Mobile Dark Mode Toggle -->
+            <button class="dashboard-icon-btn group" 
+                    aria-label="Toggle Dark Mode"
+                    title="Toggle Dark Mode"
+                    (click)="toggleDarkMode()">
+              <i [class]="darkMode() ? 'fas fa-sun text-yellow-500' : 'fas fa-moon text-gray-600'" 
+                 class="text-lg group-hover:text-blue-500 transition-colors duration-300"></i>
+            </button>
+
+            <!-- Mobile User Menu -->
+            <div class="relative" (click)="toggleUserMenu()">
+              <button class="dashboard-icon-btn group relative" 
+                      aria-label="User Menu"
+                      title="User Profile">
+                <i class="fas fa-user-circle text-xl text-gray-600 group-hover:text-blue-500 transition-colors duration-300"></i>
+                <!-- Online Status Indicator -->
+                <span class="absolute -bottom-0 -right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
+              </button>
+              
+              <!-- Mobile User Dropdown -->
+              <div *ngIf="showUserDropdown()" 
+                   class="absolute right-0 top-12 bg-white/95 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-xl py-2 w-48 z-50"
+                   [@slideDown]="showUserDropdown() ? 'open' : 'closed'">
+                <div class="px-4 py-2 border-b border-gray-100">
+                  <div class="text-sm font-medium text-gray-900">John Doe</div>
+                  <div class="text-xs text-gray-500">john.doe&#64;company.com</div>
+                </div>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                  <i class="fas fa-user-cog w-4 text-gray-400 mr-3"></i>
+                  Profile Settings
+                </a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                  <i class="fas fa-cog w-4 text-gray-400 mr-3"></i>
+                  Preferences
+                </a>
+                <hr class="my-1">
+                <button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">
+                  <i class="fas fa-sign-out-alt w-4 text-red-400 mr-3"></i>
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

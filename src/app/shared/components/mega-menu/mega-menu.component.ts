@@ -57,6 +57,8 @@ export class MegaMenuComponent {
   showProductDropdown = signal(false);
   mobileMenuOpen = signal(false);
   mobileProductOpen = signal(false);
+  showUserDropdown = signal(false);
+  darkMode = signal(false);
 
   productSections: ProductSection[] = [
     {
@@ -110,12 +112,32 @@ export class MegaMenuComponent {
     this.mobileProductOpen.update(isOpen => !isOpen);
   }
 
+  toggleUserMenu() {
+    this.showUserDropdown.update(isOpen => !isOpen);
+  }
+
+  toggleDarkMode() {
+    this.darkMode.update(isDark => !isDark);
+    // Add dark mode logic here (localStorage, theme service, etc.)
+    if (this.darkMode()) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
-    // Close mobile menu if clicking outside
     const target = event.target as HTMLElement;
+    
+    // Close mobile menu if clicking outside
     if (!target.closest('nav') && this.mobileMenuOpen()) {
       this.closeMobileMenu();
+    }
+    
+    // Close user dropdown if clicking outside
+    if (!target.closest('.relative') && this.showUserDropdown()) {
+      this.showUserDropdown.set(false);
     }
   }
 
@@ -123,5 +145,6 @@ export class MegaMenuComponent {
   onEscapeKey() {
     this.closeMobileMenu();
     this.showProductDropdown.set(false);
+    this.showUserDropdown.set(false);
   }
 }

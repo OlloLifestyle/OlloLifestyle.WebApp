@@ -35,7 +35,31 @@ export class NotificationService {
       ...notification
     };
 
+    // Debug logging to track duplicate notifications
+    console.log(`[NotificationService] Creating notification: ${notification.title}`, {
+      id,
+      type: notification.type,
+      timestamp: new Date().toISOString(),
+      stackTrace: new Error().stack
+    });
+
     const current = this.notifications$.value;
+    
+    // Check for potential duplicates (same title and type)
+    const recentDuplicate = current.find(n => 
+      n.title === notification.title && 
+      n.type === notification.type
+    );
+    
+    if (recentDuplicate) {
+      console.warn(`[NotificationService] Duplicate notification blocked for: ${notification.title}`, {
+        existingId: recentDuplicate.id,
+        blockedId: id
+      });
+      // Return the existing notification ID instead of creating a duplicate
+      return recentDuplicate.id;
+    }
+
     this.notifications$.next([...current, newNotification]);
 
     // Auto-dismiss if not persistent
