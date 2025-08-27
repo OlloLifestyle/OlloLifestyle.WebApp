@@ -10,6 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Build for production (generates PWA files)
 - `npm run watch` - Build in watch mode for development
 - `npm test` - Run unit tests with Karma/Jasmine
+- `npm run analyze` - Bundle analyzer to identify large dependencies and optimize build size
 
 ### Tailwind Development
 - `npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch` - Watch mode for Tailwind compilation
@@ -55,7 +56,7 @@ src/
 │   │   ├── models/           # Core data models
 │   │   └── services/         # Core services (auth, database, offline, push-notification)
 │   ├── shared/               # Shared components and utilities
-│   │   ├── components/       # Reusable components (mega-menu, offline-status, unauthorized)
+│   │   ├── components/       # Reusable components (offline-status, unauthorized, placeholder-page)
 │   │   └── models/           # Shared data models
 │   └── modules/              # Feature modules
 │       ├── login/            # Login component with form handling
@@ -74,7 +75,7 @@ src/
 ### Current Application State
 - **Entry Point**: Login component serves as the main landing page
 - **Authentication Flow**: Login form with company, user, and password fields with JWT-based authentication
-- **Navigation**: Mega menu component with animated dropdowns and responsive mobile menu
+- **Navigation**: Main navigation removed (mega-menu component deleted for cleaner architecture)
 - **Dashboard**: Main application dashboard with sidebar navigation
 - **UI Features**: Advanced animations using Angular Animations API, custom Tailwind keyframes
 - **Offline Support**: Full offline synchronization with local IndexedDB storage via Dexie
@@ -281,6 +282,35 @@ git stash pop
 - PWA files generated automatically in production builds
 - FontAwesome loaded via CDN (configured in `angular.json`)
 - Assets split between `/assets` and `/public` directories
+
+## Bundle Size Optimization
+
+### Recent Optimizations (Major Success)
+- **Bundle size reduced by 35%**: From 876kB to 568kB
+- **Main bundle optimized**: From 375kB to 66.7kB (82% reduction)
+- **Removed unnecessary dependencies**: Lottie-web (308kB savings)
+- **Implemented direct imports**: Replaced barrel exports for better tree-shaking
+- **Current status**: 68kB over 500kB budget (significant improvement from 376kB over)
+
+### Import Strategy
+- **Direct imports used**: All components now use specific file imports instead of barrel exports
+- **Tree-shaking optimized**: Webpack can better eliminate unused code
+- **Examples**:
+  ```typescript
+  // BEFORE (barrel imports)
+  import { OfflineStatusComponent } from '../../shared/components';
+  import { authInterceptor, offlineInterceptor } from './core/interceptors';
+  
+  // AFTER (direct imports) 
+  import { OfflineStatusComponent } from '../../shared/components/offline-status.component';
+  import { authInterceptor } from './core/interceptors/auth.interceptor';
+  import { offlineInterceptor } from './core/interceptors/offline.interceptor';
+  ```
+
+### Bundle Analysis Tools
+- **webpack-bundle-analyzer**: Installed for dependency size analysis
+- **Command**: `npm run analyze` - Generate bundle size reports
+- **Budget monitoring**: Angular.json configured with 500kB warning threshold
 
 ## Advanced PWA Features
 
