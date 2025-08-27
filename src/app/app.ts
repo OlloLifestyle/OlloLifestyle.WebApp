@@ -5,7 +5,7 @@ import { MegaMenuComponent } from './shared/components/mega-menu/mega-menu.compo
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, OfflineStatusComponent, MegaMenuComponent],
+  imports: [RouterOutlet, OfflineStatusComponent],
   templateUrl: './app.html'
 })
 export class App {

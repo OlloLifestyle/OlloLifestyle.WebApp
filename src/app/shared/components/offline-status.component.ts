@@ -66,7 +66,12 @@ import { OfflineService } from '../../core/services/offline.service';
   `,
   styles: [`
     .offline-status-container {
-      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      pointer-events: none;
     }
 
     .offline-banner, .update-banner, .install-banner, .sync-status {
@@ -76,6 +81,7 @@ import { OfflineService } from '../../core/services/offline.service';
       font-weight: 500;
       transition: all 0.3s ease;
       transform: translateY(-100%);
+      pointer-events: auto;
     }
 
     .offline-banner.offline {
@@ -85,10 +91,7 @@ import { OfflineService } from '../../core/services/offline.service';
     }
 
     .offline-banner.online {
-      background: linear-gradient(135deg, #51cf66, #40c057);
-      color: white;
-      transform: translateY(0);
-      animation: slideUp 3s ease forwards;
+      display: none !important;
     }
 
     .update-banner {

@@ -12,7 +12,7 @@ import { LoginCredentials } from '../../core/models/auth.models';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
