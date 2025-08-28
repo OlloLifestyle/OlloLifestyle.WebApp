@@ -25,6 +25,19 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   showPassword = false;
   mounted = false;
+  
+  // Two-step authentication state
+  isAuthenticated = false;
+  availableCompanies: Array<{id: string, name: string}> = [];
+  
+  // Sample company data for UI testing
+  private sampleCompanies = [
+    { id: 'demo', name: 'Ollo Lifestyle HQ' },
+    { id: 'demo', name: 'Marina Bay Hotel' },
+    { id: 'demo', name: 'Sentosa Island Resort' },
+    { id: 'demo', name: 'Orchard Wellness Spa' },
+    { id: 'demo', name: 'Raffles Medical Center' }
+  ];
 
   // Observables
   isLoading$ = this.authService.isLoading$;
@@ -44,9 +57,13 @@ export class LoginComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
-      company: ['', [Validators.required, Validators.minLength(2)]],
+      company: [{value: '', disabled: true}, []], // Explicitly disabled initially
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+    
+    // Ensure initial state is properly set
+    this.isAuthenticated = false;
+    this.availableCompanies = [];
   }
 
   private setupAnimations(): void {
@@ -83,12 +100,71 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    if (!this.isAuthenticated) {
+      // Step 1: Authenticate with username + password
+      this.authenticateUser();
+    } else {
+      // Step 2: Login with selected company
+      this.loginWithCompany();
+    }
+  }
+  
+  private authenticateUser(): void {
+    const username = this.loginForm.get('username')?.value;
+    const password = this.loginForm.get('password')?.value;
+    
+    if (!username || !password) {
+      this.notificationService.warning(
+        'Authentication Required',
+        'Please enter your username and password.',
+        { duration: 4000 }
+      );
+      return;
+    }
+    
+    // Simulate authentication API call
+    // TODO: Replace with actual API call
+    setTimeout(() => {
+      // Simulate authentication logic - check credentials
+      // For testing: username 'admin' and password 'password' = success
+      // Any other combination = failure
+      if ((username === 'admin' && password === 'password') || 
+          (username.length >= 3 && password.length >= 6 && username === 'test')) {
+        // Simulate successful authentication
+        this.isAuthenticated = true;
+        this.availableCompanies = this.sampleCompanies;
+        
+        // Enable and add validation to company field
+        const companyControl = this.loginForm.get('company');
+        companyControl?.enable();
+        companyControl?.setValidators([Validators.required]);
+        companyControl?.updateValueAndValidity();
+        
+        this.notificationService.success(
+          'Authentication Successful!',
+          'Please select your company to continue.',
+          { duration: 3000 }
+        );
+      } else {
+        // Simulate authentication failure
+        this.showErrorState();
+        this.notificationService.error(
+          'Authentication Failed',
+          'Invalid username or password. Please check your credentials.',
+          { duration: 5000 }
+        );
+      }
+    }, 1000);
+  }
+  
+  private loginWithCompany(): void {
     if (this.loginForm.valid) {
       const formValue = this.loginForm.value;
       
+      // Set company code to 'demo' regardless of selection
       const credentials: LoginCredentials = {
         username: formValue.username.trim(),
-        company: formValue.company.trim(),
+        company: 'demo',  // Always use 'demo' as company code
         password: formValue.password.trim()
       };
 
@@ -110,7 +186,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             const errorMsg = error.message || 'Login failed. Please check your credentials.';
             this.showErrorState();
             this.notificationService.error(
-              'Authentication Failed',
+              'Login Failed',
               errorMsg,
               { duration: 6000 }
             );
@@ -119,8 +195,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     } else {
       this.markFormGroupTouched();
       this.notificationService.warning(
-        'Form Incomplete',
-        'Please fill in all required fields correctly.',
+        'Company Selection Required',
+        'Please select a company to continue.',
         { duration: 4000 }
       );
     }
@@ -185,15 +261,53 @@ export class LoginComponent implements OnInit, OnDestroy {
   onEnterKey(event: KeyboardEvent, nextField?: string): void {
     if (event.key === 'Enter') {
       if (nextField) {
-        event.preventDefault();
-        const nextElement = document.querySelector(`[formControlName="${nextField}"]`) as HTMLInputElement;
-        if (nextElement) {
-          nextElement.focus();
+        // Navigate to next field if not on last field or if dropdown is enabled
+        if (nextField === 'password' || (nextField === 'company' && this.isAuthenticated)) {
+          event.preventDefault();
+          const nextElement = document.querySelector(`[formControlName="${nextField}"]`) as HTMLInputElement;
+          if (nextElement && !nextElement.disabled) {
+            nextElement.focus();
+          }
         }
       } else {
-        // Last field, submit form
+        // Submit form
         this.onSubmit();
       }
+    }
+  }
+  
+  /**
+   * Get current button label based on authentication state
+   */
+  getButtonLabel(): string {
+    if (!this.isAuthenticated) {
+      return 'Authenticate';
+    }
+    return 'Login';
+  }
+  
+  /**
+   * Get loading message based on authentication state
+   */
+  getLoadingMessage(): string {
+    if (!this.isAuthenticated) {
+      return 'Authenticating...';
+    }
+    return 'Logging in...';
+  }
+  
+  /**
+   * Check if form is valid for current step
+   */
+  isCurrentStepValid(): boolean {
+    if (!this.isAuthenticated) {
+      // Step 1: Only username and password required
+      const username = this.loginForm.get('username');
+      const password = this.loginForm.get('password');
+      return !!(username?.valid && password?.valid);
+    } else {
+      // Step 2: All fields required
+      return this.loginForm.valid;
     }
   }
 
