@@ -158,3 +158,31 @@
     opacity: 1;
   }
 }
+
+/* Company dropdown fade-in animation */
+.animate-fade-in {
+  animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Custom select styling */
+select.modern-input {
+  background-image: none; /* Remove default arrow */
+  cursor: pointer;
+}
+
+select.modern-input option {
+  background-color: #002147; /* oxford-blue */
+  color: white;
+  padding: 12px;
+}

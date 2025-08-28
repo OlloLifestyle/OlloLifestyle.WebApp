@@ -137,7 +137,7 @@
                         type="text"
                         formControlName="username"
                         placeholder="Username"
-                        (keydown)="onEnterKey($event, 'company')"
+                        (keydown)="onEnterKey($event, 'password')"
                         class="modern-input w-full pl-12 pr-4 py-4 bg-white/5 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-peach/50 focus:border-peach/50 transition-all duration-500"
                         [class.error]="isFieldInvalid('username')"
                       />
@@ -147,30 +147,6 @@
                       <p class="text-red-400 text-xs flex items-center gap-1">
                         <i class="fas fa-exclamation-circle text-xs"></i>
                         {{ getFieldError('username') }}
-                      </p>
-                    </div>
-                  </div>
-
-                  <!-- Company Input -->
-                  <div class="input-group">
-                    <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none flex items-center justify-center w-6 h-6">
-                        <i class="fas fa-building text-white/60 transition-colors duration-300 text-sm"></i>
-                      </div>
-                      <input
-                        type="text"
-                        formControlName="company"
-                        placeholder="Company Code"
-                        (keydown)="onEnterKey($event, 'password')"
-                        class="modern-input w-full pl-12 pr-4 py-4 bg-white/5 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-peach/50 focus:border-peach/50 transition-all duration-500"
-                        [class.error]="isFieldInvalid('company')"
-                      />
-                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500 pointer-events-none z-0"></div>
-                    </div>
-                    <div *ngIf="isFieldInvalid('company')" class="mt-2">
-                      <p class="text-red-400 text-xs flex items-center gap-1">
-                        <i class="fas fa-exclamation-circle text-xs"></i>
-                        {{ getFieldError('company') }}
                       </p>
                     </div>
                   </div>
@@ -185,7 +161,7 @@
                         [type]="showPassword ? 'text' : 'password'"
                         formControlName="password"
                         placeholder="Password"
-                        (keydown)="onEnterKey($event)"
+                        (keydown)="onEnterKey($event, 'company')"
                         class="modern-input w-full pl-12 pr-12 py-4 bg-white/5 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-peach/50 focus:border-peach/50 transition-all duration-500"
                         [class.error]="isFieldInvalid('password')"
                       />
@@ -207,21 +183,52 @@
                     </div>
                   </div>
 
+                  <!-- Company Dropdown (Disabled until authenticated) -->
+                  <div class="input-group">
+                    <div class="relative">
+                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none flex items-center justify-center w-6 h-6">
+                        <i class="fas fa-building text-white/60 transition-colors duration-300 text-sm"></i>
+                      </div>
+                      <select
+                        formControlName="company"
+                        (keydown)="onEnterKey($event)"
+                        class="modern-input w-full pl-12 pr-4 py-4 bg-white/5 backdrop-blur-sm border border-white/20 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-peach/50 focus:border-peach/50 transition-all duration-500 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        [class.error]="isFieldInvalid('company')"
+                      >
+                        <option value="" class="bg-oxford-blue text-white">Select Company</option>
+                        <option *ngFor="let company of availableCompanies" [value]="company.id" class="bg-oxford-blue text-white">
+                          {{ company.name }}
+                        </option>
+                      </select>
+                      <!-- Custom dropdown arrow -->
+                      <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none z-20">
+                        <i class="fas fa-chevron-down text-white/60 text-sm" [class.opacity-50]="loginForm.get('company')?.disabled"></i>
+                      </div>
+                      <div class="input-glow absolute inset-0 rounded-2xl bg-gradient-to-r from-oxford-blue/20 via-peach/10 to-green/20 opacity-0 transition-all duration-500 pointer-events-none z-0"></div>
+                    </div>
+                    <div *ngIf="isFieldInvalid('company')" class="mt-2">
+                      <p class="text-red-400 text-xs flex items-center gap-1">
+                        <i class="fas fa-exclamation-circle text-xs"></i>
+                        {{ getFieldError('company') }}
+                      </p>
+                    </div>
+                  </div>
+
                   <!-- Login Button -->
                   <button
                     type="submit"
-                    [disabled]="(isLoading$ | async) || loginForm.invalid"
+                    [disabled]="(isLoading$ | async) || !isCurrentStepValid()"
                     class="login-btn w-full py-4 bg-gradient-to-r from-oxford-blue via-oxford-blue/90 to-oxford-blue/80 hover:from-oxford-blue/90 hover:via-peach/20 hover:to-oxford-blue/70 text-white font-semibold rounded-2xl transition-all duration-500 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-oxford-blue/30 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
                   >
                     <div class="absolute inset-0 bg-gradient-to-r from-peach/0 via-peach/20 to-green/10 opacity-0 group-hover:opacity-100 transition-all duration-500 animate-shimmer"></div>
                     <div class="relative flex items-center justify-center space-x-3">
                       <div *ngIf="isLoading$ | async" class="flex items-center space-x-2">
                         <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Authenticating...</span>
+                        <span>{{ getLoadingMessage() }}</span>
                       </div>
                       <div *ngIf="!(isLoading$ | async)" class="flex items-center space-x-3">
                         <i class="fas fa-sign-in-alt group-hover:animate-pulse"></i>
-                        <span>Login</span>
+                        <span>{{ getButtonLabel() }}</span>
                       </div>
                     </div>
                   </button>
