@@ -1,6 +1,8 @@
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface ProductSection {
   title: string;
@@ -54,6 +56,9 @@ interface ProductSection {
   styleUrls: ['./mega-menu.component.css']
 })
 export class MegaMenuComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  
   showProductDropdown = signal(false);
   mobileMenuOpen = signal(false);
   mobileProductOpen = signal(false);
@@ -124,6 +129,12 @@ export class MegaMenuComponent {
     } else {
       document.documentElement.classList.remove('dark');
     }
+  }
+
+  signOut() {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 
   @HostListener('document:click', ['$event'])
