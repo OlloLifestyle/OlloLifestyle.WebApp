@@ -1,15 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, delay, catchError, map } from 'rxjs/operators';
-import { LoginCredentials, AuthResponse, User, RefreshTokenRequest } from '../models/auth.models';
+import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly http = inject(HttpClient);
   private readonly TOKEN_KEY = 'ollo_auth_token';
-  private readonly REFRESH_TOKEN_KEY = 'ollo_auth_refresh_token';
   private readonly USER_KEY = 'ollo_auth_user';
+  private readonly API_URL = 'https://localhost:44380/api';
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
@@ -27,7 +29,35 @@ export class AuthService {
   }
 
   /**
-   * Authenticate user with credentials
+   * Step 1: Authenticate user with credentials to get companies list (don't login yet)
+   */
+  authenticate(request: AuthenticateRequest): Observable<AuthResponse> {
+    this.isLoadingSubject.next(true);
+    
+    const loginData = {
+      username: request.username,
+      password: request.password,
+      companyName: "" // Empty company name for initial auth
+    };
+
+    return this.http.post<AuthResponse>(`${this.API_URL}/Auth/login`, loginData).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Authentication failed';
+        if (error.status === 401) {
+          errorMessage = 'Invalid username or password';
+        } else if (error.status === 400) {
+          errorMessage = error.error?.message || 'Invalid request';
+        } else if (error.status === 0) {
+          errorMessage = 'Cannot connect to server';
+        }
+        return throwError(() => new Error(errorMessage));
+      }),
+      tap(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Step 2: Complete login with selected company and store auth data
    */
   login(credentials: LoginCredentials): Observable<AuthResponse> {
     this.isLoadingSubject.next(true);
@@ -60,54 +90,27 @@ export class AuthService {
   }
 
   /**
-   * Get stored refresh token
+   * Get stored token expiry date
    */
-  getRefreshToken(): string | null {
-    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+  getTokenExpiry(): Date | null {
+    const expiryStr = localStorage.getItem('ollo_auth_expiry');
+    return expiryStr ? new Date(expiryStr) : null;
   }
 
   /**
-   * Refresh JWT token
+   * Check if token is expired
    */
-  refreshToken(): Observable<AuthResponse> {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    const request: RefreshTokenRequest = { refreshToken };
-    return this.performRefreshToken(request).pipe(
-      tap((response: AuthResponse) => {
-        this.setAuthData(response);
-      }),
-      catchError((error) => {
-        this.clearAuthData();
-        return throwError(() => error);
-      })
-    );
+  isTokenExpired(): boolean {
+    const expiry = this.getTokenExpiry();
+    if (!expiry) return true;
+    return new Date() >= expiry;
   }
 
   /**
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
-    return !!this.getToken() && !!this.currentUserSubject.value;
-  }
-
-  /**
-   * Check if user has specific role
-   */
-  hasRole(role: string): boolean {
-    const user = this.currentUserSubject.value;
-    return user?.roles?.includes(role) || false;
-  }
-
-  /**
-   * Check if user has any of the specified roles
-   */
-  hasAnyRole(roles: string[]): boolean {
-    const user = this.currentUserSubject.value;
-    return roles.some(role => user?.roles?.includes(role)) || false;
+    return !!this.getToken() && !!this.currentUserSubject.value && !this.isTokenExpired();
   }
 
   /**
@@ -118,71 +121,48 @@ export class AuthService {
   }
 
   /**
-   * Simulate API login call
+   * Check if user has any of the specified roles
+   * Note: Role checking would require decoding the JWT token
+   * For now, returning true for authenticated users
    */
-  private performLogin(credentials: LoginCredentials): Observable<AuthResponse> {
-    return new Observable<AuthResponse>(observer => {
-      setTimeout(() => {
-        // Mock authentication logic
-        if (credentials.username === 'admin' && 
-            credentials.company === 'demo' && 
-            credentials.password === 'password') {
-          
-          const user: User = {
-            id: '1',
-            username: credentials.username,
-            company: credentials.company,
-            email: `${credentials.username}@${credentials.company}.com`,
-            roles: ['admin', 'user']
-          };
-
-          const response: AuthResponse = {
-            user,
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock.token',
-            refreshToken: 'refresh-token-mock',
-            expiresIn: 3600
-          };
-
-          observer.next(response);
-          observer.complete();
-        } else {
-          observer.error(new Error('Invalid credentials'));
-        }
-      }, 1500); // Simulate network delay
-    });
+  hasAnyRole(roles: string[]): boolean {
+    return this.isAuthenticated();
   }
 
   /**
-   * Simulate API refresh token call
+   * Perform API login call
    */
-  private performRefreshToken(request: RefreshTokenRequest): Observable<AuthResponse> {
-    return new Observable<AuthResponse>(observer => {
-      setTimeout(() => {
-        // Mock refresh logic
-        const currentUser = this.getCurrentUser();
-        if (currentUser && request.refreshToken) {
-          const response: AuthResponse = {
-            user: currentUser,
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refreshed.token',
-            refreshToken: 'new-refresh-token-mock',
-            expiresIn: 3600
-          };
-          observer.next(response);
-          observer.complete();
-        } else {
-          observer.error(new Error('Invalid refresh token'));
+  private performLogin(credentials: LoginCredentials): Observable<AuthResponse> {
+    const loginData = {
+      username: credentials.username,
+      password: credentials.password,
+      companyName: credentials.company
+    };
+
+    return this.http.post<AuthResponse>(`${this.API_URL}/Auth/login`, loginData).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Login failed';
+        if (error.status === 401) {
+          errorMessage = 'Invalid credentials';
+        } else if (error.status === 400) {
+          errorMessage = error.error?.message || 'Invalid request';
+        } else if (error.status === 0) {
+          errorMessage = 'Cannot connect to server';
         }
-      }, 500);
-    });
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
+
 
   /**
    * Store authentication data
    */
   private setAuthData(response: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, response.token);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+    localStorage.setItem('ollo_auth_expiry', response.expiresAt);
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
+    localStorage.setItem('ollo_auth_companies', JSON.stringify(response.companies));
     this.currentUserSubject.next(response.user);
   }
 
@@ -191,8 +171,9 @@ export class AuthService {
    */
   private clearAuthData(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    localStorage.removeItem('ollo_auth_expiry');
     localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem('ollo_auth_companies');
     this.currentUserSubject.next(null);
   }
 

@@ -1,12 +1,15 @@
 export interface User {
-  id: string;
-  username: string;
-  company: string;
-  email: string;
-  roles: string[];
-  firstName?: string;
-  lastName?: string;
-  avatar?: string;
+  id: number;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+}
+
+export interface Company {
+  id: number;
+  name: string;
+  isActive: boolean;
 }
 
 export interface LoginCredentials {
@@ -15,11 +18,17 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface AuthenticateRequest {
+  username: string;
+  password: string;
+}
+
+
 export interface AuthResponse {
-  user: User;
   token: string;
-  refreshToken: string;
-  expiresIn: number;
+  expiresAt: string;
+  user: User;
+  companies: Company[];
 }
 
 export interface RefreshTokenRequest {
