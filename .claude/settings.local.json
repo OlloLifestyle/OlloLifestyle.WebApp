@@ -33,7 +33,8 @@
       "Bash(mcp-server-sequential-thinking:*)",
       "Bash(npm run test:puppeteer:*)",
       "Bash(jest:*)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(ssh:*)"
     ],
     "deny": []
   },
