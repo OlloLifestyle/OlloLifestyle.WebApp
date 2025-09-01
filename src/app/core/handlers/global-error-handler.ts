@@ -10,6 +10,15 @@ export class GlobalErrorHandler implements ErrorHandler {
   private notificationService = inject(NotificationService);
 
   handleError(error: any): void {
+    // Ignore specific, known errors that are handled locally by components.
+    // This prevents the global handler from overriding specific UI feedback.
+    if (error instanceof Error && error.message === 'Invalid credentials') {
+      // The login component handles this error to show a specific message.
+      // We can log it here for debugging but we should not show a generic notification.
+      this.loggingService.logInfo('Login error handled locally by component.', { error });
+      return;
+    }
+
     // The HttpErrorInterceptor is responsible for handling HttpErrorResponse.
     // We check for it here to prevent double-logging and double-notifying.
     if (error instanceof HttpErrorResponse) {
