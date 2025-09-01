@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 
 // Database interfaces
 export interface OfflineRequest {
@@ -90,64 +89,8 @@ export class DatabaseService {
       await this.db.open();
       console.log('Database initialized successfully');
       await this.cleanupExpiredData();
-      
-      // Only seed data in development environment
-      if (!environment.production) {
-        await this.seedDevelopmentData();
-      }
     } catch (error) {
       console.error('Failed to initialize database:', error);
-    }
-  }
-
-  // Development Data Seeding (Development Only)
-  private async seedDevelopmentData(): Promise<void> {
-    try {
-      console.log('🌱 Seeding development data...');
-      
-      // Check if we already have seeded data
-      const existingData = await this.db.cachedData.where('key').equals('dev_seed_marker').first();
-      if (existingData) {
-        console.log('Development data already seeded, skipping...');
-        return;
-      }
-
-      // Seed sample cached data
-      await this.setCachedData('sample_products', [
-        { id: 1, name: 'Sample Product 1', price: 29.99, category: 'Electronics' },
-        { id: 2, name: 'Sample Product 2', price: 49.99, category: 'Clothing' },
-        { id: 3, name: 'Sample Product 3', price: 19.99, category: 'Books' }
-      ]);
-
-      // Seed sample user data
-      await this.saveUserData('dev_user_001', {
-        name: 'Development User',
-        email: 'dev@ollo.com',
-        role: 'admin'
-      }, {
-        theme: 'light',
-        notifications: true,
-        language: 'en'
-      });
-
-      // Seed sample offline requests (for testing)
-      await this.queueOfflineRequest({
-        url: '/api/test-endpoint',
-        method: 'POST',
-        body: { message: 'Development test request' },
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      // Mark that seeding is complete
-      await this.setCachedData('dev_seed_marker', { 
-        seeded: true, 
-        version: '1.0.0',
-        timestamp: Date.now() 
-      });
-
-      console.log('✅ Development data seeded successfully');
-    } catch (error) {
-      console.error('❌ Failed to seed development data:', error);
     }
   }
 
@@ -362,35 +305,5 @@ export class DatabaseService {
       await Promise.all(this.db.tables.map(table => table.clear()));
     });
     console.log('All database data cleared');
-  }
-
-  // Clear development seeded data (Development Only)
-  async clearSeededData(): Promise<void> {
-    if (environment.production) {
-      console.warn('Cannot clear seeded data in production environment');
-      return;
-    }
-
-    try {
-      // Clear specific seeded data
-      await this.db.cachedData.where('key').equals('sample_products').delete();
-      await this.db.cachedData.where('key').equals('dev_seed_marker').delete();
-      await this.db.userData.where('userId').equals('dev_user_001').delete();
-      
-      console.log('✅ Development seeded data cleared');
-    } catch (error) {
-      console.error('❌ Failed to clear seeded data:', error);
-    }
-  }
-
-  // Re-seed development data (Development Only)
-  async reseedDevelopmentData(): Promise<void> {
-    if (environment.production) {
-      console.warn('Cannot reseed data in production environment');
-      return;
-    }
-
-    await this.clearSeededData();
-    await this.seedDevelopmentData();
   }
 }
