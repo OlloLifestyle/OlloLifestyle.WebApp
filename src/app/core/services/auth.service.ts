@@ -3,15 +3,16 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, delay, catchError, map } from 'rxjs/operators';
 import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest } from '../models/auth.models';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(ConfigService);
   private readonly TOKEN_KEY = 'ollo_auth_token';
   private readonly USER_KEY = 'ollo_auth_user';
-  private readonly API_URL = 'https://localhost:44380/api';
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
@@ -40,7 +41,7 @@ export class AuthService {
       companyName: "" // Empty company name for initial auth
     };
 
-    return this.http.post<AuthResponse>(`${this.API_URL}/Auth/login`, loginData).pipe(
+    return this.http.post<AuthResponse>(this.config.buildApiUrl('Auth/login'), loginData).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Authentication failed';
         if (error.status === 401) {
@@ -139,7 +140,7 @@ export class AuthService {
       companyName: credentials.company
     };
 
-    return this.http.post<AuthResponse>(`${this.API_URL}/Auth/login`, loginData).pipe(
+    return this.http.post<AuthResponse>(this.config.buildApiUrl('Auth/login'), loginData).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Login failed';
         if (error.status === 401) {
