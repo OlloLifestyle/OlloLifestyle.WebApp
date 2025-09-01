@@ -13,8 +13,8 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build the Angular app
-RUN npm run build
+# Build the Angular app for Docker deployment
+RUN npm run build -- --configuration=docker
 
 # Stage 2: Serve with Node.js serve
 FROM node:20-alpine
