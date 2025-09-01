@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { ConfigService } from './config.service';
 
 export interface NotificationData {
   id: string;
@@ -15,23 +16,17 @@ export interface NotificationData {
   providedIn: 'root'
 })
 export class NotificationService {
+  private readonly config = inject(ConfigService);
   private notifications$ = new BehaviorSubject<NotificationData[]>([]);
   
   public notifications = this.notifications$.asObservable();
-
-  private lottieAnimations = {
-    success: 'https://lottie.host/4d6e93e8-7333-4a5e-9c89-6c5c9c5c5c5c/animation.json', // Success checkmark
-    error: 'https://lottie.host/8b2f6a1c-4d8f-4c3b-9a7e-1e2f3g4h5i6j/animation.json',   // Error X
-    warning: 'https://lottie.host/1a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p6/animation.json', // Warning triangle
-    info: 'https://lottie.host/6f7g8h9i-0j1k-2l3m-4n5o-p6q7r8s9t0u1/animation.json'      // Info circle
-  };
 
   show(notification: Omit<NotificationData, 'id'>): string {
     const id = this.generateId();
     const newNotification: NotificationData = {
       id,
       duration: 5000,
-      lottieAnimation: this.lottieAnimations[notification.type],
+      lottieAnimation: this.config.lottieAnimations[notification.type],
       ...notification
     };
 

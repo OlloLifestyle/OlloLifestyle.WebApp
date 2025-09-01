@@ -6,7 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { LoginCredentials } from '../../core/models/auth.models';
+import { LoginCredentials, AuthenticateRequest } from '../../core/models/auth.models';
 
 @Component({
   selector: 'app-login',
@@ -28,16 +28,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   
   // Two-step authentication state
   isAuthenticated = false;
-  availableCompanies: Array<{id: string, name: string}> = [];
-  
-  // Sample company data for UI testing
-  private sampleCompanies = [
-    { id: 'demo', name: 'Ollo Lifestyle HQ' },
-    { id: 'demo', name: 'Marina Bay Hotel' },
-    { id: 'demo', name: 'Sentosa Island Resort' },
-    { id: 'demo', name: 'Orchard Wellness Spa' },
-    { id: 'demo', name: 'Raffles Medical Center' }
-  ];
+  availableCompanies: Array<{id: number, name: string}> = [];
+  authenticatedUser: any = null;
 
   // Observables
   isLoading$ = this.authService.isLoading$;
@@ -57,13 +49,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
-      company: [{value: '', disabled: true}, []], // Explicitly disabled initially
+      company: [{value: '', disabled: true}, []], // Disabled initially until authenticated
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
     
-    // Ensure initial state is properly set
+    // Reset state
     this.isAuthenticated = false;
     this.availableCompanies = [];
+    this.authenticatedUser = null;
   }
 
   private setupAnimations(): void {
@@ -104,7 +97,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       // Step 1: Authenticate with username + password
       this.authenticateUser();
     } else {
-      // Step 2: Login with selected company
+      // Step 2: Complete login with selected company
       this.loginWithCompany();
     }
   }
@@ -122,49 +115,54 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
     
-    // Simulate authentication API call
-    // TODO: Replace with actual API call
-    setTimeout(() => {
-      // Simulate authentication logic - check credentials
-      // For testing: username 'admin' and password 'password' = success
-      // Any other combination = failure
-      if ((username === 'admin' && password === 'password') || 
-          (username.length >= 3 && password.length >= 6 && username === 'test')) {
-        // Simulate successful authentication
-        this.isAuthenticated = true;
-        this.availableCompanies = this.sampleCompanies;
-        
-        // Enable and add validation to company field
-        const companyControl = this.loginForm.get('company');
-        companyControl?.enable();
-        companyControl?.setValidators([Validators.required]);
-        companyControl?.updateValueAndValidity();
-        
-        this.notificationService.success(
-          'Authentication Successful!',
-          'Please select your company to continue.',
-          { duration: 3000 }
-        );
-      } else {
-        // Simulate authentication failure
-        this.showErrorState();
-        this.notificationService.error(
-          'Authentication Failed',
-          'Invalid username or password. Please check your credentials.',
-          { duration: 5000 }
-        );
-      }
-    }, 1000);
+    const request: AuthenticateRequest = {
+      username: username.trim(),
+      password: password.trim()
+    };
+
+    this.authService.authenticate(request)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          // Step 1 successful - show companies and enable company field
+          this.isAuthenticated = true;
+          this.authenticatedUser = response.user;
+          this.availableCompanies = response.companies;
+          
+          // Enable and add validation to company field
+          const companyControl = this.loginForm.get('company');
+          companyControl?.enable();
+          companyControl?.setValidators([Validators.required]);
+          companyControl?.updateValueAndValidity();
+          
+          this.notificationService.success(
+            'Authentication Successful!',
+            'Please select your company to continue.',
+            { duration: 3000 }
+          );
+        },
+        error: (error) => {
+          const errorMsg = error.message || 'Authentication failed. Please check your credentials.';
+          this.showErrorState();
+          this.notificationService.error(
+            'Authentication Failed',
+            errorMsg,
+            { duration: 5000 }
+          );
+        }
+      });
   }
   
   private loginWithCompany(): void {
     if (this.loginForm.valid) {
       const formValue = this.loginForm.value;
       
-      // Set company code to 'demo' regardless of selection
+      // Find selected company name from the companies list
+      const selectedCompany = this.availableCompanies.find(c => c.id.toString() === formValue.company);
+      
       const credentials: LoginCredentials = {
         username: formValue.username.trim(),
-        company: 'demo',  // Always use 'demo' as company code
+        company: selectedCompany?.name || formValue.company,
         password: formValue.password.trim()
       };
 
@@ -175,7 +173,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.showSuccessState();
             this.notificationService.success(
               'Login Successful!',
-              'Welcome to Ollo Lifestyle. Redirecting to dashboard...',
+              `Welcome ${response.user.firstName} ${response.user.lastName}. Redirecting to dashboard...`,
               { duration: 2000 }
             );
             setTimeout(() => {
@@ -261,7 +259,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   onEnterKey(event: KeyboardEvent, nextField?: string): void {
     if (event.key === 'Enter') {
       if (nextField) {
-        // Navigate to next field if not on last field or if dropdown is enabled
+        // Navigate to next field if enabled
         if (nextField === 'password' || (nextField === 'company' && this.isAuthenticated)) {
           event.preventDefault();
           const nextElement = document.querySelector(`[formControlName="${nextField}"]`) as HTMLInputElement;

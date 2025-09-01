@@ -52,15 +52,20 @@ src/
 │   ├── app.ts                 # Root component
 │   ├── core/                  # Core services and infrastructure
 │   │   ├── guards/           # Route guards (auth.guard.ts)
-│   │   ├── interceptors/     # HTTP interceptors (auth, offline)
+│   │   ├── handlers/         # Error handlers (global-error.handler.ts)
+│   │   ├── interceptors/     # HTTP interceptors (auth, offline, http-error)
 │   │   ├── models/           # Core data models
-│   │   └── services/         # Core services (auth, database, offline, push-notification)
+│   │   └── services/         # Core services (auth, database, offline, push-notification, config, logging)
 │   ├── shared/               # Shared components and utilities
 │   │   ├── components/       # Reusable components (mega-menu/, notification/, offline-status, unauthorized, placeholder-page)
 │   │   └── models/           # Shared data models
 │   └── modules/              # Feature modules
 │       ├── login/            # Login component with form handling
 │       └── dashboard/        # Main dashboard component
+├── environments/              # Environment configuration files
+│   ├── environment.ts         # Development configuration
+│   ├── environment.prod.ts    # Production configuration
+│   └── environment.docker.ts  # Docker deployment configuration
 ├── main.ts                    # Bootstrap entry point
 ├── index.html                 # Main HTML template
 └── styles.css                 # Global styles with Tailwind imports
@@ -83,6 +88,18 @@ src/
 - **Demo Credentials**: company: "demo", user: "admin", password: "password"
 
 ### Recent Updates (Latest)
+- **Comprehensive Error Handling System**: Complete error management infrastructure implemented:
+  - **GlobalErrorHandler**: Catches all unhandled client-side exceptions with user-friendly notifications
+  - **HttpErrorInterceptor**: Handles all API errors (400, 403, 404, 500+) with specific status-based messages
+  - **LoggingService**: Centralized error logging with development/production modes and external service integration prep
+  - **Enhanced AuthInterceptor**: Now shows "Session Expired" notifications via NotificationService integration
+  - **Error Flow**: Client errors → GlobalErrorHandler → LoggingService → NotificationService
+- **Configuration Management System**: Eliminated all hardcoded URLs and implemented proper environment configuration:
+  - **Environment Files**: environment.ts (dev), environment.prod.ts (production), environment.docker.ts (container deployment)
+  - **ConfigService**: Centralized configuration management with type-safe interfaces and helper methods
+  - **API URL Management**: Dynamic API URLs via `config.buildApiUrl()` replacing hardcoded URLs
+  - **Feature Toggles**: Environment-based feature flags for logging, debugging, offline sync, notifications
+  - **Multi-Environment Support**: Development (localhost:44380), Production (192.168.50.98:8080), Docker (/api proxy)
 - **Professional Dashboard Icons**: Updated MegaMenuComponent with borderless animated icons:
   - 🔔 Notifications: Bell icon with red notification badge and animation
   - 🌐 Globe: Language/region icon with hover animations
@@ -95,7 +112,6 @@ src/
   - Automatic blocking of duplicate notifications with same title and type
   - Console logging for notification creation with stack traces for debugging  
   - Warning logs when duplicates are detected and blocked
-- **Template Fixes**: Resolved HTML template syntax issues with email addresses (proper @ symbol escaping)
 
 ### MegaMenu Component Details
 The MegaMenuComponent (`src/app/shared/components/mega-menu/`) provides the main navigation interface with:
@@ -269,6 +285,8 @@ networks:
 - Use Angular's naming conventions (PascalCase for components, camelCase for properties)
 - Separate concerns: component logic, template, and styles in separate files
 - Follow Angular's style guide for component architecture
+- **NO hardcoded URLs**: All API endpoints and external resources MUST use ConfigService
+- **Environment-aware development**: Use ConfigService for all configuration values
 
 ### Architecture Enforcement
 - **Direct Import Policy**: All imports must be direct file paths
@@ -472,11 +490,33 @@ All components use `standalone: true` with explicit imports rather than NgModule
 Application uses Angular's modern signal-based reactivity system for state management.
 
 ### HTTP Client Configuration
-- Configured in `app.config.ts` with offline interceptor
-- Global error handling via `provideBrowserGlobalErrorListeners()`
+- Configured in `app.config.ts` with comprehensive interceptor chain
+- **Interceptor Order**: httpErrorInterceptor → authInterceptor → offlineInterceptor
+- Global error handling via `provideBrowserGlobalErrorListeners()` and custom GlobalErrorHandler
 - Zone change detection with event coalescing for performance
+
+### Error Handling Architecture
+- **GlobalErrorHandler**: Catches all unhandled client-side exceptions (template errors, null references, etc.)
+- **HttpErrorInterceptor**: Processes all HTTP errors with status-specific user messages (400, 403, 404, 500+)
+- **LoggingService**: Centralized error logging with environment-aware console output and external service preparation
+- **NotificationService Integration**: All error handlers use NotificationService for user-friendly error display
+- **Error Flow**: Errors → Logging → User Notifications with proper categorization and filtering
+
+### Configuration Management System
+- **Environment Files**: Separate configurations for development, production, and Docker deployments
+- **ConfigService**: Type-safe centralized configuration management with helper methods
+- **No Hardcoded URLs**: All API endpoints and external resources configured via environment files
+- **Feature Toggles**: Environment-specific feature flags (logging, debugging, offline sync, etc.)
+- **Multi-Environment Support**:
+  - Development: `https://localhost:44380/api`
+  - Production: `http://192.168.50.98:8080/api`  
+  - Docker: `/api` (nginx proxy routing)
+- **Dynamic API URLs**: `config.buildApiUrl('endpoint')` for all HTTP requests
+- **Asset Configuration**: Lottie animations and external assets managed via environment configuration
 
 ### Development vs Production Configurations
 - Service Worker disabled in development mode (`isDevMode()` check)
 - Different build configurations for development vs production
-- Environment-specific API base URLs via environment variables
+- Environment-specific API base URLs and feature flags
+- Production: Minimal logging, Docker-optimized routing
+- Development: Full logging, debug mode, local API endpoints
