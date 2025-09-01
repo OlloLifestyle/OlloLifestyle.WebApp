@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   api: {
-    baseUrl: '/api', // Nginx proxy handles routing to ollo-api:5000
+    baseUrl: '/api', // Proxy through nginx to ollo-api:5000 (internal routing)
     timeout: 30000,
   },
   assets: {
