@@ -1,13 +1,15 @@
 import { HttpInterceptorFn, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const notificationService = inject(NotificationService);
   
   // Skip auth for login/refresh endpoints
   if (isAuthEndpoint(req)) {
@@ -30,11 +32,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        // Handle 401 Unauthorized - logout and redirect
-        console.warn('Unauthorized access - redirecting to login');
-        authService.logout().subscribe(() => {
-          router.navigate(['/login']);
-        });
+        // Handle 401 Unauthorized
+        notificationService.error(
+          'Session Expired',
+          'Your session has expired. Please log in again.',
+          { persistent: true }
+        );
+
+        // Logout and redirect to the login page
+        authService.logout().pipe(
+          tap(() => router.navigate(['/login']))
+        ).subscribe();
       }
       return throwError(() => error);
     })
