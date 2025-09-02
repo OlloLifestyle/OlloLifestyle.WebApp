@@ -34,7 +34,12 @@
       "Bash(npm run test:puppeteer:*)",
       "Bash(jest:*)",
       "Bash(npx jest:*)",
-      "Bash(ssh:*)"
+      "Bash(ssh:*)",
+      "Bash(dir:*)",
+      "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)",
+      "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)",
+      "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)",
+      "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)"
     ],
     "deny": []
   },

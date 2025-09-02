@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   api: {
-    baseUrl: 'http://192.168.50.98:8080/api',
+    baseUrl: 'http://192.168.50.98:5000/api',
     timeout: 30000, // 30 seconds
   },
   assets: {
