@@ -54,13 +54,6 @@ export class AuthService {
           errorMessage = 'Cannot connect to server';
         }
         
-        // Show error notification directly from service to ensure it's displayed
-        this.notificationService.error(
-          'Authentication Failed',
-          errorMessage,
-          { duration: 5000 }
-        );
-        
         return throwError(() => new Error(errorMessage));
       }),
       finalize(() => this.isLoadingSubject.next(false))

@@ -33,6 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // Observables
   isLoading$ = this.authService.isLoading$;
+  
 
   ngOnInit(): void {
     this.initializeForm();
@@ -120,26 +121,25 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: password.trim()
     };
 
-    // Track if authentication succeeded to show error notification if needed
-    let authSucceeded = false;
+    // Store the current state to detect if auth succeeded
+    const initialAuthState = this.isAuthenticated;
     
-    // Set a timeout to show error notification if no success after reasonable time
+    // Always show error notification after delay if authentication doesn't succeed
     const errorTimeout = setTimeout(() => {
-      if (!authSucceeded) {
+      if (!this.isAuthenticated && this.isAuthenticated === initialAuthState) {
         this.showErrorState();
         this.notificationService.error(
-          'Authentication Failed',
+          'Authentication Failed', 
           'Invalid username or password. Please check your credentials.',
           { duration: 5000 }
         );
       }
-    }, 3000);
+    }, 800); // Very short delay for immediate feedback
 
     this.authService.authenticate(request)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          authSucceeded = true;
           clearTimeout(errorTimeout);
           
           // Step 1 successful - show companies and enable company field
@@ -160,8 +160,9 @@ export class LoginComponent implements OnInit, OnDestroy {
           );
         },
         error: (error) => {
-          authSucceeded = true; // Prevent timeout from triggering
           clearTimeout(errorTimeout);
+          
+          // Show immediate error notification
           const errorMsg = error.message || 'Authentication failed. Please check your credentials.';
           this.showErrorState();
           this.notificationService.error(
