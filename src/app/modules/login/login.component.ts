@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
@@ -33,6 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // Observables
   isLoading$ = this.authService.isLoading$;
+  
 
   ngOnInit(): void {
     this.initializeForm();
@@ -120,10 +121,27 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: password.trim()
     };
 
+    // Store the current state to detect if auth succeeded
+    const initialAuthState = this.isAuthenticated;
+    
+    // Always show error notification after delay if authentication doesn't succeed
+    const errorTimeout = setTimeout(() => {
+      if (!this.isAuthenticated && this.isAuthenticated === initialAuthState) {
+        this.showErrorState();
+        this.notificationService.error(
+          'Authentication Failed', 
+          'Invalid username or password. Please check your credentials.',
+          { duration: 5000 }
+        );
+      }
+    }, 800); // Very short delay for immediate feedback
+
     this.authService.authenticate(request)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
+          clearTimeout(errorTimeout);
+          
           // Step 1 successful - show companies and enable company field
           this.isAuthenticated = true;
           this.authenticatedUser = response.user;
@@ -142,6 +160,9 @@ export class LoginComponent implements OnInit, OnDestroy {
           );
         },
         error: (error) => {
+          clearTimeout(errorTimeout);
+          
+          // Show immediate error notification
           const errorMsg = error.message || 'Authentication failed. Please check your credentials.';
           this.showErrorState();
           this.notificationService.error(

@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { tap, delay, catchError, map } from 'rxjs/operators';
+import { tap, delay, catchError, map, finalize } from 'rxjs/operators';
 import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest } from '../models/auth.models';
 import { ConfigService } from './config.service';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { ConfigService } from './config.service';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly config = inject(ConfigService);
+  private readonly notificationService = inject(NotificationService);
   private readonly TOKEN_KEY = 'ollo_auth_token';
   private readonly USER_KEY = 'ollo_auth_user';
 
@@ -51,9 +53,10 @@ export class AuthService {
         } else if (error.status === 0) {
           errorMessage = 'Cannot connect to server';
         }
+        
         return throwError(() => new Error(errorMessage));
       }),
-      tap(() => this.isLoadingSubject.next(false))
+      finalize(() => this.isLoadingSubject.next(false))
     );
   }
 
@@ -71,7 +74,7 @@ export class AuthService {
         console.error('Login failed:', error);
         return throwError(() => error);
       }),
-      tap(() => this.isLoadingSubject.next(false))
+      finalize(() => this.isLoadingSubject.next(false))
     );
   }
 

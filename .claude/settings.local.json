@@ -39,7 +39,18 @@
       "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)",
       "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)",
       "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)",
-      "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)"
+      "Read(D:\\Development\\Live\\GitHub\\OlloLifestyle\\OlloLifestyleAPI/**)",
+      "mcp__playwright-mcp__init-browser",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_console_messages",
+      "Bash(timeout:*)",
+      "Bash(taskkill:*)",
+      "mcp__playwright__browser_close"
     ],
     "deny": []
   },

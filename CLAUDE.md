@@ -520,3 +520,29 @@ Application uses Angular's modern signal-based reactivity system for state manag
 - Environment-specific API base URLs and feature flags
 - Production: Minimal logging, Docker-optimized routing
 - Development: Full logging, debug mode, local API endpoints
+
+## Recent Infrastructure Updates (Latest)
+
+### Nginx Proxy Configuration Fix (RESOLVED)
+**Issue**: API requests through HTTPS proxy were returning 404 Not Found errors despite correct infrastructure setup.
+
+**Root Cause**: nginx `proxy_pass` configuration with trailing slash (`proxy_pass http://127.0.0.1:5000/`) was stripping the `/api/` prefix from requests, causing the API to receive `/Auth/login` instead of `/api/Auth/login`.
+
+**Solution**: 
+- **Fixed nginx.conf**: Removed trailing slash from `proxy_pass http://127.0.0.1:5000/` → `proxy_pass http://127.0.0.1:5000`
+- **Applied to both server blocks**: HTTPS (port 443) and internal (port 8080) configurations
+- **Container rebuild required**: nginx configuration changes require container rebuild, not just restart
+
+**Production Status**:
+✅ **HTTPS API routing working**: `https://portal.ollolife.com/api/*` successfully routes to API server  
+✅ **SSL termination working**: Let's Encrypt certificates properly configured  
+✅ **Multi-service architecture operational**: WebApp, API, and nginx containers communicating correctly  
+✅ **Network connectivity verified**: Host networking mode with localhost routing functional  
+✅ **Authentication endpoint accessible**: Login API returns proper responses (credentials validation working)
+
+**Infrastructure Architecture (Production)**:
+- **Domain**: `https://portal.ollolife.com` (port 443) - WebApp with API proxy
+- **Internal API**: `http://192.168.50.98:8080/api/` - Direct API access for debugging
+- **Swagger Documentation**: `http://192.168.50.98:8080/swagger` - API documentation
+- **Container Setup**: Host networking mode for nginx and API, webapp on port 3001
+- **SSL/TLS**: Let's Encrypt certificates with HTTP/2 support and security headers
