@@ -56,8 +56,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
  */
 function isAuthEndpoint(req: HttpRequest<any>): boolean {
   return req.url.includes('/auth/login') || 
+         req.url.includes('/Auth/login') ||
          req.url.includes('/auth/refresh') ||
-         req.url.includes('/auth/logout');
+         req.url.includes('/Auth/refresh') ||
+         req.url.includes('/auth/logout') ||
+         req.url.includes('/Auth/logout');
 }
 
 /**
