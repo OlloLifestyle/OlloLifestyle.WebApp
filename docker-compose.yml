@@ -6,17 +6,10 @@ services:
     build: ./nginx
     container_name: ollo-nginx-proxy
     restart: unless-stopped
-    ports:
-      - "80:80"      # HTTP (redirects to HTTPS)
-      - "443:443"    # HTTPS WebApp domain access  
-      - "8080:8080"  # Internal API + Swagger access
+    network_mode: host
     volumes:
       - ./logs/nginx:/var/log/nginx
       - /etc/letsencrypt:/etc/letsencrypt:ro  # SSL certificates (read-only)
-    extra_hosts:
-      - "host.docker.internal:192.168.50.98"
-    networks:
-      - frontend
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
