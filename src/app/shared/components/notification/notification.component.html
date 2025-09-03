@@ -1,0 +1,38 @@
+<div class="notification-container" [@listAnimation]="notifications().length">
+  <div
+    *ngFor="let notification of notifications(); trackBy: trackByFn"
+    [@notificationAnimation]
+    class="notification-toast"
+    [class]="'notification-' + notification.type"
+    (click)="dismiss(notification.id)"
+  >
+    <!-- Icon -->
+    <div class="notification-icon" [class]="'icon-' + notification.type">
+      <i [class]="getIconClass(notification.type)"></i>
+    </div>
+
+    <!-- Content -->
+    <div class="notification-content">
+      <div class="notification-title">{{ notification.title }}</div>
+      <div *ngIf="notification.message" class="notification-message">
+        {{ notification.message }}
+      </div>
+    </div>
+
+    <!-- Close -->
+    <button
+      class="notification-close"
+      (click)="$event.stopPropagation(); dismiss(notification.id)"
+      aria-label="Close notification"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Progress Bar -->
+    <div
+      *ngIf="!notification.persistent"
+      class="notification-progress"
+      [style.animation-duration]="notification.duration + 'ms'"
+    ></div>
+  </div>
+</div>

@@ -1,5 +1,4 @@
-import { Injectable, signal, inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
 import { ConfigService } from './config.service';
 
 export interface NotificationData {
@@ -17,11 +16,13 @@ export interface NotificationData {
 })
 export class NotificationService {
   private readonly config = inject(ConfigService);
-  private notifications$ = new BehaviorSubject<NotificationData[]>([]);
-  
-  public notifications = this.notifications$.asObservable();
+
+  private readonly _notifications = signal<NotificationData[]>([]);
+  readonly notifications = this._notifications.asReadonly();
 
   show(notification: Omit<NotificationData, 'id'>): string {
+    console.log('NotificationService.show() called:', notification);
+    
     const id = this.generateId();
     const newNotification: NotificationData = {
       id,
@@ -30,90 +31,52 @@ export class NotificationService {
       ...notification
     };
 
-    // Debug logging to track duplicate notifications
-    console.log(`[NotificationService] Creating notification: ${notification.title}`, {
-      id,
-      type: notification.type,
-      timestamp: new Date().toISOString(),
-      stackTrace: new Error().stack
-    });
-
-    const current = this.notifications$.value;
-    
-    // Check for potential duplicates (same title and type)
-    const recentDuplicate = current.find(n => 
-      n.title === notification.title && 
-      n.type === notification.type
+    const current = this._notifications();
+    const duplicate = current.find(
+      n => n.title === notification.title && n.type === notification.type
     );
-    
-    if (recentDuplicate) {
-      console.warn(`[NotificationService] Duplicate notification blocked for: ${notification.title}`, {
-        existingId: recentDuplicate.id,
-        blockedId: id
-      });
-      // Return the existing notification ID instead of creating a duplicate
-      return recentDuplicate.id;
+
+    if (duplicate) {
+      console.warn('Duplicate notification blocked:', notification.title, notification.type);
+      return duplicate.id;
     }
 
-    this.notifications$.next([...current, newNotification]);
+    console.log('Adding notification to list. Current count:', current.length);
+    this._notifications.set([...current, newNotification]);
+    console.log('Notification added. New count:', this._notifications().length);
 
-    // Auto-dismiss if not persistent
     if (!newNotification.persistent) {
-      setTimeout(() => {
-        this.dismiss(id);
-      }, newNotification.duration);
+      setTimeout(() => this.dismiss(id), newNotification.duration);
     }
 
     return id;
   }
 
-  success(title: string, message?: string, options?: Partial<NotificationData>): string {
-    return this.show({
-      type: 'success',
-      title,
-      message,
-      ...options
-    });
+  success(title: string, message?: string, options?: Partial<NotificationData>) {
+    return this.show({ type: 'success', title, message, ...options });
   }
 
-  error(title: string, message?: string, options?: Partial<NotificationData>): string {
-    return this.show({
-      type: 'error',
-      title,
-      message,
-      duration: 8000, // Longer for errors
-      ...options
-    });
+  error(title: string, message?: string, options?: Partial<NotificationData>) {
+    return this.show({ type: 'error', title, message, duration: 8000, ...options });
   }
 
-  warning(title: string, message?: string, options?: Partial<NotificationData>): string {
-    return this.show({
-      type: 'warning',
-      title,
-      message,
-      ...options
-    });
+  warning(title: string, message?: string, options?: Partial<NotificationData>) {
+    return this.show({ type: 'warning', title, message, ...options });
   }
 
-  info(title: string, message?: string, options?: Partial<NotificationData>): string {
-    return this.show({
-      type: 'info',
-      title,
-      message,
-      ...options
-    });
+  info(title: string, message?: string, options?: Partial<NotificationData>) {
+    return this.show({ type: 'info', title, message, ...options });
   }
 
-  dismiss(id: string): void {
-    const current = this.notifications$.value;
-    this.notifications$.next(current.filter(n => n.id !== id));
+  dismiss(id: string) {
+    this._notifications.update(list => list.filter(n => n.id !== id));
   }
 
-  dismissAll(): void {
-    this.notifications$.next([]);
+  dismissAll() {
+    this._notifications.set([]);
   }
 
   private generateId(): string {
-    return `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `notification-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
   }
 }
