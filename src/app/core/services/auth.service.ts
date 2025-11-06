@@ -4,7 +4,19 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, delay, catchError, map, finalize } from 'rxjs/operators';
 import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest } from '../models/auth.models';
 import { ConfigService } from './config.service';
-import { NotificationService } from './notification.service';
+
+export class AuthError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+    public code?: string,
+    public details?: unknown,
+    public originalError?: HttpErrorResponse
+  ) {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +24,6 @@ import { NotificationService } from './notification.service';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly config = inject(ConfigService);
-  private readonly notificationService = inject(NotificationService);
   private readonly TOKEN_KEY = 'ollo_auth_token';
   private readonly USER_KEY = 'ollo_auth_user';
 
@@ -53,8 +64,8 @@ export class AuthService {
         } else if (error.status === 0) {
           errorMessage = 'Cannot connect to server';
         }
-        
-        return throwError(() => new Error(errorMessage));
+
+        return throwError(() => this.buildAuthError(error, errorMessage));
       }),
       finalize(() => this.isLoadingSubject.next(false))
     );
@@ -70,8 +81,12 @@ export class AuthService {
       tap((response: AuthResponse) => {
         this.setAuthData(response);
       }),
-      catchError((error) => {
+      catchError((error: HttpErrorResponse | AuthError) => {
         console.error('Login failed:', error);
+        if (error instanceof HttpErrorResponse) {
+          const message = this.resolveLoginErrorMessage(error);
+          return throwError(() => this.buildAuthError(error, message));
+        }
         return throwError(() => error);
       }),
       finalize(() => this.isLoadingSubject.next(false))
@@ -145,17 +160,63 @@ export class AuthService {
 
     return this.http.post<AuthResponse>(this.config.buildApiUrl('Auth/login'), loginData).pipe(
       catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Login failed';
-        if (error.status === 401) {
-          errorMessage = 'Invalid credentials';
-        } else if (error.status === 400) {
-          errorMessage = error.error?.message || 'Invalid request';
-        } else if (error.status === 0) {
-          errorMessage = 'Cannot connect to server';
-        }
-        return throwError(() => new Error(errorMessage));
+        const message = this.resolveLoginErrorMessage(error);
+        return throwError(() => this.buildAuthError(error, message));
       })
     );
+  }
+
+  private resolveLoginErrorMessage(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'Invalid credentials';
+    }
+    if (error.status === 400) {
+      return this.extractErrorMessage(error) || 'Invalid request';
+    }
+    if (error.status === 0) {
+      return 'Cannot connect to server';
+    }
+    return this.extractErrorMessage(error) || 'Login failed';
+  }
+
+  private buildAuthError(error: HttpErrorResponse, fallbackMessage: string): AuthError {
+    const message = this.extractErrorMessage(error) || fallbackMessage;
+    const code = this.extractErrorCode(error);
+    const details = this.extractErrorDetails(error);
+    return new AuthError(error.status, message, code, details, error);
+  }
+
+  private extractErrorCode(error: HttpErrorResponse): string | undefined {
+    const payload = error.error;
+    if (payload && typeof payload === 'object' && 'code' in payload) {
+      return (payload as { code?: string }).code;
+    }
+    return error.statusText || undefined;
+  }
+
+  private extractErrorDetails(error: HttpErrorResponse): unknown {
+    return error.error ?? null;
+  }
+
+  private extractErrorMessage(error: HttpErrorResponse): string | undefined {
+    if (typeof error.error === 'string' && error.error.trim().length > 0) {
+      return error.error;
+    }
+    if (error.error && typeof error.error === 'object') {
+      if (typeof error.error.message === 'string' && error.error.message.trim()) {
+        return error.error.message;
+      }
+      if (typeof error.error.error === 'string' && error.error.error.trim()) {
+        return error.error.error;
+      }
+      if (Array.isArray(error.error.errors) && typeof error.error.errors[0] === 'string') {
+        return error.error.errors[0];
+      }
+    }
+    if (error.message) {
+      return error.message;
+    }
+    return undefined;
   }
 
 

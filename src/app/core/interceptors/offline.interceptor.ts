@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpRequest, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { Observable, of, throwError, from } from 'rxjs';
+import { catchError, tap, mergeMap } from 'rxjs/operators';
 import { OfflineService } from '../services/offline.service';
 import { DatabaseService } from '../services/database.service';
 
@@ -29,13 +29,16 @@ export const offlineInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
     }),
-    catchError(async (error: HttpErrorResponse) => {
-      // If request fails due to network issues, try to serve from cache
+    catchError((error: HttpErrorResponse) => {
       if (error.status === 0 || error.status >= 500) {
-        const cachedResponse = await tryServeCachedResponse(req, dbService);
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+        return from(tryServeCachedResponse(req, dbService)).pipe(
+          mergeMap(cachedResponse => {
+            if (cachedResponse) {
+              return of(cachedResponse);
+            }
+            return throwError(() => error);
+          })
+        );
       }
       return throwError(() => error);
     })

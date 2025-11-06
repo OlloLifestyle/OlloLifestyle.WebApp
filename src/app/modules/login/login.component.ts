@@ -2,9 +2,10 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService, AuthError } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { LoginCredentials, AuthenticateRequest } from '../../core/models/auth.models';
 
@@ -134,8 +135,8 @@ export class LoginComponent implements OnInit, OnDestroy {
             { duration: 3000 }
           );
         },
-        error: (error) => {
-          const errorMsg = error.message || 'Authentication failed. Please check your credentials.';
+        error: (error: AuthError | HttpErrorResponse | unknown) => {
+          const errorMsg = this.resolveAuthErrorMessage(error, 'Authentication failed. Please check your credentials.');
           this.showErrorState();
           this.notificationService.error(
             'Authentication Failed',
@@ -171,8 +172,8 @@ export class LoginComponent implements OnInit, OnDestroy {
               this.router.navigate(['/dashboard']);
             }, 1500);
           },
-          error: (error) => {
-            const errorMsg = error.message || 'Login failed. Please check your credentials.';
+          error: (error: AuthError | HttpErrorResponse | unknown) => {
+            const errorMsg = this.resolveAuthErrorMessage(error, 'Login failed. Please check your credentials.');
             this.showErrorState();
             this.notificationService.error(
               'Login Failed',
@@ -216,6 +217,18 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: 'Password'
     };
     return names[fieldName] || fieldName;
+  }
+
+  private resolveAuthErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof AuthError && error.message) {
+      return error.message;
+    }
+
+    if (error && typeof (error as any).message === 'string' && (error as any).message.trim()) {
+      return (error as any).message;
+    }
+
+    return fallback;
   }
 
   private markFormGroupTouched(): void {
