@@ -1,0 +1,474 @@
+<section class="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-2xl">
+  <div class="pointer-events-none absolute inset-0 overflow-hidden">
+    <div class="absolute -top-40 -right-24 h-96 w-96 rounded-full bg-gradient-to-br from-indigo-500/30 to-purple-500/20 blur-3xl animate-orb-float-1"></div>
+    <div class="absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-gradient-to-br from-teal-400/20 to-cyan-500/20 blur-3xl animate-orb-float-2"></div>
+    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:24px_24px] animate-grid-move"></div>
+  </div>
+
+  <div class="relative grid gap-6 p-6 lg:grid-cols-[360px_1fr] xl:grid-cols-[380px_1fr]">
+    <!-- Directory / Search Panel -->
+    <aside class="flex h-full min-h-[520px] flex-col rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/50">
+            Directory
+          </p>
+          <p class="text-2xl font-semibold">People grid</p>
+        </div>
+        <button
+          type="button"
+          (click)="startCreate()"
+          class="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white"
+        >
+          <i class="fas fa-plus text-xs"></i>
+          New profile
+        </button>
+      </div>
+
+      <div class="mt-5 relative">
+        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-white/60"></i>
+        <input
+          type="search"
+          [value]="searchTerm()"
+          (input)="handleSearch(($any($event.target)).value)"
+          placeholder="Search name, role, or company"
+          class="w-full rounded-2xl border border-white/20 bg-white/5 py-3 pl-11 pr-12 text-sm text-white placeholder:text-white/50 focus:border-white/60 focus:outline-none focus:ring-0"
+        />
+        <button
+          *ngIf="searchTerm()"
+          type="button"
+          (click)="clearSearch()"
+          class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-1 text-white/70 hover:bg-white/20"
+        >
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+
+      <div class="mt-3 flex items-center justify-between text-[13px] text-white/60">
+        <span>{{ filteredUsers().length }} curated profile{{ filteredUsers().length === 1 ? '' : 's' }}</span>
+        <span class="inline-flex items-center gap-2">
+          <i class="fas fa-circle text-[6px]" [class.text-emerald-300]="filteredUsers().length" [class.text-rose-300]="!filteredUsers().length"></i>
+          <span>{{ filteredUsers().length ? 'Ready to collaborate' : 'No matches found' }}</span>
+        </span>
+      </div>
+
+      <div class="mt-5 flex-1 overflow-hidden">
+        <div
+          *ngIf="filteredUsers().length; else emptyDirectory"
+          class="space-y-3 overflow-y-auto pr-2"
+          style="max-height: calc(100vh - 280px); scrollbar-width: thin;"
+          [@listStagger]="filteredUsers().length"
+        >
+          <button
+            *ngFor="let user of filteredUsers(); trackBy: trackUser"
+            type="button"
+            (click)="selectUser(user)"
+            class="w-full rounded-2xl border p-4 text-left transition duration-200"
+            [ngClass]="selectedUserId() === user.id ? 'border-white/70 bg-white/15' : 'border-white/15 bg-white/5'"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold shadow-lg shadow-black/20"
+                [ngStyle]="{ background: user.avatarAccent }"
+              >
+                {{ getInitials(user) }}
+              </div>
+              <div class="flex-1 space-y-1">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="text-base font-semibold">{{ user.fullName }}</p>
+                  <span
+                    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                    [ngClass]="user.isActive ? 'border-emerald-300/60 text-emerald-200' : 'border-rose-300/50 text-rose-200'"
+                  >
+                    <span class="h-1.5 w-1.5 rounded-full" [class.bg-emerald-300]="user.isActive" [class.bg-rose-300]="!user.isActive"></span>
+                    {{ user.isActive ? 'Active' : 'Paused' }}
+                  </span>
+                </div>
+                <p class="text-sm text-white/70">{{ user.headline }}</p>
+                <div class="flex flex-wrap gap-2 text-[11px] text-white/50">
+                  <span *ngFor="let role of user.roles | slice:0:2" class="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5">
+                    <span class="h-1.5 w-1.5 rounded-full" [style.background]="role.accentColor"></span>
+                    {{ role.name }}
+                  </span>
+                  <span class="inline-flex items-center gap-1">
+                    <i class="fas fa-clock text-[10px]"></i>
+                    {{ user.lastLoginAt | date: 'MMM d, y' }}
+                  </span>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right text-white/30" [class.opacity-0]="selectedUserId() === user.id"></i>
+            </div>
+          </button>
+        </div>
+
+        <ng-template #emptyDirectory>
+          <div
+            class="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center"
+            [@fadeScale]
+          >
+            <div #emptyStateLottie class="mb-4 h-32 w-32"></div>
+            <p class="text-lg font-semibold">No profiles match “{{ searchTerm() }}”</p>
+            <p class="mt-2 text-sm text-white/70">Try another role, change the company filter, or craft a new profile.</p>
+            <button
+              type="button"
+              (click)="startCreate()"
+              class="mt-4 inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+            >
+              <i class="fas fa-wand-magic-sparkles text-xs"></i>
+              Start new profile
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </aside>
+
+    <!-- Details Panel -->
+    <section class="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur lg:p-8">
+      <ng-container *ngIf="selectedUser() || isCreatingNew(); else promptSelection">
+        <div class="flex flex-col gap-6" [@fadeScale]>
+          <!-- Hero -->
+          <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent p-6 lg:p-8">
+            <div class="pointer-events-none absolute inset-0">
+              <div class="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-white/10 to-transparent"></div>
+              <div class="absolute -bottom-12 -right-10 h-48 w-48 rounded-full bg-white/15 blur-2xl"></div>
+            </div>
+            <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center">
+              <ng-container *ngIf="selectedUser() as current; else newProfileHero">
+                <div class="flex-1 space-y-3">
+                  <div class="flex flex-wrap items-center gap-3">
+                    <div
+                      class="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-semibold shadow-lg shadow-black/20"
+                      [ngStyle]="{ background: current.avatarAccent }"
+                    >
+                      {{ getInitials(current) }}
+                    </div>
+                    <div>
+                      <p class="text-2xl font-semibold">{{ current.fullName }}</p>
+                      <p class="text-sm text-white/70">{{ current.location }} · {{ current.timezone }}</p>
+                    </div>
+                    <span
+                      class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold"
+                      [ngClass]="current.isActive ? 'border-emerald-300/60 text-emerald-200' : 'border-rose-300/50 text-rose-200'"
+                    >
+                      <span class="h-1.5 w-1.5 rounded-full" [class.bg-emerald-300]="current.isActive" [class.bg-rose-300]="!current.isActive"></span>
+                      {{ current.isActive ? 'Active' : 'Paused' }}
+                    </span>
+                  </div>
+                  <p class="text-lg text-white/80">{{ current.heroTagline }}</p>
+                  <div class="flex flex-wrap gap-2 text-xs font-semibold text-white/80">
+                    <span class="rounded-full bg-white/15 px-3 py-1">
+                      Playbook · {{ current.playbookStage }}
+                    </span>
+                    <span *ngFor="let badge of current.badges" class="rounded-full border border-white/20 px-3 py-1">
+                      {{ badge }}
+                    </span>
+                  </div>
+                  <div class="flex flex-wrap gap-2 text-[13px] text-white/70">
+                    <span *ngFor="let company of current.companies" class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1">
+                      <i class="fas fa-building text-xs text-white/50"></i>
+                      {{ company.name }}
+                    </span>
+                  </div>
+                </div>
+                <div class="space-y-2 text-sm text-white/70">
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-clock text-white/50"></i>
+                    <div class="text-right">
+                      <p class="text-xs uppercase tracking-wide text-white/50">Last login</p>
+                      <p class="font-semibold text-white">{{ current.lastLoginAt | date: 'MMM d, y • h:mm a' }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-star text-white/50"></i>
+                    <div class="text-right">
+                      <p class="text-xs uppercase tracking-wide text-white/50">Member since</p>
+                      <p class="font-semibold text-white">{{ current.createdAt | date: 'MMM d, y' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #newProfileHero>
+                <div class="space-y-4">
+                  <p class="text-sm font-semibold uppercase tracking-[0.3em] text-white/60">New profile</p>
+                  <p class="text-3xl font-semibold">Let's craft a mindful access blueprint</p>
+                  <p class="text-white/70">
+                    Assign roles, pair their home companies, and set the tone for how this teammate will show up inside OLLO.
+                  </p>
+                  <div class="flex flex-wrap gap-2 text-xs text-white/70">
+                    <span class="rounded-full border border-white/20 px-3 py-1">Step 1 · Identity</span>
+                    <span class="rounded-full border border-white/20 px-3 py-1">Step 2 · Roles</span>
+                    <span class="rounded-full border border-white/20 px-3 py-1">Step 3 · Companies</span>
+                  </div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">
+                  <p class="font-semibold mb-2">Need inspiration?</p>
+                  <p>Use the directory on the left to peek into how leaders like Amelia or Marcus are configured.</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Insights -->
+          <ng-container *ngIf="selectedUser() as current; else newProfileInsights">
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div
+                *ngFor="let insight of current.insights; trackBy: trackInsight"
+                class="rounded-2xl border border-white/10 bg-white/5 p-5"
+              >
+                <p class="text-sm text-white/60">{{ insight.label }}</p>
+                <p class="mt-2 text-3xl font-semibold">{{ insight.value }}</p>
+                <div class="mt-3 flex items-center gap-2 text-xs text-white/60">
+                  <i [class]="trendIcon(insight.trend)"></i>
+                  <span>{{ trendLabel(insight.trend) }}</span>
+                  <span class="font-semibold text-white/80">
+                    {{ insight.delta >= 0 ? '+' : '' }}{{ insight.delta }} vs last week
+                  </span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #newProfileInsights>
+            <div class="rounded-2xl border border-dashed border-white/20 bg-white/5 p-5 text-sm text-white/70">
+              Insights will populate automatically once this profile is saved and connected to rituals.
+            </div>
+          </ng-template>
+
+          <!-- Form + Timeline -->
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="space-y-5">
+              <div class="grid gap-4 md:grid-cols-2">
+                <label class="block text-sm font-semibold text-white/80">
+                  First name
+                  <input
+                    formControlName="firstName"
+                    type="text"
+                    class="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 text-white placeholder:text-white/40 focus:border-white/60 focus:outline-none"
+                    placeholder="Amelia"
+                  />
+                  <span *ngIf="isFieldInvalid('firstName')" class="mt-2 block text-xs text-rose-200">
+                    Please enter a first name with at least two characters.
+                  </span>
+                </label>
+                <label class="block text-sm font-semibold text-white/80">
+                  Last name
+                  <input
+                    formControlName="lastName"
+                    type="text"
+                    class="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 text-white placeholder:text-white/40 focus:border-white/60 focus:outline-none"
+                    placeholder="Rivers"
+                  />
+                  <span *ngIf="isFieldInvalid('lastName')" class="mt-2 block text-xs text-rose-200">
+                    A last name is required.
+                  </span>
+                </label>
+              </div>
+
+              <label class="block text-sm font-semibold text-white/80">
+                Email / username
+                <input
+                  formControlName="userName"
+                  type="email"
+                  class="mt-2 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 text-white placeholder:text-white/40 focus:border-white/60 focus:outline-none"
+                  placeholder="teammate@ollo.com"
+                />
+                <span *ngIf="isFieldInvalid('userName')" class="mt-2 block text-xs text-rose-200">
+                  A valid email address is required.
+                </span>
+              </label>
+
+              <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                  <p class="text-sm font-semibold text-white/80">Status</p>
+                  <div class="mt-3 flex gap-3">
+                    <button
+                      type="button"
+                      (click)="setUserStatus(true)"
+                      class="w-full rounded-2xl border px-4 py-2 text-sm font-semibold transition"
+                      [ngClass]="userForm.get('isActive')?.value ? 'border-emerald-300/70 text-emerald-200' : 'border-white/20 text-white/70'"
+                    >
+                      Active
+                    </button>
+                    <button
+                      type="button"
+                      (click)="setUserStatus(false)"
+                      class="w-full rounded-2xl border px-4 py-2 text-sm font-semibold transition"
+                      [ngClass]="!userForm.get('isActive')?.value ? 'border-rose-300/70 text-rose-200' : 'border-white/20 text-white/70'"
+                    >
+                      Paused
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-white/80">Playbook stage</p>
+                  <p class="mt-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/70">
+                    {{ selectedUser()?.playbookStage || 'Assign after saving profile' }}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-white/80">Roles</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button
+                    *ngFor="let role of roles()"
+                    type="button"
+                    (click)="toggleRole(role.id)"
+                    class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition"
+                    [ngClass]="isRoleSelected(role.id) ? 'bg-white text-slate-900' : 'border-white/15 text-white/80'"
+                  >
+                    <span class="h-2 w-2 rounded-full" [style.background]="role.accentColor"></span>
+                    {{ role.name }}
+                  </button>
+                </div>
+                <span *ngIf="isFieldInvalid('roleIds')" class="mt-2 block text-xs text-rose-200">
+                  Assign at least one role.
+                </span>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-white/80">Companies</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button
+                    *ngFor="let company of companies()"
+                    type="button"
+                    (click)="toggleCompany(company.id)"
+                    class="inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-semibold transition"
+                    [ngClass]="isCompanySelected(company.id) ? 'bg-white/15 border-white/50' : 'border-white/20 text-white/80'"
+                  >
+                    <i class="fas fa-building text-xs text-white/50"></i>
+                    {{ company.name }}
+                    <span
+                      class="text-xs font-semibold"
+                      [class.text-emerald-200]="company.isActive"
+                      [class.text-amber-200]="!company.isActive"
+                    >
+                      {{ company.isActive ? 'Live' : 'Paused' }}
+                    </span>
+                  </button>
+                </div>
+                <span *ngIf="isFieldInvalid('companyIds')" class="mt-2 block text-xs text-rose-200">
+                  Pick at least one company.
+                </span>
+              </div>
+
+              <div class="flex flex-wrap gap-3 pt-2">
+                <button
+                  type="submit"
+                  class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white/90 disabled:cursor-not-allowed disabled:bg-white/40"
+                  [disabled]="userForm.invalid || isSaving() || (!isCreatingNew() && !userForm.dirty)"
+                >
+                  <i class="fas fa-floppy-disk text-xs"></i>
+                  {{ isCreatingNew() ? 'Create profile' : 'Save changes' }}
+                </button>
+
+                <button
+                  type="button"
+                  (click)="resetFormView()"
+                  class="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10 disabled:opacity-40"
+                  [disabled]="!userForm.dirty"
+                >
+                  <i class="fas fa-rotate-left text-xs"></i>
+                  Reset
+                </button>
+
+                <button
+                  type="button"
+                  (click)="deleteUser()"
+                  class="inline-flex items-center gap-2 rounded-full border border-rose-200/40 px-5 py-2.5 text-sm font-semibold text-rose-200 hover:bg-rose-500/10 disabled:opacity-30"
+                  [disabled]="isCreatingNew() || !userForm.get('id')?.value || isSaving()"
+                >
+                  <i class="fas fa-box-archive text-xs"></i>
+                  Archive user
+                </button>
+              </div>
+            </form>
+
+            <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+              <ng-container *ngIf="selectedUser() as current; else newProfileSidebar">
+                <div>
+                  <p class="text-sm font-semibold uppercase tracking-[0.3em] text-white/60">Timeline</p>
+                  <ol class="mt-4 space-y-4">
+                    <li *ngFor="let event of current.timeline; trackBy: trackTimeline" class="flex gap-4">
+                      <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full text-white"
+                        [ngClass]="{
+                          'bg-emerald-400/30': event.tone === 'success',
+                          'bg-cyan-400/30': event.tone === 'info',
+                          'bg-amber-400/30': event.tone === 'warning'
+                        }"
+                      >
+                        <i [class]="event.icon"></i>
+                      </div>
+                      <div class="flex-1 text-sm">
+                        <p class="font-semibold text-white">{{ event.title }}</p>
+                        <p class="text-white/70">{{ event.description }}</p>
+                        <p class="text-[11px] text-white/50 mt-1">{{ event.timestamp | date: 'MMM d, y • h:mm a' }}</p>
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+
+                <div class="mt-6">
+                  <p class="text-sm font-semibold uppercase tracking-[0.3em] text-white/60">Favorite actions</p>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <button
+                      *ngFor="let action of current.favoriteActions; trackBy: trackAction"
+                      type="button"
+                      class="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:bg-white/10"
+                    >
+                      <i class="fas fa-sparkles text-[11px] text-white/60"></i>
+                      {{ action }}
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #newProfileSidebar>
+                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-white/60">Kick-off checklist</p>
+                <ul class="mt-4 space-y-3 text-sm text-white/80">
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-circle text-[6px] text-white/40 mt-2"></i>
+                    Assign at least one system role to unlock rituals and dashboards.
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-circle text-[6px] text-white/40 mt-2"></i>
+                    Pair the teammate with an active company. You can add labs access later.
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-circle text-[6px] text-white/40 mt-2"></i>
+                    Save the profile to auto-generate access reviews and insights.
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-circle text-[6px] text-white/40 mt-2"></i>
+                    Use the directory to clone inspiration from existing leaders.
+                  </li>
+                </ul>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #promptSelection>
+        <div class="flex min-h-[520px] flex-col items-center justify-center gap-4 text-center" [@fadeScale]>
+          <div class="rounded-full bg-white/10 p-5">
+            <i class="fas fa-users text-2xl text-white/80"></i>
+          </div>
+          <p class="text-2xl font-semibold">Choose a profile to begin</p>
+          <p class="max-w-md text-sm text-white/70">
+            Search or filter on the left to inspect an existing teammate, or craft a new profile to welcome someone into OLLO.
+          </p>
+          <button
+            type="button"
+            (click)="startCreate()"
+            class="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900"
+          >
+            <i class="fas fa-plus text-xs"></i>
+            Create profile
+          </button>
+        </div>
+      </ng-template>
+    </section>
+  </div>
+</section>

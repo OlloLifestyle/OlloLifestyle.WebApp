@@ -1,6 +1,6 @@
 import { Component, HostListener, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -17,7 +17,7 @@ interface ProductSection {
 @Component({
   selector: 'app-mega-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   animations: [
     trigger('slideDown', [
       state('closed', style({

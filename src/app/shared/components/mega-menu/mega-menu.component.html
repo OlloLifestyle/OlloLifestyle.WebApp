@@ -80,6 +80,15 @@
           <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
             Resources
           </a>
+          <a
+            routerLink="/dashboard/user-master"
+            routerLinkActive="text-blue-600 font-semibold"
+            [routerLinkActiveOptions]="{ exact: false }"
+            class="flex items-center gap-2 text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+          >
+            <i class="fas fa-users-gear text-xs"></i>
+            User Master
+          </a>
           <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
             Settings
           </a>
@@ -258,6 +267,16 @@
 
         <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
           Resources
+        </a>
+        <a
+          routerLink="/dashboard/user-master"
+          routerLinkActive="text-blue-600 font-semibold bg-blue-50"
+          [routerLinkActiveOptions]="{ exact: false }"
+          (click)="closeMobileMenu()"
+          class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 flex items-center gap-2"
+        >
+          <i class="fas fa-users-gear text-xs"></i>
+          User Master
         </a>
         <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
           Settings

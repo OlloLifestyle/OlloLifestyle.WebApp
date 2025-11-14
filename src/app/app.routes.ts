@@ -15,7 +15,22 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./modules/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./shared/components/placeholder-page.component').then(m => m.PlaceholderPageComponent)
+      },
+      {
+        path: 'user-master',
+        loadComponent: () => import('./modules/user-master/user-master.component').then(m => m.UserMasterComponent)
+      },
+      {
+        path: 'users',
+        redirectTo: 'user-master',
+        pathMatch: 'full'
+      }
+    ]
   },
   {
     path: 'unauthorized',
