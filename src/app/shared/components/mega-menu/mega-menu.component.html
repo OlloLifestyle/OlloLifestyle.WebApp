@@ -246,14 +246,14 @@
                [class.rotate-180]="mobileProductOpen()"></i>
           </button>
 
-          <div *ngIf="mobileProductOpen()" class="mt-2 ml-4 space-y-4">
+          <div *ngIf="mobileProductOpen()" class="mobile-submenu">
             <!-- Mobile Browse Products -->
             <div>
               <h4 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                 <i class="fas fa-cube text-blue-500 mr-2"></i>
                 Browse Products
               </h4>
-              <div class="space-y-2">
+              <div class="mobile-submenu-list">
                 <a *ngFor="let item of productSections[0].items" 
                    [href]="item.href" 
                    class="mobile-link mobile-link--icon text-sm">
@@ -269,7 +269,7 @@
                 <i class="fas fa-tools text-purple-500 mr-2"></i>
                 Apps & Tools
               </h4>
-              <div class="space-y-2">
+              <div class="mobile-submenu-list">
                 <a *ngFor="let item of productSections[1].items" 
                    [href]="item.href" 
                    class="mobile-link mobile-link--icon">
