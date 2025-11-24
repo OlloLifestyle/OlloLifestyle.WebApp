@@ -67,6 +67,71 @@
   box-shadow: 8px 0 32px rgba(0, 0, 0, 0.1);
 }
 
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  border-radius: 0.75rem;
+  transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #2563eb;
+}
+
+.nav-link--pill {
+  padding: 0.65rem 0.9rem;
+  background: transparent;
+}
+
+.nav-link--pill:hover {
+  background: rgba(59, 130, 246, 0.08);
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.15);
+}
+
+.mobile-link {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  transition: color 0.2s ease, background-color 0.2s ease, border-left-color 0.2s ease;
+}
+
+.mobile-link:hover {
+  color: #2563eb;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.mobile-link--icon {
+  gap: 0.6rem;
+}
+
+.mobile-dropdown-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  color: #374151;
+  font-weight: 600;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.mobile-dropdown-toggle:hover {
+  color: #2563eb;
+  background: rgba(59, 130, 246, 0.05);
+}
+
 /* Professional Dashboard Icons - Borderless */
 .dashboard-icon-btn {
   display: flex;

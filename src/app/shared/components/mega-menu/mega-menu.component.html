@@ -36,7 +36,7 @@
       <!-- Desktop Menu Items -->
       <div class="hidden lg:block">
         <div class="ml-10 flex items-baseline space-x-8">
-          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+          <a href="#" class="nav-link nav-link--pill">
             Explore
           </a>
           
@@ -44,7 +44,7 @@
           <div class="relative"
                (mouseenter)="showProductDropdown.set(true)"
                (mouseleave)="showProductDropdown.set(false)">
-            <button class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium flex items-center transition-colors duration-200"
+            <button class="nav-link nav-link--pill"
                     [class.text-blue-600]="showProductDropdown()">
               Product
               <i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-200"
@@ -95,19 +95,19 @@
             </div>
           </div>
 
-          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+          <a href="#" class="nav-link nav-link--pill">
             Resources
           </a>
           <a
             routerLink="/dashboard/user-master"
             routerLinkActive="text-blue-600 font-semibold"
             [routerLinkActiveOptions]="{ exact: false }"
-            class="flex items-center gap-2 text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+            class="nav-link nav-link--pill"
           >
             <i class="fas fa-users-gear text-xs"></i>
             User Master
           </a>
-          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+          <a href="#" class="nav-link nav-link--pill">
             Settings
           </a>
         </div>
@@ -233,14 +233,14 @@
     <div class="p-6">
       <!-- Mobile Menu Items -->
       <div class="space-y-4">
-        <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+        <a href="#" class="mobile-link">
           Explore
         </a>
 
         <!-- Mobile Product Section -->
         <div>
           <button (click)="toggleMobileProduct()" 
-                  class="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                  class="mobile-dropdown-toggle">
             <span>Product</span>
             <i class="fas fa-chevron-down text-xs transition-transform duration-200"
                [class.rotate-180]="mobileProductOpen()"></i>
@@ -256,8 +256,8 @@
               <div class="space-y-2">
                 <a *ngFor="let item of productSections[0].items" 
                    [href]="item.href" 
-                   class="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
-                  <i [class]="item.icon + ' mr-3 w-4'"></i>
+                   class="mobile-link mobile-link--icon text-sm">
+                  <i [class]="item.icon + ' w-4'"></i>
                   {{item.name}}
                 </a>
               </div>
@@ -272,13 +272,11 @@
               <div class="space-y-2">
                 <a *ngFor="let item of productSections[1].items" 
                    [href]="item.href" 
-                   class="block px-3 py-2 text-sm hover:bg-purple-50 rounded-lg transition-colors duration-200">
-                  <div class="flex items-start">
-                    <i [class]="item.icon + ' mr-3 mt-0.5 text-gray-400'"></i>
-                    <div>
-                      <div class="text-gray-700 hover:text-gray-900 font-medium">{{item.name}}</div>
-                      <div class="text-xs text-gray-500 mt-1">{{item.description}}</div>
-                    </div>
+                   class="mobile-link mobile-link--icon">
+                  <i [class]="item.icon + ' text-gray-400'"></i>
+                  <div>
+                    <div class="text-gray-700 hover:text-gray-900 font-medium">{{item.name}}</div>
+                    <div class="text-xs text-gray-500 mt-1">{{item.description}}</div>
                   </div>
                 </a>
               </div>
@@ -286,7 +284,7 @@
           </div>
         </div>
 
-        <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+        <a href="#" class="mobile-link">
           Resources
         </a>
         <a
@@ -294,12 +292,12 @@
           routerLinkActive="text-blue-600 font-semibold bg-blue-50"
           [routerLinkActiveOptions]="{ exact: false }"
           (click)="closeMobileMenu()"
-          class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 flex items-center gap-2"
+          class="mobile-link mobile-link--icon"
         >
           <i class="fas fa-users-gear text-xs"></i>
           User Master
         </a>
-        <a href="#" class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+        <a href="#" class="mobile-link">
           Settings
         </a>
 
