@@ -1,7 +1,25 @@
-<!-- Desktop Navigation -->
-<nav class="hidden lg:block bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
+<ng-template #scrollActivity>
+  <div class="pointer-events-none relative h-1 w-full" aria-hidden="true">
+    <div class="absolute inset-0 rounded-full bg-slate-200/60"></div>
+    <div
+      class="absolute inset-y-0 left-0 rounded-full bg-indigo-500/70 transition-[width] duration-300 ease-out"
+      [style.width.%]="scrollProgress()"
+    ></div>
+    <div
+      class="absolute top-1/2 h-3 w-3 -translate-y-1/2 -translate-x-1/2 rounded-full bg-indigo-600 shadow-lg shadow-indigo-500/30 transition-all duration-300 ease-out"
+      [style.left.%]="scrollProgress()"
+    ></div>
+  </div>
+</ng-template>
+
+<div class="fixed inset-x-0 top-0 z-50">
+  <!-- Desktop Navigation -->
+  <nav class="hidden lg:block bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-2">
+        <ng-container *ngTemplateOutlet="scrollActivity"></ng-container>
+      </div>
+      <div class="flex items-center justify-between h-16">
       <!-- Logo -->
       <div class="flex-shrink-0 logo-container">
         <img 
@@ -164,12 +182,15 @@
       </div>
     </div>
   </div>
-</nav>
+  </nav>
 
-<!-- Mobile Navigation -->
-<nav class="lg:hidden bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-  <div class="px-4 sm:px-6">
-    <div class="flex items-center justify-between h-16">
+  <!-- Mobile Navigation -->
+  <nav class="lg:hidden bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <div class="px-4 sm:px-6">
+      <div class="mb-2">
+        <ng-container *ngTemplateOutlet="scrollActivity"></ng-container>
+      </div>
+      <div class="flex items-center justify-between h-16">
       <!-- Mobile Logo -->
       <div class="flex-shrink-0 logo-container">
         <img 
@@ -200,15 +221,15 @@
     </div>
   </div>
 
-  <!-- Mobile Menu Overlay -->
-  <div *ngIf="mobileMenuOpen()" 
-       class="fixed inset-0 top-16 bg-black/20 backdrop-blur-sm z-40"
-       (click)="closeMobileMenu()">
-  </div>
+    <!-- Mobile Menu Overlay -->
+    <div *ngIf="mobileMenuOpen()" 
+         class="fixed inset-x-0 bottom-0 top-[5rem] bg-black/20 backdrop-blur-sm z-40"
+         (click)="closeMobileMenu()">
+    </div>
 
-  <!-- Mobile Menu -->
-  <div [@slideInMobile]="mobileMenuOpen() ? 'open' : 'closed'"
-       class="lg:hidden fixed top-16 left-0 h-[calc(100vh-4rem)] w-80 bg-white/95 backdrop-blur-lg shadow-xl z-50 overflow-y-auto">
+    <!-- Mobile Menu -->
+    <div [@slideInMobile]="mobileMenuOpen() ? 'open' : 'closed'"
+         class="lg:hidden fixed top-[5rem] left-0 h-[calc(100vh-5rem)] w-80 bg-white/95 backdrop-blur-lg shadow-xl z-50 overflow-y-auto">
     <div class="p-6">
       <!-- Mobile Menu Items -->
       <div class="space-y-4">
@@ -354,3 +375,7 @@
     </div>
   </div>
 </nav>
+</div>
+
+<!-- Spacer to offset fixed navigation -->
+<div class="h-[5rem] sm:h-[5rem] lg:h-[5.25rem]" aria-hidden="true"></div>

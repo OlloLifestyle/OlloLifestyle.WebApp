@@ -39,6 +39,7 @@ import { ConfigService } from '../../core/services/config.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './user-master.component.html',
+  styleUrls: ['./user-master.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('fadeScale', [

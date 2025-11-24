@@ -64,6 +64,7 @@ export class MegaMenuComponent {
   mobileProductOpen = signal(false);
   showUserDropdown = signal(false);
   darkMode = signal(false);
+  scrollProgress = signal(0);
 
   productSections: ProductSection[] = [
     {
@@ -129,6 +130,16 @@ export class MegaMenuComponent {
     } else {
       document.documentElement.classList.remove('dark');
     }
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    const doc = document.documentElement;
+    const scrollTop = window.pageYOffset || doc.scrollTop || 0;
+    const scrollHeight = doc.scrollHeight - doc.clientHeight;
+    const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    const clamped = Math.min(Math.max(progress, 0), 100);
+    this.scrollProgress.set(clamped);
   }
 
   signOut() {
