@@ -60,9 +60,9 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
 };
 
 /**
- * Guard for permission-based access (flat or scoped)
+ * Guard for scoped permissions (e.g., scope=user, permission=read)
  */
-export const permissionGuard = (permission: string): CanActivateFn => {
+export const scopedPermissionGuard = (scope: string, permission: string): CanActivateFn => {
   return (route, state): Observable<boolean | UrlTree> => {
     const authService = inject(AuthService);
     const router = inject(Router);
@@ -71,12 +71,12 @@ export const permissionGuard = (permission: string): CanActivateFn => {
       return of(router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } }));
     }
 
-    const hasPermission = authService.can(permission);
+    const hasPermission = authService.canScoped(scope, permission);
     if (hasPermission) {
       return of(true);
     }
 
-    console.warn(`Access denied. Required permission: ${permission}`);
+    console.warn(`Access denied. Required scoped permission: ${scope}.${permission}`);
     return of(router.createUrlTree(['/unauthorized']));
   };
 };

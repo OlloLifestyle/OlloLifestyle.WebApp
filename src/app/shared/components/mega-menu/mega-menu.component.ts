@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core/services/auth.service';
+import { CanDirective } from '../../directives/can.directive';
 
 interface ProductSection {
   title: string;
@@ -18,7 +19,7 @@ interface ProductSection {
 @Component({
   selector: 'app-mega-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CanDirective],
   animations: [
     trigger('slideDown', [
       state('closed', style({

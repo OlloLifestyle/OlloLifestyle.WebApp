@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, permissionGuard } from './core/guards/auth.guard';
+import { authGuard, guestGuard, scopedPermissionGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -24,7 +24,7 @@ export const routes: Routes = [
       {
         path: 'user-master',
         loadComponent: () => import('./modules/user-master/user-master.component').then(m => m.UserMasterComponent),
-        canActivate: [permissionGuard('user.read')]
+        canActivate: [scopedPermissionGuard('user', 'read')]
       }
     ]
   },

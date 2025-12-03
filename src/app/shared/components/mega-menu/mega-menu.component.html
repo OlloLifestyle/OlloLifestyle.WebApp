@@ -99,6 +99,7 @@
             Resources
           </a>
           <a
+            *appCan="['user.access','user.read']"
             [routerLink]="canSeeUserMaster() ? '/dashboard/user-master' : null"
             routerLinkActive="text-blue-600 font-semibold"
             [routerLinkActiveOptions]="{ exact: false }"
@@ -299,6 +300,7 @@
           Resources
         </a>
         <a
+          *appCan="['user.access','user.read']"
           [routerLink]="canSeeUserMaster() ? '/dashboard/user-master' : null"
           routerLinkActive="text-blue-600 font-semibold bg-blue-50"
           [routerLinkActiveOptions]="{ exact: false }"

@@ -310,10 +310,14 @@ export class AuthService {
         scopedPermissions[scope] = normalize((claims as any)[key]);
       });
 
+    const flattenedFromScoped = Object.entries(scopedPermissions).flatMap(
+      ([scope, perms]) => perms.map(perm => `${scope}.${perm}`)
+    );
+
     const accessProfile: AccessProfile = {
       roleName: (claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string) || (claims as any).role || 'User',
       roleId: claims.role_id || '',
-      permissions: normalize(claims.permission),
+      permissions: flattenedFromScoped,
       scopedPermissions
     };
 

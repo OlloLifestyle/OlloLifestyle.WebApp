@@ -18,6 +18,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Get the auth token
   const authToken = authService.getToken();
+  if (!authToken || authService.isTokenExpired()) {
+    authService.logout().subscribe(() => {
+      router.navigate(['/login']);
+    });
+    return throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Token expired' }));
+  }
   
   // Add Authorization header if token exists and request needs auth
   const authReq = authToken && shouldAddAuthHeader(req) 
@@ -45,6 +51,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         authService.logout().subscribe(() => {
           router.navigate(['/login']);
         });
+      } else if (error.status === 403) {
+        notificationService.warning(
+          'Access denied',
+          'You do not have permission to perform this action.',
+          { duration: 4000 }
+        );
+        router.navigate(['/unauthorized']);
       }
       return throwError(() => error);
     })
