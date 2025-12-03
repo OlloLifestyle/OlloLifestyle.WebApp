@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { map, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 /**
@@ -56,6 +55,28 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
 
     // User doesn't have required role
     console.warn(`Access denied. Required roles: ${allowedRoles.join(', ')}`);
+    return of(router.createUrlTree(['/unauthorized']));
+  };
+};
+
+/**
+ * Guard for permission-based access (flat or scoped)
+ */
+export const permissionGuard = (permission: string): CanActivateFn => {
+  return (route, state): Observable<boolean | UrlTree> => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
+
+    if (!authService.isAuthenticated()) {
+      return of(router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } }));
+    }
+
+    const hasPermission = authService.can(permission);
+    if (hasPermission) {
+      return of(true);
+    }
+
+    console.warn(`Access denied. Required permission: ${permission}`);
     return of(router.createUrlTree(['/unauthorized']));
   };
 };

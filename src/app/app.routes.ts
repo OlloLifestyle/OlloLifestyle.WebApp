@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { authGuard, guestGuard, permissionGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -23,7 +23,8 @@ export const routes: Routes = [
       },
       {
         path: 'user-master',
-        loadComponent: () => import('./modules/user-master/user-master.component').then(m => m.UserMasterComponent)
+        loadComponent: () => import('./modules/user-master/user-master.component').then(m => m.UserMasterComponent),
+        canActivate: [permissionGuard('user.read')]
       },
       {
         path: 'users',

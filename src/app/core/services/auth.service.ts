@@ -35,7 +35,9 @@ export class AuthService {
   public readonly currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
   public readonly isAuthenticated$: Observable<boolean> = this.currentUserSubject.pipe(
     map(user => !!user),
-    tap(isAuth => console.log('Auth state changed:', isAuth)),
+    tap(isAuth => {
+      /* quiet in production; add logger here if needed */
+    }),
     delay(0) // Avoid ExpressionChangedAfterItHasBeenCheckedError
   );
   public readonly accessProfile$ = this.accessProfileSubject.asObservable();
@@ -156,7 +158,7 @@ export class AuthService {
   /**
    * Check if user has a permission in the flat permission list
    */
-  hasPermission(permission: string): boolean {
+  private hasPermission(permission: string): boolean {
     const profile = this.accessProfileSubject.value;
     if (!profile) {
       return false;
@@ -182,7 +184,7 @@ export class AuthService {
   /**
    * Check if user has a scoped permission (e.g., user.read)
    */
-  hasScopedPermission(scope: keyof PermissionMap | string, permission: string): boolean {
+  canScoped(scope: keyof PermissionMap | string, permission: string): boolean {
     const profile = this.accessProfileSubject.value;
     if (!profile) {
       return false;
@@ -195,7 +197,7 @@ export class AuthService {
   /**
    * Return normalized CRUD-style permissions for a module/scope
    */
-  getModulePermissions(scope: keyof PermissionMap | string) {
+  getScopePermissions(scope: keyof PermissionMap | string) {
     const profile = this.accessProfileSubject.value;
     const scoped = profile?.scopedPermissions[scope] || [];
     const has = (perm: string) => scoped.includes(perm);
