@@ -25,11 +25,6 @@ export const routes: Routes = [
         path: 'user-master',
         loadComponent: () => import('./modules/user-master/user-master.component').then(m => m.UserMasterComponent),
         canActivate: [permissionGuard('user.read')]
-      },
-      {
-        path: 'users',
-        redirectTo: 'user-master',
-        pathMatch: 'full'
       }
     ]
   },
