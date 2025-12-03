@@ -99,9 +99,13 @@
             Resources
           </a>
           <a
-            routerLink="/dashboard/user-master"
+            [routerLink]="canSeeUserMaster() ? '/dashboard/user-master' : null"
             routerLinkActive="text-blue-600 font-semibold"
             [routerLinkActiveOptions]="{ exact: false }"
+            [attr.aria-disabled]="!userAccessEnabled()"
+            [class.opacity-50]="!userAccessEnabled()"
+            [class.cursor-not-allowed]="!userAccessEnabled()"
+            [class.pointer-events-none]="!userAccessEnabled()"
             class="nav-link nav-link--pill"
           >
             <i class="fas fa-users-gear text-xs"></i>
@@ -160,8 +164,15 @@
                class="absolute right-0 top-12 bg-white/95 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-xl py-2 w-48 z-50"
                [@slideDown]="showUserDropdown() ? 'open' : 'closed'">
             <div class="px-4 py-2 border-b border-gray-100">
-              <div class="text-sm font-medium text-gray-900">John Doe</div>
-              <div class="text-xs text-gray-500">john.doe&#64;company.com</div>
+              <div class="text-sm font-medium text-gray-900">
+                {{ currentUser()?.firstName }} {{ currentUser()?.lastName }}
+              </div>
+              <div class="text-xs text-gray-500">
+                {{ currentUser()?.userName }}
+              </div>
+              <div class="text-[11px] text-gray-400" *ngIf="accessProfile()?.roleName">
+                {{ accessProfile()?.roleName }}
+              </div>
             </div>
             <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
               <i class="fas fa-user-cog w-4 text-gray-400 mr-3"></i>
@@ -288,10 +299,14 @@
           Resources
         </a>
         <a
-          routerLink="/dashboard/user-master"
+          [routerLink]="canSeeUserMaster() ? '/dashboard/user-master' : null"
           routerLinkActive="text-blue-600 font-semibold bg-blue-50"
           [routerLinkActiveOptions]="{ exact: false }"
           (click)="closeMobileMenu()"
+          [attr.aria-disabled]="!userAccessEnabled()"
+          [class.opacity-50]="!userAccessEnabled()"
+          [class.cursor-not-allowed]="!userAccessEnabled()"
+          [class.pointer-events-none]="!userAccessEnabled()"
           class="mobile-link mobile-link--icon"
         >
           <i class="fas fa-users-gear text-xs"></i>
@@ -349,8 +364,15 @@
                    class="absolute right-0 top-12 bg-white/95 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-xl py-2 w-48 z-50"
                    [@slideDown]="showUserDropdown() ? 'open' : 'closed'">
                 <div class="px-4 py-2 border-b border-gray-100">
-                  <div class="text-sm font-medium text-gray-900">John Doe</div>
-                  <div class="text-xs text-gray-500">john.doe&#64;company.com</div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ currentUser()?.firstName }} {{ currentUser()?.lastName }}
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    {{ currentUser()?.userName }}
+                  </div>
+                  <div class="text-[11px] text-gray-400" *ngIf="accessProfile()?.roleName">
+                    {{ accessProfile()?.roleName }}
+                  </div>
                 </div>
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                   <i class="fas fa-user-cog w-4 text-gray-400 mr-3"></i>

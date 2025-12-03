@@ -1,7 +1,8 @@
-import { Component, HostListener, signal, inject } from '@angular/core';
+import { Component, HostListener, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface ProductSection {
@@ -65,6 +66,10 @@ export class MegaMenuComponent {
   showUserDropdown = signal(false);
   darkMode = signal(false);
   scrollProgress = signal(0);
+  currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
+  accessProfile = toSignal(this.authService.accessProfile$, { initialValue: null });
+  userAccessEnabled = computed(() => this.authService.can('user.access'));
+  canSeeUserMaster = computed(() => this.authService.canAny(['user.access', 'user.read']));
 
   productSections: ProductSection[] = [
     {

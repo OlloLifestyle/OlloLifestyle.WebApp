@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, delay, catchError, map, finalize } from 'rxjs/operators';
-import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest } from '../models/auth.models';
+import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest, AccessProfile, JwtClaims, PermissionScopes } from '../models/auth.models';
 import { ConfigService } from './config.service';
 
 export class AuthError extends Error {
@@ -26,8 +26,10 @@ export class AuthService {
   private readonly config = inject(ConfigService);
   private readonly TOKEN_KEY = 'ollo_auth_token';
   private readonly USER_KEY = 'ollo_auth_user';
+  private readonly ACCESS_KEY = 'ollo_auth_access';
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private accessProfileSubject = new BehaviorSubject<AccessProfile | null>(null);
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
 
   public readonly currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
@@ -36,6 +38,7 @@ export class AuthService {
     tap(isAuth => console.log('Auth state changed:', isAuth)),
     delay(0) // Avoid ExpressionChangedAfterItHasBeenCheckedError
   );
+  public readonly accessProfile$ = this.accessProfileSubject.asObservable();
   public readonly isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
 
   constructor() {
@@ -141,11 +144,67 @@ export class AuthService {
 
   /**
    * Check if user has any of the specified roles
-   * Note: Role checking would require decoding the JWT token
-   * For now, returning true for authenticated users
    */
   hasAnyRole(roles: string[]): boolean {
-    return this.isAuthenticated();
+    const profile = this.accessProfileSubject.value;
+    if (!profile) {
+      return false;
+    }
+    return roles.some(role => role.toLowerCase() === profile.roleName.toLowerCase());
+  }
+
+  /**
+   * Check if user has a permission in the flat permission list
+   */
+  hasPermission(permission: string): boolean {
+    const profile = this.accessProfileSubject.value;
+    if (!profile) {
+      return false;
+    }
+    const needle = permission.toLowerCase();
+    return profile.permissions.includes(needle);
+  }
+
+  /**
+   * General permission check entry point (alias for hasPermission)
+   */
+  can(permission: string): boolean {
+    return this.hasPermission(permission);
+  }
+
+  /**
+   * Check if user has any permission in the provided list
+   */
+  canAny(permissions: string[]): boolean {
+    return permissions.some(p => this.can(p));
+  }
+
+  /**
+   * Check if user has a scoped permission (e.g., user.read)
+   */
+  hasScopedPermission(scope: keyof PermissionScopes, permission: string): boolean {
+    const profile = this.accessProfileSubject.value;
+    if (!profile) {
+      return false;
+    }
+    const scoped = profile.scopedPermissions[scope] || [];
+    const needle = permission.toLowerCase();
+    return scoped.includes(needle);
+  }
+
+  /**
+   * Return normalized CRUD-style permissions for a module/scope
+   */
+  getModulePermissions(scope: keyof PermissionScopes) {
+    const profile = this.accessProfileSubject.value;
+    const scoped = profile?.scopedPermissions[scope] || [];
+    const has = (perm: string) => scoped.includes(perm);
+    return {
+      access: has('access'),
+      read: has('read'),
+      write: has('write') || has('edit') || has('update'),
+      delete: has('delete') || has('remove')
+    };
   }
 
   /**
@@ -228,7 +287,34 @@ export class AuthService {
     localStorage.setItem('ollo_auth_expiry', response.expiresAt);
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
     localStorage.setItem('ollo_auth_companies', JSON.stringify(response.companies));
+
+    const claims = this.decodeToken<JwtClaims>(response.token);
+    const normalize = (value: unknown): string[] => {
+      if (!value) return [];
+      if (Array.isArray(value)) {
+        return value
+          .filter((v): v is string => typeof v === 'string')
+          .map(v => v.toLowerCase());
+      }
+      if (typeof value === 'string') return [value.toLowerCase()];
+      return [];
+    };
+
+    const accessProfile: AccessProfile = {
+      roleName: (claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string) || (claims as any).role || 'User',
+      roleId: claims.role_id || '',
+      permissions: normalize(claims.permission),
+      scopedPermissions: {
+        user: normalize((claims as any).permission_user),
+        employee: normalize((claims as any).permission_employee ?? (claims as any).permission_user),
+        order: normalize(claims.permission_order),
+        product: normalize(claims.permission_product)
+      }
+    };
+
+    localStorage.setItem(this.ACCESS_KEY, JSON.stringify(accessProfile));
     this.currentUserSubject.next(response.user);
+    this.accessProfileSubject.next(accessProfile);
   }
 
   /**
@@ -239,7 +325,9 @@ export class AuthService {
     localStorage.removeItem('ollo_auth_expiry');
     localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem('ollo_auth_companies');
+    localStorage.removeItem(this.ACCESS_KEY);
     this.currentUserSubject.next(null);
+    this.accessProfileSubject.next(null);
   }
 
   /**
@@ -249,14 +337,36 @@ export class AuthService {
     try {
       const storedUser = localStorage.getItem(this.USER_KEY);
       const storedToken = localStorage.getItem(this.TOKEN_KEY);
+      const storedAccess = localStorage.getItem(this.ACCESS_KEY);
       
       if (storedUser && storedToken) {
         const user = JSON.parse(storedUser);
         this.currentUserSubject.next(user);
       }
+
+      if (storedAccess) {
+        const accessProfile: AccessProfile = JSON.parse(storedAccess);
+        this.accessProfileSubject.next(accessProfile);
+      }
     } catch (error) {
       console.error('Failed to load stored user:', error);
       this.clearAuthData();
+    }
+  }
+
+  /**
+   * Decode a JWT token payload
+   */
+  private decodeToken<T = unknown>(token: string): T {
+    try {
+      const payload = token.split('.')[1];
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = normalized.padEnd(normalized.length + (4 - (normalized.length % 4)) % 4, '=');
+      const decoded = atob(padded);
+      return JSON.parse(decoded) as T;
+    } catch (error) {
+      console.warn('Failed to decode token', error);
+      return {} as T;
     }
   }
 }
