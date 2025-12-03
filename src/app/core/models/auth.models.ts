@@ -12,12 +12,7 @@ export interface Company {
   isActive: boolean;
 }
 
-export interface PermissionScopes {
-  user: string[];
-  employee: string[];
-  order: string[];
-  product: string[];
-}
+export type PermissionMap = Record<string, string[]>;
 
 export interface JwtClaims {
   sub: string;
@@ -25,11 +20,7 @@ export interface JwtClaims {
   iat: number;
   exp: number;
   role_id: string;
-  permission: string[];
-  permission_user?: string[] | string;
-  permission_employee?: string[] | string;
-  permission_order?: string[] | string;
-  permission_product?: string[] | string;
+  permission?: string[];
   company_id: string;
   company_name: string;
   is_admin?: string;
@@ -41,7 +32,7 @@ export interface AccessProfile {
   roleName: string;
   roleId: string;
   permissions: string[];
-  scopedPermissions: PermissionScopes;
+  scopedPermissions: PermissionMap;
 }
 
 export interface LoginCredentials {

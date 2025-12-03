@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, delay, catchError, map, finalize } from 'rxjs/operators';
-import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest, AccessProfile, JwtClaims, PermissionScopes } from '../models/auth.models';
+import { LoginCredentials, AuthResponse, User, RefreshTokenRequest, AuthenticateRequest, AccessProfile, JwtClaims, PermissionMap } from '../models/auth.models';
 import { ConfigService } from './config.service';
 
 export class AuthError extends Error {
@@ -182,7 +182,7 @@ export class AuthService {
   /**
    * Check if user has a scoped permission (e.g., user.read)
    */
-  hasScopedPermission(scope: keyof PermissionScopes, permission: string): boolean {
+  hasScopedPermission(scope: keyof PermissionMap | string, permission: string): boolean {
     const profile = this.accessProfileSubject.value;
     if (!profile) {
       return false;
@@ -195,7 +195,7 @@ export class AuthService {
   /**
    * Return normalized CRUD-style permissions for a module/scope
    */
-  getModulePermissions(scope: keyof PermissionScopes) {
+  getModulePermissions(scope: keyof PermissionMap | string) {
     const profile = this.accessProfileSubject.value;
     const scoped = profile?.scopedPermissions[scope] || [];
     const has = (perm: string) => scoped.includes(perm);
@@ -300,16 +300,19 @@ export class AuthService {
       return [];
     };
 
+    const scopedPermissions: PermissionMap = {};
+    Object.keys(claims || {})
+      .filter(key => key.startsWith('permission_'))
+      .forEach(key => {
+        const scope = key.replace('permission_', '');
+        scopedPermissions[scope] = normalize((claims as any)[key]);
+      });
+
     const accessProfile: AccessProfile = {
       roleName: (claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string) || (claims as any).role || 'User',
       roleId: claims.role_id || '',
       permissions: normalize(claims.permission),
-      scopedPermissions: {
-        user: normalize((claims as any).permission_user),
-        employee: normalize((claims as any).permission_employee ?? (claims as any).permission_user),
-        order: normalize(claims.permission_order),
-        product: normalize(claims.permission_product)
-      }
+      scopedPermissions
     };
 
     localStorage.setItem(this.ACCESS_KEY, JSON.stringify(accessProfile));
